@@ -1,65 +1,67 @@
 import CSwordBridge
 
+/// Provides access to the SWORD engine and its installed modules.
 public final class SwordLibrary {
+    /// The version of the SwordKit native bridge.
     public static let bridgeVersion = string(
         from: SwordBridgeVersion()
     )
 
+    /// The version of the linked SWORD engine.
     public static let engineVersion = string(
         from: SwordEngineVersion()
     )
 
+    /// The modules available through this SWORD installation.
     public let modules: [SwordModule]
 
+    private let storage: SwordManagerStorage?
+
+    /// Creates a library using the modules installed in the standard
+    /// SWORD module locations.
     public init() {
-        guard let manager = SwordManagerCreate() else {
-            modules = []
+        guard let storage = SwordManagerStorage() else {
+            self.storage = nil
+            self.modules = []
             return
         }
 
-        defer {
-            SwordManagerDestroy(manager)
-        }
+        self.storage = storage
 
-        let count = SwordManagerModuleCount(manager)
+        let count = SwordManagerModuleCount(storage.handle)
 
-        modules = (0..<count).map { index in
-            let name = Self.string(
-                from: SwordManagerModuleName(manager, index)
-            )
-
-            let title = Self.string(
-                from: SwordManagerModuleDescription(manager, index)
-            )
-
-            let language = Self.string(
-                from: SwordManagerModuleLanguage(manager, index)
-            )
-
-            let type = Self.string(
-                from: SwordManagerModuleType(manager, index)
-            )
+        self.modules = (0..<count).compactMap { index in
+            guard let handle = SwordManagerOpenModule(
+                storage.handle,
+                index
+            ) else {
+                return nil
+            }
 
             return SwordModule(
-                name: name,
-                title: title,
-                language: language,
-                category: .init(swordType: type)
+                storage: storage,
+                handle: handle
             )
         }
     }
 
+    /// Returns the installed module with the specified name.
+    ///
+    /// Module-name matching is case-insensitive.
     public func module(named name: String) -> SwordModule? {
         modules.first {
             $0.name.lowercased() == name.lowercased()
         }
     }
 
+    /// Returns the installed module with the specified name.
+    ///
+    /// Module-name matching is case-insensitive.
     public subscript(name: String) -> SwordModule? {
         module(named: name)
     }
 
-    private static func string(
+    internal static func string(
         from pointer: UnsafePointer<CChar>?
     ) -> String {
         guard let pointer else {

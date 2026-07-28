@@ -42,6 +42,13 @@ struct SwordManager {
     }
 };
 
+struct SwordModuleHandle {
+    sword::SWModule *module;
+
+    explicit SwordModuleHandle(sword::SWModule *module)
+        : module(module) {}
+};
+
 extern "C" {
 
 const char *SwordBridgeVersion(void) {
@@ -73,48 +80,63 @@ size_t SwordManagerModuleCount(const SwordManager *manager) {
     return manager->modules.size();
 }
 
-const char *SwordManagerModuleName(
+SwordModuleHandle *SwordManagerOpenModule(
     const SwordManager *manager,
     size_t index
 ) {
     if (manager == nullptr || index >= manager->modules.size()) {
-        return "";
+        return nullptr;
     }
 
-    return safeCString(manager->modules[index]->getName());
+    try {
+        return new SwordModuleHandle(manager->modules[index]);
+    } catch (...) {
+        return nullptr;
+    }
 }
 
-const char *SwordManagerModuleDescription(
-    const SwordManager *manager,
-    size_t index
-) {
-    if (manager == nullptr || index >= manager->modules.size()) {
-        return "";
-    }
-
-    return safeCString(manager->modules[index]->getDescription());
+void SwordModuleDestroy(SwordModuleHandle *module) {
+    delete module;
 }
 
-const char *SwordManagerModuleLanguage(
-    const SwordManager *manager,
-    size_t index
+const char *SwordModuleName(
+    const SwordModuleHandle *module
 ) {
-    if (manager == nullptr || index >= manager->modules.size()) {
+    if (module == nullptr || module->module == nullptr) {
         return "";
     }
 
-    return safeCString(manager->modules[index]->getLanguage());
+    return safeCString(module->module->getName());
 }
 
-const char *SwordManagerModuleType(
-    const SwordManager *manager,
-    size_t index
+const char *SwordModuleDescription(
+    const SwordModuleHandle *module
 ) {
-    if (manager == nullptr || index >= manager->modules.size()) {
+    if (module == nullptr || module->module == nullptr) {
         return "";
     }
 
-    return safeCString(manager->modules[index]->getType());
+    return safeCString(module->module->getDescription());
+}
+
+const char *SwordModuleLanguage(
+    const SwordModuleHandle *module
+) {
+    if (module == nullptr || module->module == nullptr) {
+        return "";
+    }
+
+    return safeCString(module->module->getLanguage());
+}
+
+const char *SwordModuleType(
+    const SwordModuleHandle *module
+) {
+    if (module == nullptr || module->module == nullptr) {
+        return "";
+    }
+
+    return safeCString(module->module->getType());
 }
 
 } // extern "C"

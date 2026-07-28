@@ -11,30 +11,34 @@ const char *SwordBridgeVersion(void);
 const char *SwordEngineVersion(void);
 
 typedef struct SwordManager SwordManager;
+typedef struct SwordModuleHandle SwordModuleHandle;
 
 SwordManager *SwordManagerCreate(void);
 void SwordManagerDestroy(SwordManager *manager);
 
 size_t SwordManagerModuleCount(const SwordManager *manager);
 
-const char *SwordManagerModuleName(
+SwordModuleHandle *SwordManagerOpenModule(
     const SwordManager *manager,
     size_t index
 );
 
-const char *SwordManagerModuleDescription(
-    const SwordManager *manager,
-    size_t index
+void SwordModuleDestroy(SwordModuleHandle *module);
+
+const char *SwordModuleName(
+    const SwordModuleHandle *module
 );
 
-const char *SwordManagerModuleLanguage(
-    const SwordManager *manager,
-    size_t index
+const char *SwordModuleDescription(
+    const SwordModuleHandle *module
 );
 
-const char *SwordManagerModuleType(
-    const SwordManager *manager,
-    size_t index
+const char *SwordModuleLanguage(
+    const SwordModuleHandle *module
+);
+
+const char *SwordModuleType(
+    const SwordModuleHandle *module
 );
 
 #ifdef __cplusplus

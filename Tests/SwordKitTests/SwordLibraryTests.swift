@@ -91,3 +91,20 @@ func knownSwordCategoriesAreMapped() {
             == .other("Custom Type")
     )
 }
+
+@Test
+func moduleKeepsNativeManagerAlive() {
+    let module: SwordModule?
+
+    do {
+        let library = SwordLibrary()
+        module = library.modules.first
+    }
+
+    guard let module else {
+        // The machine may have zero installed modules.
+        return
+    }
+
+    #expect(!module.name.isEmpty)
+}
