@@ -1,38 +1,71 @@
 import CSwordBridge
 
 public final class SwordLibrary {
-    public init() {}
+    public static let bridgeVersion = string(
+        from: SwordBridgeVersion()
+    )
 
-    public var bridgeVersion: String {
-        guard let version = SwordBridgeVersion() else {
-            return "Unknown"
+    public static let engineVersion = string(
+        from: SwordEngineVersion()
+    )
+
+    public let modules: [SwordModule]
+
+    public init() {
+        guard let manager = SwordManagerCreate() else {
+            modules = []
+            return
         }
 
-        return String(cString: version)
+        defer {
+            SwordManagerDestroy(manager)
+        }
+
+        let count = SwordManagerModuleCount(manager)
+
+        modules = (0..<count).map { index in
+            let name = Self.string(
+                from: SwordManagerModuleName(manager, index)
+            )
+
+            let title = Self.string(
+                from: SwordManagerModuleDescription(manager, index)
+            )
+
+            let language = Self.string(
+                from: SwordManagerModuleLanguage(manager, index)
+            )
+
+            let type = Self.string(
+                from: SwordManagerModuleType(manager, index)
+            )
+
+            return SwordModule(
+                name: name,
+                title: title,
+                language: language,
+                category: .init(swordType: type)
+            )
+        }
     }
 
-    public var engineVersion: String {
-        guard let version = SwordEngineVersion() else {
-            return "Unknown"
+    public func module(named name: String) -> SwordModule? {
+        modules.first {
+            $0.name.lowercased() == name.lowercased()
         }
-
-        return String(cString: version)
     }
 
-    public func moduleNames() -> [String] {
-        guard let names = SwordInstalledModuleNames() else {
-            return []
+    public subscript(name: String) -> SwordModule? {
+        module(named: name)
+    }
+
+    private static func string(
+        from pointer: UnsafePointer<CChar>?
+    ) -> String {
+        guard let pointer else {
+            return ""
         }
 
-        let value = String(cString: names)
-
-        guard !value.isEmpty else {
-            return []
-        }
-
-        return value
-            .split(separator: "\n")
-            .map(String.init)
-            .sorted()
+        return String(cString: pointer)
     }
 }
