@@ -5,5 +5,13 @@ import Testing
 func bridgeReturnsVersion() {
     let library = SwordLibrary()
 
-    #expect(library.version == "SwordKit Bridge 0.1")
+    #expect(library.bridgeVersion == "SwordKit Bridge 0.1")
+}
+
+@Test
+func swordEngineReturnsVersion() {
+    let library = SwordLibrary()
+
+    #expect(!library.engineVersion.isEmpty)
+    #expect(library.engineVersion != "Unknown")
 }
