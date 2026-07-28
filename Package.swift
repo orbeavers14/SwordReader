@@ -24,6 +24,11 @@ let package = Package(
             name: "SwordKit",
             dependencies: ["CSwordBridge"],
             path: "Sources/SwordKit"
+        ),
+        .testTarget(
+            name: "SwordKitTests",
+            dependencies: ["SwordKit"],
+            path: "Tests/SwordKitTests"
         )
     ],
     cxxLanguageStandard: .cxx17
