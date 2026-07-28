@@ -29,7 +29,8 @@ let package = Package(
   		  ]),
    		 .linkedLibrary("z"),
   		  .linkedLibrary("bz2"),
-  		  .linkedLibrary("lzma")
+  		  .linkedLibrary("lzma"),
+		.linkedLibrary("curl")
 	]
     ),
     .target(

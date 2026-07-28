@@ -13,6 +13,7 @@ DerivedData/
 # Xcode
 DerivedData/
 .build/
+Vendor/libsword/build/
 .swiftpm/
 *.xcodeproj/xcuserdata/
 *.xcworkspace/xcuserdata/
