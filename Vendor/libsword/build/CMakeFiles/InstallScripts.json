@@ -1,9 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/Users/codygerig/sword/build/cmake_install.cmake",
-		"/Users/codygerig/sword/build/utilities/cmake_install.cmake",
-		"/Users/codygerig/sword/build/utilities/diatheke/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
