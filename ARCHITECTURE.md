@@ -209,54 +209,6 @@ The exact public API may evolve while this phase is implemented and tested.
 
 ## Roadmap
 
-### Completed
+## Roadmap
 
-* Reproducible native build
-* Static linking
-* Swift-to-C-to-C++ bridge
-* Engine and bridge versions
-* Installed-module discovery
-* Swift module metadata model
-* Module lookup
-
-### Next: verse retrieval
-
-* Native module-session handle
-* Module opening
-* Reference assignment
-* Plain-text rendering
-* Swift error handling
-* Verse result model
-* Integration tests
-
-### Chapters and books
-
-* Chapter retrieval
-* Verse iteration
-* Book enumeration
-* Testament and canon metadata
-
-### Search
-
-* Word search
-* Phrase search
-* Search scopes
-* Search result models
-* Cancellation and progress reporting
-
-### Module management
-
-* Repository discovery
-* Module installation
-* Module updates
-* Module removal
-* Configuration paths
-
-### Advanced features
-
-* SWORD filters
-* Strong's numbers and morphology
-* Footnotes and cross-references
-* Async APIs
-* Caching
-* SwiftUI-oriented helpers
+See [Docs/ROADMAP.md](Docs/ROADMAP.md) for planned milestones.

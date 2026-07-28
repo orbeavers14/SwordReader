@@ -5,8 +5,7 @@ import PackageDescription
 let package = Package(
     name: "SwordKit",
     platforms: [
-        .macOS(.v14),
-        .iOS(.v17)
+        .macOS(.v14)
     ],
     products: [
         .library(
@@ -15,34 +14,34 @@ let package = Package(
         )
     ],
     targets: [
-    .target(
-        name: "CSwordBridge",
-        path: "Sources/CSwordBridge",
-        publicHeadersPath: "include",
-        cxxSettings: [
-            .headerSearchPath("../../Vendor/libsword/include")
-        ],
-      	 linkerSettings: [
-    		.unsafeFlags([
-       			 "-LVendor/libsword/build",
-       			 "-lsword"
-  		  ]),
-   		 .linkedLibrary("z"),
-  		  .linkedLibrary("bz2"),
-  		  .linkedLibrary("lzma"),
-		.linkedLibrary("curl")
-	]
-    ),
-    .target(
-        name: "SwordKit",
-        dependencies: ["CSwordBridge"],
-        path: "Sources/SwordKit"
-    ),
-    .testTarget(
-        name: "SwordKitTests",
-        dependencies: ["SwordKit"],
-        path: "Tests/SwordKitTests"
-    )
-],
+        .target(
+            name: "CSwordBridge",
+            path: "Sources/CSwordBridge",
+            publicHeadersPath: "include",
+            cxxSettings: [
+                .headerSearchPath("../../Vendor/libsword/include")
+            ],
+            linkerSettings: [
+                .unsafeFlags([
+                    "-LVendor/libsword/build",
+                    "-lsword"
+                ]),
+                .linkedLibrary("z"),
+                .linkedLibrary("bz2"),
+                .linkedLibrary("lzma"),
+                .linkedLibrary("curl")
+            ]
+        ),
+        .target(
+            name: "SwordKit",
+            dependencies: ["CSwordBridge"],
+            path: "Sources/SwordKit"
+        ),
+        .testTarget(
+            name: "SwordKitTests",
+            dependencies: ["SwordKit"],
+            path: "Tests/SwordKitTests"
+        )
+    ],
     cxxLanguageStandard: .cxx17
 )

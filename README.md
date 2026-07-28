@@ -1,27 +1,39 @@
 # SwordKit
 
-SwordKit is a modern Swift framework for building offline Bible applications on Apple platforms.
+SwordKit is an experimental Swift interface to the CrossWire SWORD engine.
 
-## Goals
+It provides an idiomatic Swift API while hiding the underlying SWORD C++ implementation behind a small C-compatible bridge.
 
-- Native Swift API
-- SwiftUI-first
-- Offline Bible study
-- Fast search
-- Parallel translations
-- Notes, bookmarks, and highlights
-- Cross-platform (macOS, iOS, iPadOS)
+## Current features
 
-## Architecture
+- Swift Package Manager library
+- Reproducible static SWORD build
+- Thin C bridge over the SWORD C++ API
+- SWORD engine and bridge version reporting
+- Installed-module discovery
+- Swift module metadata
+- Case-insensitive module lookup
 
-```
-SwiftUI App
-        ↓
-SwordKit
-        ↓
-CSwordBridge
-        ↓
-libsword
-```
+## Planned features
 
-The SWORD engine is vendored in `Vendor/libsword` and treated as a third-party dependency.
+- Verse retrieval
+- Chapter and book iteration
+- Search
+- Module installation and management
+- iOS support
+
+See [Docs/ROADMAP.md](Docs/ROADMAP.md) for planned milestones.
+
+## Requirements
+
+- macOS 14 or later
+- Swift 6
+- Xcode
+- CMake
+
+## Building
+
+Build the vendored SWORD library:
+
+```bash
+./Scripts/build-libsword.sh
