@@ -7,6 +7,7 @@ extern "C" {
 
 const char *SwordBridgeVersion(void);
 const char *SwordEngineVersion(void);
+const char *SwordInstalledModuleNames(void);
 
 #ifdef __cplusplus
 }

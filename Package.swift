@@ -22,12 +22,15 @@ let package = Package(
         cxxSettings: [
             .headerSearchPath("../../Vendor/libsword/include")
         ],
-        linkerSettings: [
-            .unsafeFlags([
-                "-LVendor/libsword/build",
-                "-lsword"
-            ])
-        ]
+      	 linkerSettings: [
+    		.unsafeFlags([
+       			 "-LVendor/libsword/build",
+       			 "-lsword"
+  		  ]),
+   		 .linkedLibrary("z"),
+  		  .linkedLibrary("bz2"),
+  		  .linkedLibrary("lzma")
+	]
     ),
     .target(
         name: "SwordKit",

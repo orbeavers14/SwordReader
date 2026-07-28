@@ -15,3 +15,12 @@ func swordEngineReturnsVersion() {
     #expect(!library.engineVersion.isEmpty)
     #expect(library.engineVersion != "Unknown")
 }
+
+@Test
+func libraryListsInstalledModules() {
+    let library = SwordLibrary()
+    let moduleNames = library.moduleNames()
+
+    print("Installed SWORD modules: \(moduleNames)")
+    #expect(moduleNames == moduleNames.sorted())
+}
