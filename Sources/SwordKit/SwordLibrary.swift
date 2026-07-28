@@ -1,9 +1,13 @@
-public final class SwordLibrary {
+import CSwordBridge
 
-    public init() {
-    }
+public final class SwordLibrary {
+    public init() {}
 
     public var version: String {
-        "SwordKit 0.1"
+        guard let version = SwordBridgeVersion() else {
+            return "Unknown"
+        }
+
+        return String(cString: version)
     }
 }
