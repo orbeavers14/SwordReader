@@ -46,6 +46,69 @@ public final class SwordModule: Hashable {
         self.category = Category(swordType: type)
     }
 
+    /// Retrieves a verse from this module.
+    ///
+    /// - Parameter reference: A Scripture reference such as
+    ///   `"John 3:16"`.
+    /// - Returns: The verse and its SWORD-normalized reference.
+    /// - Throws: A ``SwordError`` when the reference is invalid,
+    ///   unavailable, or incompatible with the module.
+    public func verse(
+        _ reference: SwordReference
+    ) throws -> SwordVerse {
+        guard category == .bible else {
+            throw SwordError.unsupportedModuleType
+        }
+
+        let status = reference.value.withCString {
+            SwordModuleSetKey(handle, $0)
+        }
+
+        guard status == 0 else {
+            throw SwordError.referenceNotFound(reference.value)
+        }
+
+        let resolvedValue = SwordLibrary.string(
+            from: SwordModuleCurrentKey(handle)
+        )
+
+        guard !resolvedValue.isEmpty else {
+            throw SwordError.missingResolvedReference
+        }
+
+        let resolvedReference = try SwordReference(resolvedValue)
+
+        let text = SwordLibrary.string(
+            from: SwordModuleRenderText(handle)
+        )
+
+        guard !text.isEmpty else {
+            throw SwordError.emptyRenderedText(
+                reference: resolvedReference.value
+            )
+        }
+
+        return SwordVerse(
+            reference: resolvedReference,
+            moduleName: name,
+            text: text
+        )
+    }
+
+    /// Retrieves a verse using a textual reference.
+    ///
+    /// This convenience overload creates a ``SwordReference`` before
+    /// performing the lookup.
+    ///
+    /// - Parameter reference: A reference such as `"John 3:16"`.
+    /// - Returns: The retrieved verse.
+    /// - Throws: A ``SwordError`` when the reference cannot be retrieved.
+    public func verse(
+        _ reference: String
+    ) throws -> SwordVerse {
+        try verse(SwordReference(reference))
+    }
+    
     deinit {
         SwordModuleDestroy(handle)
     }

@@ -108,3 +108,66 @@ func moduleKeepsNativeManagerAlive() {
 
     #expect(!module.name.isEmpty)
 }
+
+@Test
+func referenceTrimsWhitespace() throws {
+    let reference = try SwordReference("  John 3:16  ")
+
+    #expect(reference.value == "John 3:16")
+    #expect(reference.description == "John 3:16")
+}
+
+@Test
+func emptyReferenceThrows() {
+    #expect(throws: SwordError.emptyReference) {
+        _ = try SwordReference("   \n   ")
+    }
+}
+
+@Test
+func verseStoresRetrievedValues() throws {
+    let reference = try SwordReference("John 3:16")
+
+    let verse = SwordVerse(
+        reference: reference,
+        moduleName: "KJV",
+        text: "Test verse text"
+    )
+
+    #expect(verse.reference == reference)
+    #expect(verse.moduleName == "KJV")
+    #expect(verse.text == "Test verse text")
+}
+
+@Test
+func bibleModuleCanRetrieveVerse() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: { $0.category == .bible }
+    ) else {
+        // Integration testing requires an installed Bible module.
+        return
+    }
+
+    let verse = try bible.verse("John 3:16")
+
+    #expect(!verse.text.isEmpty)
+    #expect(!verse.reference.value.isEmpty)
+    #expect(verse.moduleName == bible.name)
+}
+
+@Test
+func verseLookupRejectsNonBibleModule() {
+    let library = SwordLibrary()
+
+    guard let module = library.modules.first(
+        where: { $0.category != .bible }
+    ) else {
+        return
+    }
+
+    #expect(throws: SwordError.unsupportedModuleType) {
+        _ = try module.verse("John 3:16")
+    }
+}

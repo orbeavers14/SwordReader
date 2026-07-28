@@ -44,6 +44,8 @@ struct SwordManager {
 
 struct SwordModuleHandle {
     sword::SWModule *module;
+    std::string currentKey;
+    std::string renderedText;
 
     explicit SwordModuleHandle(sword::SWModule *module)
         : module(module) {}
@@ -137,6 +139,73 @@ const char *SwordModuleType(
     }
 
     return safeCString(module->module->getType());
+}
+
+int SwordModuleSetKey(
+    SwordModuleHandle *module,
+    const char *reference
+) {
+    if (
+        module == nullptr
+        || module->module == nullptr
+        || reference == nullptr
+        || reference[0] == '\0'
+    ) {
+        return -1;
+    }
+
+    try {
+        const char status = module->module->setKey(reference);
+
+        module->currentKey = safeCString(
+            module->module->getKeyText()
+        );
+
+        module->renderedText.clear();
+
+        return static_cast<int>(status);
+    } catch (...) {
+        module->currentKey.clear();
+        module->renderedText.clear();
+        return -1;
+    }
+}
+
+const char *SwordModuleCurrentKey(
+    SwordModuleHandle *module
+) {
+    if (module == nullptr || module->module == nullptr) {
+        return "";
+    }
+
+    try {
+        module->currentKey = safeCString(
+            module->module->getKeyText()
+        );
+
+        return module->currentKey.c_str();
+    } catch (...) {
+        module->currentKey.clear();
+        return "";
+    }
+}
+
+const char *SwordModuleRenderText(
+    SwordModuleHandle *module
+                                  ) {
+    if (module == nullptr || module->module == nullptr) {
+        return "";
+    }
+    
+    try {
+        module->renderedText =
+        module->module->renderText().c_str();
+        
+        return module->renderedText.c_str();
+    } catch (...) {
+        module->renderedText.clear();
+        return "";
+    }
 }
 
 } // extern "C"

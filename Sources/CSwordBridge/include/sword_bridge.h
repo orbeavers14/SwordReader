@@ -41,6 +41,19 @@ const char *SwordModuleType(
     const SwordModuleHandle *module
 );
 
+int SwordModuleSetKey(
+    SwordModuleHandle *module,
+    const char *reference
+);
+
+const char *SwordModuleCurrentKey(
+    SwordModuleHandle *module
+);
+
+const char *SwordModuleRenderText(
+    SwordModuleHandle *module
+);
+
 #ifdef __cplusplus
 }
 #endif
