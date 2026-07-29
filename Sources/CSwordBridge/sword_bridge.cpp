@@ -208,4 +208,42 @@ const char *SwordModuleRenderText(
     }
 }
 
+void SwordModuleIncrement(
+    SwordModuleHandle *module
+) {
+    if (module == nullptr || module->module == nullptr) {
+        return;
+    }
+
+    try {
+        module->module->increment();
+
+        module->currentKey =
+            safeCString(module->module->getKeyText());
+
+        module->renderedText.clear();
+    }
+    catch (...) {
+    }
+}
+
+void SwordModuleDecrement(
+    SwordModuleHandle *module
+) {
+    if (module == nullptr || module->module == nullptr) {
+        return;
+    }
+
+    try {
+        module->module->decrement();
+
+        module->currentKey =
+            safeCString(module->module->getKeyText());
+
+        module->renderedText.clear();
+    }
+    catch (...) {
+    }
+}
+
 } // extern "C"

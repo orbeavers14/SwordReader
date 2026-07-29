@@ -25,6 +25,14 @@ SwordModuleHandle *SwordManagerOpenModule(
 
 void SwordModuleDestroy(SwordModuleHandle *module);
 
+void SwordModuleIncrement(
+    SwordModuleHandle *module
+);
+
+void SwordModuleDecrement(
+    SwordModuleHandle *module
+);
+
 const char *SwordModuleName(
     const SwordModuleHandle *module
 );

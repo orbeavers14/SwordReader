@@ -14,4 +14,7 @@ public enum SwordError: Error, Equatable, Sendable {
 
     /// SWORD returned no rendered content for the requested reference.
     case emptyRenderedText(reference: String)
+    
+    case invalidVerseCount(Int)
+    
 }

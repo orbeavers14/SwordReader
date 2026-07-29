@@ -7,45 +7,45 @@ import CSwordBridge
 public final class SwordModule: Hashable {
     /// The module's internal SWORD identifier.
     public let name: String
-
+    
     /// The human-readable module title or description.
     public let title: String
-
+    
     /// The module's language code.
     public let language: String
-
+    
     /// The general type of content contained in the module.
     public let category: Category
-
+    
     private let storage: SwordManagerStorage
     internal let handle: OpaquePointer
-
+    
     internal init(
         storage: SwordManagerStorage,
         handle: OpaquePointer
     ) {
         self.storage = storage
         self.handle = handle
-
+        
         self.name = SwordLibrary.string(
             from: SwordModuleName(handle)
         )
-
+        
         self.title = SwordLibrary.string(
             from: SwordModuleDescription(handle)
         )
-
+        
         self.language = SwordLibrary.string(
             from: SwordModuleLanguage(handle)
         )
-
+        
         let type = SwordLibrary.string(
             from: SwordModuleType(handle)
         )
-
+        
         self.category = Category(swordType: type)
     }
-
+    
     /// Retrieves a verse from this module.
     ///
     /// - Parameter reference: A Scripture reference such as
@@ -59,42 +59,42 @@ public final class SwordModule: Hashable {
         guard category == .bible else {
             throw SwordError.unsupportedModuleType
         }
-
+        
         let status = reference.value.withCString {
             SwordModuleSetKey(handle, $0)
         }
-
+        
         guard status == 0 else {
             throw SwordError.referenceNotFound(reference.value)
         }
-
+        
         let resolvedValue = SwordLibrary.string(
             from: SwordModuleCurrentKey(handle)
         )
-
+        
         guard !resolvedValue.isEmpty else {
             throw SwordError.missingResolvedReference
         }
-
+        
         let resolvedReference = try SwordReference(resolvedValue)
-
+        
         let text = SwordLibrary.string(
             from: SwordModuleRenderText(handle)
         )
-
+        
         guard !text.isEmpty else {
             throw SwordError.emptyRenderedText(
                 reference: resolvedReference.value
             )
         }
-
+        
         return SwordVerse(
             reference: resolvedReference,
             moduleName: name,
             text: text
         )
     }
-
+    
     /// Retrieves a verse using a textual reference.
     ///
     /// This convenience overload creates a ``SwordReference`` before
@@ -112,16 +112,74 @@ public final class SwordModule: Hashable {
     deinit {
         SwordModuleDestroy(handle)
     }
-
+    
     public static func == (
         lhs: SwordModule,
         rhs: SwordModule
     ) -> Bool {
         lhs === rhs
     }
-
+    
     public func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(self))
+    }
+    
+    /// Retrieves a sequential passage beginning at the supplied reference.
+    ///
+    /// - Parameters:
+    ///   - reference: The first verse in the passage.
+    ///   - verseCount: The number of verses to retrieve.
+    /// - Returns: A sequential collection of verses.
+    /// - Throws: A ``SwordError`` when the request cannot be completed.
+    public func passage(
+        startingAt reference: SwordReference,
+        verseCount: Int
+    ) throws -> SwordPassage {
+        guard category == .bible else {
+            throw SwordError.unsupportedModuleType
+        }
+        
+        guard verseCount > 0 else {
+            throw SwordError.invalidVerseCount(verseCount)
+        }
+        
+        let firstVerse = try verse(reference)
+        
+        var verses = [firstVerse]
+        verses.reserveCapacity(verseCount)
+        
+        while verses.count < verseCount {
+            let previousReference = currentReference
+            
+            advance()
+            
+            guard let nextVerse = currentVerse else {
+                break
+            }
+            
+            guard nextVerse.reference != previousReference else {
+                break
+            }
+            
+            verses.append(nextVerse)
+        }
+        
+        return SwordPassage(
+            reference: firstVerse.reference,
+            moduleName: name,
+            verses: verses
+        )
+    }
+    
+    /// Retrieves a sequential passage using a textual starting reference.
+    public func passage(
+        startingAt reference: String,
+        verseCount: Int
+    ) throws -> SwordPassage {
+        try passage(
+            startingAt: SwordReference(reference),
+            verseCount: verseCount
+        )
     }
 }
 
@@ -161,5 +219,47 @@ public extension SwordModule {
                 self = .other(swordType)
             }
         }
+    }
+}
+
+extension SwordModule {
+    internal func advance() {
+        SwordModuleIncrement(handle)
+    }
+
+    internal func retreat() {
+        SwordModuleDecrement(handle)
+    }
+
+    internal var currentReference: SwordReference? {
+        let text = SwordLibrary.string(
+            from: SwordModuleCurrentKey(handle)
+        )
+
+        return try? SwordReference(text)
+    }
+
+    internal var currentText: String {
+        SwordLibrary.string(
+            from: SwordModuleRenderText(handle)
+        )
+    }
+    
+    internal var currentVerse: SwordVerse? {
+        guard let reference = currentReference else {
+            return nil
+        }
+
+        let text = currentText
+
+        guard !text.isEmpty else {
+            return nil
+        }
+
+        return SwordVerse(
+            reference: reference,
+            moduleName: name,
+            text: text
+        )
     }
 }

@@ -171,3 +171,66 @@ func verseLookupRejectsNonBibleModule() {
         _ = try module.verse("John 3:16")
     }
 }
+
+@Test
+func moduleCanAdvanceToNextVerse() throws {
+
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: { $0.category == .bible }
+    ) else {
+        return
+    }
+
+    _ = try bible.verse("John 3:16")
+
+    let first = bible.currentReference
+
+    bible.advance()
+
+    let second = bible.currentReference
+
+    #expect(first != nil)
+    #expect(second != nil)
+    #expect(first != second)
+}
+
+@Test
+func moduleCanRetrieveSequentialPassage() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: { $0.category == .bible }
+    ) else {
+        return
+    }
+
+    let passage = try bible.passage(
+        startingAt: "John 3:16",
+        verseCount: 3
+    )
+
+    #expect(passage.verses.count == 3)
+    #expect(passage.verses[0].reference.value == "John 3:16")
+    #expect(passage.verses[1].reference.value == "John 3:17")
+    #expect(passage.verses[2].reference.value == "John 3:18")
+}
+
+@Test
+func passageRejectsInvalidVerseCount() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: { $0.category == .bible }
+    ) else {
+        return
+    }
+
+    #expect(throws: SwordError.self) {
+        try bible.passage(
+            startingAt: "John 3:16",
+            verseCount: 0
+        )
+    }
+}
