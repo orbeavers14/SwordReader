@@ -133,10 +133,12 @@ public final class SwordModule: Hashable {
     /// - Parameters:
     ///   - query: The nonempty text to find.
     ///   - type: The matching strategy. The default is exact phrase search.
+    ///   - caseSensitive: Whether letter case must match. The default is `true`.
     /// - Returns: Matching verses in the order returned by SWORD.
     public func search(
         _ query: String,
-        type: SwordSearchType = .phrase
+        type: SwordSearchType = .phrase,
+        caseSensitive: Bool = true
     ) throws -> [SwordSearchResult] {
         guard category == .bible else {
             throw SwordError.unsupportedModuleType
@@ -160,7 +162,8 @@ public final class SwordModule: Hashable {
             SwordModuleSearchCount(
                 handle,
                 pointer,
-                type.bridgeValue
+                type.bridgeValue,
+                caseSensitive ? 1 : 0
             )
         }
 

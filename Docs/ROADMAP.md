@@ -81,6 +81,7 @@ try bible.references(
 - [x] Basic phrase search
 - [x] Multi-word search
 - [x] Regular-expression search
+- [x] Case-insensitive search
 - [x] Swift-native `SwordSearchType`
 - [x] Immutable `SwordSearchResult` values
 - [x] SWORD relevance scores
@@ -95,19 +96,19 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Case-Insensitive Search
+## Strong's Number Search
 
 Goal:
 
 ```swift
 let results = try bible.search(
-    "grace",
-    caseSensitive: false
+    "G5485",
+    type: .strongs
 )
 ```
 
-The next search milestone will add a Swift-native case-sensitivity option
-across phrase, multi-word, and regular-expression searches.
+The next search milestone will expose searches over SWORD's Strong's-number
+entry attributes.
 
 ---
 
@@ -128,7 +129,6 @@ let results = try bible.search(
 
 Planned:
 
-- [ ] Case-insensitive search
 - [ ] Strong's search
 - [ ] Morphology search
 - [ ] Scoped search

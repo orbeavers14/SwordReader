@@ -549,3 +549,28 @@ func bibleModuleCanSearchWithRegularExpression() throws {
         }
     )
 }
+
+@Test
+func bibleModuleCanSearchIgnoringCase() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: {
+            $0.category == .bible
+                && $0.language.lowercased().hasPrefix("en")
+        }
+    ) else {
+        return
+    }
+
+    let results = try bible.search(
+        "jEsUs WePt",
+        caseSensitive: false
+    )
+
+    #expect(
+        results.contains {
+            $0.reference.value == "John 11:35"
+        }
+    )
+}

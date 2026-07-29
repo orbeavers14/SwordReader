@@ -79,7 +79,8 @@ void SwordModuleClearParsedReferences(
 size_t SwordModuleSearchCount(
     SwordModuleHandle *module,
     const char *query,
-    int searchType
+    int searchType,
+    int caseSensitive
 );
 
 const char *SwordModuleSearchResultReference(

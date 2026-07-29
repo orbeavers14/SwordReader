@@ -1,6 +1,7 @@
 #include "sword_bridge.h"
 
 #include <algorithm>
+#include <regex.h>
 #include <string>
 #include <vector>
 
@@ -159,7 +160,8 @@ void SwordModuleClearParsedReferences(
 size_t SwordModuleSearchCount(
     SwordModuleHandle *module,
     const char *query,
-    int searchType
+    int searchType,
+    int caseSensitive
 ) {
     if (
         module == nullptr
@@ -171,6 +173,7 @@ size_t SwordModuleSearchCount(
             && searchType != sword::SWModule::SEARCHTYPE_MULTIWORD
             && searchType != sword::SWModule::SEARCHTYPE_REGEX
         )
+        || (caseSensitive != 0 && caseSensitive != 1)
     ) {
         return 0;
     }
@@ -182,7 +185,8 @@ size_t SwordModuleSearchCount(
     try {
         sword::ListKey results = module->module->search(
             query,
-            searchType
+            searchType,
+            caseSensitive ? 0 : REG_ICASE
         );
 
         const int count = results.getCount();
