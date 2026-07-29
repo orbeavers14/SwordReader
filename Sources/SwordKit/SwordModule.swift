@@ -128,12 +128,15 @@ public final class SwordModule: Hashable {
         )
     }
 
-    /// Searches a Bible module for an exact phrase.
+    /// Searches a Bible module for matching entries.
     ///
-    /// - Parameter query: The nonempty phrase to find.
+    /// - Parameters:
+    ///   - query: The nonempty text to find.
+    ///   - type: The matching strategy. The default is exact phrase search.
     /// - Returns: Matching verses in the order returned by SWORD.
     public func search(
-        _ query: String
+        _ query: String,
+        type: SwordSearchType = .phrase
     ) throws -> [SwordSearchResult] {
         guard category == .bible else {
             throw SwordError.unsupportedModuleType
@@ -154,7 +157,11 @@ public final class SwordModule: Hashable {
         }
 
         let count = trimmedQuery.withCString { pointer in
-            SwordModuleSearchCount(handle, pointer)
+            SwordModuleSearchCount(
+                handle,
+                pointer,
+                type.bridgeValue
+            )
         }
 
         var results: [SwordSearchResult] = []

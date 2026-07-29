@@ -158,13 +158,18 @@ void SwordModuleClearParsedReferences(
 
 size_t SwordModuleSearchCount(
     SwordModuleHandle *module,
-    const char *query
+    const char *query,
+    int searchType
 ) {
     if (
         module == nullptr
         || module->module == nullptr
         || query == nullptr
         || query[0] == '\0'
+        || (
+            searchType != sword::SWModule::SEARCHTYPE_PHRASE
+            && searchType != sword::SWModule::SEARCHTYPE_MULTIWORD
+        )
     ) {
         return 0;
     }
@@ -176,7 +181,7 @@ size_t SwordModuleSearchCount(
     try {
         sword::ListKey results = module->module->search(
             query,
-            sword::SWModule::SEARCHTYPE_PHRASE
+            searchType
         );
 
         const int count = results.getCount();

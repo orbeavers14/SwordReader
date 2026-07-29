@@ -79,6 +79,8 @@ try bible.references(
 ## Search
 
 - [x] Basic phrase search
+- [x] Multi-word search
+- [x] Swift-native `SwordSearchType`
 - [x] Immutable `SwordSearchResult` values
 - [x] SWORD relevance scores
 
@@ -92,19 +94,19 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Multi-Word Search
+## Regular Expression Search
 
 Goal:
 
 ```swift
 let results = try bible.search(
-    "faith hope love",
-    type: .multiWord
+    "faith|hope|love",
+    type: .regularExpression
 )
 ```
 
-The next search milestone will introduce a Swift-native search type while
-continuing to keep SWORD search keys and ownership inside the C bridge.
+The next search milestone will expose SWORD's regular-expression search
+through the existing Swift-native search type.
 
 ---
 
@@ -123,9 +125,8 @@ let results = try bible.search(
 )
 ```
 
-Planned after basic phrase search:
+Planned:
 
-- [ ] Multi-word search
 - [ ] Regex search
 - [ ] Strong's search
 - [ ] Morphology search

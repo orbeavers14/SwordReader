@@ -499,3 +499,28 @@ func searchRejectsEmptyQuery() throws {
         try bible.search("   ")
     }
 }
+
+@Test
+func bibleModuleCanSearchForMultipleWords() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: {
+            $0.category == .bible
+                && $0.language.lowercased().hasPrefix("en")
+        }
+    ) else {
+        return
+    }
+
+    let results = try bible.search(
+        "Jesus Lazarus",
+        type: .multiWord
+    )
+
+    #expect(
+        results.contains {
+            $0.reference.value == "John 11:14"
+        }
+    )
+}
