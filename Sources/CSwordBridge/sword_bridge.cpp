@@ -53,6 +53,10 @@ struct SwordModuleHandle {
     std::vector<std::string> parsedReferences;
     std::string parsedReferenceBuffer;
 
+    std::vector<std::string> searchResultReferences;
+    std::vector<long> searchResultScores;
+    std::string searchResultReferenceBuffer;
+
     explicit SwordModuleHandle(sword::SWModule *module)
         : module(module) {}
 };
@@ -150,6 +154,118 @@ void SwordModuleClearParsedReferences(
 
     module->parsedReferences.clear();
     module->parsedReferenceBuffer.clear();
+}
+
+size_t SwordModuleSearchCount(
+    SwordModuleHandle *module,
+    const char *query
+) {
+    if (
+        module == nullptr
+        || module->module == nullptr
+        || query == nullptr
+        || query[0] == '\0'
+    ) {
+        return 0;
+    }
+
+    module->searchResultReferences.clear();
+    module->searchResultScores.clear();
+    module->searchResultReferenceBuffer.clear();
+
+    try {
+        sword::ListKey results = module->module->search(
+            query,
+            sword::SWModule::SEARCHTYPE_PHRASE
+        );
+
+        const int count = results.getCount();
+
+        if (count <= 0) {
+            return 0;
+        }
+
+        module->searchResultReferences.reserve(
+            static_cast<size_t>(count)
+        );
+        module->searchResultScores.reserve(
+            static_cast<size_t>(count)
+        );
+
+        for (int index = 0; index < count; ++index) {
+            const sword::SWKey *key = results.getElement(index);
+
+            if (key == nullptr) {
+                continue;
+            }
+
+            const char *reference = key->getText();
+
+            if (reference == nullptr || reference[0] == '\0') {
+                continue;
+            }
+
+            module->searchResultReferences.emplace_back(reference);
+            module->searchResultScores.push_back(
+                static_cast<long>(key->userData)
+            );
+        }
+
+        return module->searchResultReferences.size();
+    } catch (...) {
+        module->searchResultReferences.clear();
+        module->searchResultScores.clear();
+        module->searchResultReferenceBuffer.clear();
+        return 0;
+    }
+}
+
+const char *SwordModuleSearchResultReference(
+    SwordModuleHandle *module,
+    size_t index
+) {
+    if (
+        module == nullptr
+        || index >= module->searchResultReferences.size()
+    ) {
+        return "";
+    }
+
+    try {
+        module->searchResultReferenceBuffer =
+            module->searchResultReferences[index];
+
+        return module->searchResultReferenceBuffer.c_str();
+    } catch (...) {
+        module->searchResultReferenceBuffer.clear();
+        return "";
+    }
+}
+
+long SwordModuleSearchResultScore(
+    const SwordModuleHandle *module,
+    size_t index
+) {
+    if (
+        module == nullptr
+        || index >= module->searchResultScores.size()
+    ) {
+        return 0;
+    }
+
+    return module->searchResultScores[index];
+}
+
+void SwordModuleClearSearchResults(
+    SwordModuleHandle *module
+) {
+    if (module == nullptr) {
+        return;
+    }
+
+    module->searchResultReferences.clear();
+    module->searchResultScores.clear();
+    module->searchResultReferenceBuffer.clear();
 }
 
 const char *SwordBridgeVersion(void) {

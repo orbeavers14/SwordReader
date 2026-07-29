@@ -76,18 +76,35 @@ try bible.references(
 
 ---
 
-# Next Milestone
+## Search
 
-## Basic Phrase Search
+- [x] Basic phrase search
+- [x] Immutable `SwordSearchResult` values
+- [x] SWORD relevance scores
 
-Goal:
+Example:
 
 ```swift
 let results = try bible.search("grace")
 ```
 
-The first search milestone will return immutable Swift values while keeping
-SWORD search keys and ownership inside the C bridge.
+---
+
+# Next Milestone
+
+## Multi-Word Search
+
+Goal:
+
+```swift
+let results = try bible.search(
+    "faith hope love",
+    type: .multiWord
+)
+```
+
+The next search milestone will introduce a Swift-native search type while
+continuing to keep SWORD search keys and ownership inside the C bridge.
 
 ---
 

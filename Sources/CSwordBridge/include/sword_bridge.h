@@ -76,6 +76,25 @@ void SwordModuleClearParsedReferences(
     SwordModuleHandle *module
 );
 
+size_t SwordModuleSearchCount(
+    SwordModuleHandle *module,
+    const char *query
+);
+
+const char *SwordModuleSearchResultReference(
+    SwordModuleHandle *module,
+    size_t index
+);
+
+long SwordModuleSearchResultScore(
+    const SwordModuleHandle *module,
+    size_t index
+);
+
+void SwordModuleClearSearchResults(
+    SwordModuleHandle *module
+);
+
 #ifdef __cplusplus
 }
 #endif

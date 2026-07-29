@@ -445,3 +445,57 @@ func moduleCanRetrieveCrossBookChapters() throws {
     #expect(verses[25].reference.value == "Acts 1:1")
     #expect(verses.last?.reference.value == "Acts 1:26")
 }
+
+@Test
+func searchResultStoresRetrievedValues() throws {
+    let result = SwordSearchResult(
+        reference: try SwordReference("John 11:35"),
+        moduleName: "KJV",
+        text: "Jesus wept.",
+        score: 42
+    )
+
+    #expect(result.reference.value == "John 11:35")
+    #expect(result.moduleName == "KJV")
+    #expect(result.text == "Jesus wept.")
+    #expect(result.score == 42)
+}
+
+@Test
+func bibleModuleCanSearchForPhrase() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: {
+            $0.category == .bible
+                && $0.language.lowercased().hasPrefix("en")
+        }
+    ) else {
+        return
+    }
+
+    let results = try bible.search("Jesus wept")
+
+    let result = results.first {
+        $0.reference.value == "John 11:35"
+    }
+
+    #expect(result != nil)
+    #expect(result?.moduleName == bible.name)
+    #expect(result?.text.isEmpty == false)
+}
+
+@Test
+func searchRejectsEmptyQuery() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: { $0.category == .bible }
+    ) else {
+        return
+    }
+
+    #expect(throws: SwordError.invalidSearchQuery("   ")) {
+        try bible.search("   ")
+    }
+}

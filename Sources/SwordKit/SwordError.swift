@@ -27,5 +27,8 @@ public enum SwordError: Error, Equatable, Sendable {
     case invalidChapterReference(String)
     
     case invalidReferenceList(String)
+
+    /// A search query contained no non-whitespace characters.
+    case invalidSearchQuery(String)
     
 }

@@ -127,6 +127,72 @@ public final class SwordModule: Hashable {
             in: references(in: expression)
         )
     }
+
+    /// Searches a Bible module for an exact phrase.
+    ///
+    /// - Parameter query: The nonempty phrase to find.
+    /// - Returns: Matching verses in the order returned by SWORD.
+    public func search(
+        _ query: String
+    ) throws -> [SwordSearchResult] {
+        guard category == .bible else {
+            throw SwordError.unsupportedModuleType
+        }
+
+        let trimmedQuery = query.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+
+        guard !trimmedQuery.isEmpty else {
+            throw SwordError.invalidSearchQuery(query)
+        }
+
+        SwordModuleClearSearchResults(handle)
+
+        defer {
+            SwordModuleClearSearchResults(handle)
+        }
+
+        let count = trimmedQuery.withCString { pointer in
+            SwordModuleSearchCount(handle, pointer)
+        }
+
+        var results: [SwordSearchResult] = []
+        results.reserveCapacity(count)
+
+        for index in 0..<count {
+            guard let pointer = SwordModuleSearchResultReference(
+                handle,
+                index
+            ) else {
+                continue
+            }
+
+            let value = String(cString: pointer)
+
+            guard !value.isEmpty else {
+                continue
+            }
+
+            let verse = try verse(SwordReference(value))
+
+            results.append(
+                SwordSearchResult(
+                    reference: verse.reference,
+                    moduleName: verse.moduleName,
+                    text: verse.text,
+                    score: Int(
+                        SwordModuleSearchResultScore(
+                            handle,
+                            index
+                        )
+                    )
+                )
+            )
+        }
+
+        return results
+    }
     
     /// Retrieves a complete chapter from a Bible module.
     public func chapter(
