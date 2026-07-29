@@ -8,6 +8,9 @@
 #include <swmodule.h>
 #include <swversion.h>
 
+#include <listkey.h>
+#include <versekey.h>
+
 namespace {
 
 const char *safeCString(const char *value) {
@@ -46,12 +49,108 @@ struct SwordModuleHandle {
     sword::SWModule *module;
     std::string currentKey;
     std::string renderedText;
+    
+    std::vector<std::string> parsedReferences;
+    std::string parsedReferenceBuffer;
 
     explicit SwordModuleHandle(sword::SWModule *module)
         : module(module) {}
 };
 
 extern "C" {
+
+size_t SwordModuleParseReferenceCount(
+    SwordModuleHandle *module,
+    const char *reference
+) {
+    if (
+        module == nullptr
+        || module->module == nullptr
+        || reference == nullptr
+        || reference[0] == '\0'
+    ) {
+        return 0;
+    }
+
+    module->parsedReferences.clear();
+    module->parsedReferenceBuffer.clear();
+
+    try {
+        sword::VerseKey parser;
+
+        sword::ListKey references = parser.parseVerseList(
+            reference,
+            module->module->getKeyText(),
+            true
+        );
+
+        const int count = references.getCount();
+
+        if (count <= 0) {
+            return 0;
+        }
+
+        module->parsedReferences.reserve(
+            static_cast<size_t>(count)
+        );
+
+        for (int index = 0; index < count; ++index) {
+            const sword::SWKey *key =
+                references.getElement(index);
+
+            if (key == nullptr) {
+                continue;
+            }
+
+            const char *text = key->getText();
+
+            if (text == nullptr || text[0] == '\0') {
+                continue;
+            }
+
+            module->parsedReferences.emplace_back(text);
+        }
+
+        return module->parsedReferences.size();
+    } catch (...) {
+        module->parsedReferences.clear();
+        module->parsedReferenceBuffer.clear();
+        return 0;
+    }
+}
+
+const char *SwordModuleParsedReference(
+    SwordModuleHandle *module,
+    size_t index
+) {
+    if (
+        module == nullptr
+        || index >= module->parsedReferences.size()
+    ) {
+        return "";
+    }
+
+    try {
+        module->parsedReferenceBuffer =
+            module->parsedReferences[index];
+
+        return module->parsedReferenceBuffer.c_str();
+    } catch (...) {
+        module->parsedReferenceBuffer.clear();
+        return "";
+    }
+}
+
+void SwordModuleClearParsedReferences(
+    SwordModuleHandle *module
+) {
+    if (module == nullptr) {
+        return;
+    }
+
+    module->parsedReferences.clear();
+    module->parsedReferenceBuffer.clear();
+}
 
 const char *SwordBridgeVersion(void) {
     return "0.1.0";

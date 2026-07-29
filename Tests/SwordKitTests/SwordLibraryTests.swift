@@ -326,3 +326,58 @@ func moduleCanRetrieveChapter() throws {
     #expect(chapter.verses.first?.reference.value == "John 3:1")
     #expect(chapter.verses.last?.reference.value == "John 3:36")
 }
+
+@Test
+func moduleCanParseReferenceList() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: { $0.category == .bible }
+    ) else {
+        return
+    }
+
+    let references = try bible.references(
+        in: "John 3:16-18; Romans 8:28"
+    )
+
+    #expect(references.count == 4)
+    #expect(references[0].value == "John 3:16")
+    #expect(references[1].value == "John 3:17")
+    #expect(references[2].value == "John 3:18")
+    #expect(references[3].value == "Romans 8:28")
+}
+
+@Test
+func moduleCanParseNumberedBookReferenceList() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: { $0.category == .bible }
+    ) else {
+        return
+    }
+
+    let references = try bible.references(
+        in: "1 Corinthians 13:4-6"
+    )
+
+    #expect(references.count == 3)
+    #expect(references.first?.value == "1 Corinthians 13:4")
+    #expect(references.last?.value == "1 Corinthians 13:6")
+}
+
+@Test
+func referenceListRejectsEmptyExpression() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: { $0.category == .bible }
+    ) else {
+        return
+    }
+
+    #expect(throws: SwordError.self) {
+        try bible.references(in: "   ")
+    }
+}

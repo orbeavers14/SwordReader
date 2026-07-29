@@ -46,6 +46,67 @@ public final class SwordModule: Hashable {
         self.category = Category(swordType: type)
     }
     
+    /// Parses a Scripture reference expression using the module's
+    /// native SWORD versification.
+    public func references(
+        in expression: String
+    ) throws -> SwordReferenceList {
+        guard category == .bible else {
+            throw SwordError.unsupportedModuleType
+        }
+
+        let trimmedExpression = expression.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+
+        guard !trimmedExpression.isEmpty else {
+            throw SwordError.invalidReferenceList(expression)
+        }
+
+        SwordModuleClearParsedReferences(handle)
+
+        defer {
+            SwordModuleClearParsedReferences(handle)
+        }
+
+        let count = trimmedExpression.withCString { pointer in
+            SwordModuleParseReferenceCount(
+                handle,
+                pointer
+            )
+        }
+
+        guard count > 0 else {
+            throw SwordError.invalidReferenceList(expression)
+        }
+
+        var references: [SwordReference] = []
+        references.reserveCapacity(count)
+
+        for index in 0..<count {
+            guard let pointer = SwordModuleParsedReference(
+                handle,
+                index
+            ) else {
+                throw SwordError.invalidReferenceList(expression)
+            }
+
+            let value = String(cString: pointer)
+
+            guard !value.isEmpty else {
+                throw SwordError.invalidReferenceList(expression)
+            }
+
+            references.append(
+                try SwordReference(value)
+            )
+        }
+
+        return SwordReferenceList(
+            references: references
+        )
+    }
+    
     /// Retrieves a complete chapter from a Bible module.
     public func chapter(
         _ reference: SwordChapterReference

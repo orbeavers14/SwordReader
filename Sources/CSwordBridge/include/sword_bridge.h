@@ -62,6 +62,20 @@ const char *SwordModuleRenderText(
     SwordModuleHandle *module
 );
 
+size_t SwordModuleParseReferenceCount(
+    SwordModuleHandle *module,
+    const char *reference
+);
+
+const char *SwordModuleParsedReference(
+    SwordModuleHandle *module,
+    size_t index
+);
+
+void SwordModuleClearParsedReferences(
+    SwordModuleHandle *module
+);
+
 #ifdef __cplusplus
 }
 #endif

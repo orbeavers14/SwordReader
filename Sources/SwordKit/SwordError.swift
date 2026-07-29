@@ -26,4 +26,6 @@ public enum SwordError: Error, Equatable, Sendable {
     /// The supplied chapter reference could not be interpreted.
     case invalidChapterReference(String)
     
+    case invalidReferenceList(String)
+    
 }
