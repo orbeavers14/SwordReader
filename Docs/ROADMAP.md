@@ -83,6 +83,7 @@ try bible.references(
 - [x] Regular-expression search
 - [x] Case-insensitive search
 - [x] Strong's-number search
+- [x] Morphology search
 - [x] Swift-native `SwordSearchType`
 - [x] Immutable `SwordSearchResult` values
 - [x] SWORD relevance scores
@@ -97,19 +98,19 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Morphology Search
+## Scoped Search
 
 Goal:
 
 ```swift
 let results = try bible.search(
-    "V-AAI-3S",
-    type: .morphology
+    "faith",
+    scope: "Romans"
 )
 ```
 
-The next search milestone will expose searches over SWORD's morphology entry
-attributes.
+The next search milestone will constrain matching to a Scripture reference
+expression parsed using the module's native versification.
 
 ---
 
@@ -130,7 +131,6 @@ let results = try bible.search(
 
 Planned:
 
-- [ ] Morphology search
 - [ ] Scoped search
 - [ ] Search cancellation
 - [ ] Progress reporting

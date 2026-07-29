@@ -612,3 +612,23 @@ func strongsSearchRejectsInvalidNumber() throws {
         )
     }
 }
+
+@Test
+func bibleModuleCanSearchByMorphology() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let results = try bible.search(
+        "V-AAI-3S",
+        type: .morphology
+    )
+
+    #expect(
+        results.contains {
+            $0.reference.value == "Acts 2:22"
+        }
+    )
+}

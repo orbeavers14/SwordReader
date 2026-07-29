@@ -167,6 +167,7 @@ public final class SwordModule: Hashable {
                 handle,
                 pointer,
                 type.bridgeValue,
+                type.bridgeAttributeType,
                 caseSensitive ? 1 : 0
             )
         }

@@ -18,6 +18,10 @@ const char *safeCString(const char *value) {
     return value != nullptr ? value : "";
 }
 
+constexpr int searchAttributeNone = 0;
+constexpr int searchAttributeStrongs = 1;
+constexpr int searchAttributeMorphology = 2;
+
 } // namespace
 
 struct SwordManager {
@@ -161,8 +165,12 @@ size_t SwordModuleSearchCount(
     SwordModuleHandle *module,
     const char *query,
     int searchType,
+    int attributeType,
     int caseSensitive
 ) {
+    const bool isAttributeSearch =
+        searchType == sword::SWModule::SEARCHTYPE_ENTRYATTR;
+
     if (
         module == nullptr
         || module->module == nullptr
@@ -173,6 +181,14 @@ size_t SwordModuleSearchCount(
             && searchType != sword::SWModule::SEARCHTYPE_MULTIWORD
             && searchType != sword::SWModule::SEARCHTYPE_REGEX
             && searchType != sword::SWModule::SEARCHTYPE_ENTRYATTR
+        )
+        || (
+            isAttributeSearch
+                ? (
+                    attributeType != searchAttributeStrongs
+                    && attributeType != searchAttributeMorphology
+                )
+                : attributeType != searchAttributeNone
         )
         || (caseSensitive != 0 && caseSensitive != 1)
     ) {
@@ -186,11 +202,15 @@ size_t SwordModuleSearchCount(
     try {
         std::string searchQuery = query;
 
-        if (
-            searchType == sword::SWModule::SEARCHTYPE_ENTRYATTR
-        ) {
+        if (isAttributeSearch) {
+            const char *attribute =
+                attributeType == searchAttributeStrongs
+                    ? "Lemma."
+                    : "Morph.";
+
             searchQuery =
-                "Word//Lemma./" + searchQuery + "/";
+                "Word//" + std::string(attribute)
+                + "/" + searchQuery + "/";
         }
 
         sword::ListKey results = module->module->search(

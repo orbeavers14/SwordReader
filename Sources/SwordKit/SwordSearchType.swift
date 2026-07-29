@@ -12,6 +12,9 @@ public enum SwordSearchType: Hashable, Sendable {
     /// Matches entries tagged with a Strong's Greek or Hebrew number.
     case strongs
 
+    /// Matches entries tagged with a morphology code.
+    case morphology
+
     internal var bridgeValue: Int32 {
         switch self {
         case .phrase:
@@ -25,6 +28,22 @@ public enum SwordSearchType: Hashable, Sendable {
 
         case .strongs:
             -3
+
+        case .morphology:
+            -3
+        }
+    }
+
+    internal var bridgeAttributeType: Int32 {
+        switch self {
+        case .phrase, .multiWord, .regularExpression:
+            0
+
+        case .strongs:
+            1
+
+        case .morphology:
+            2
         }
     }
 
