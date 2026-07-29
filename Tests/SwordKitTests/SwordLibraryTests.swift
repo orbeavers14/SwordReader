@@ -234,3 +234,50 @@ func passageRejectsInvalidVerseCount() throws {
         )
     }
 }
+
+@Test
+func passageRangeParsesSameChapterRange() throws {
+    let range = try SwordPassageRange(
+        "John 3:16-21"
+    )
+
+    #expect(range.start.value == "John 3:16")
+    #expect(range.endingVerse == 21)
+    #expect(range.verseCount == 6)
+}
+
+@Test
+func passageRangeSupportsNumberedBooks() throws {
+    let range = try SwordPassageRange(
+        "1 Corinthians 13:4-8"
+    )
+
+    #expect(range.start.value == "1 Corinthians 13:4")
+    #expect(range.endingVerse == 8)
+    #expect(range.verseCount == 5)
+}
+
+@Test
+func passageRangeRejectsReversedRange() {
+    #expect(throws: SwordError.self) {
+        try SwordPassageRange("John 3:21-16")
+    }
+}
+
+@Test
+func moduleCanRetrievePassageRange() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: { $0.category == .bible }
+    ) else {
+        return
+    }
+
+    let passage = try bible.passage("John 3:16-18")
+
+    #expect(passage.verses.count == 3)
+    #expect(passage.verses[0].reference.value == "John 3:16")
+    #expect(passage.verses[1].reference.value == "John 3:17")
+    #expect(passage.verses[2].reference.value == "John 3:18")
+}

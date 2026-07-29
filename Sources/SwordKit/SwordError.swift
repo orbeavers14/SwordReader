@@ -17,4 +17,10 @@ public enum SwordError: Error, Equatable, Sendable {
     
     case invalidVerseCount(Int)
     
+    /// The supplied passage range could not be interpreted.
+    case invalidPassageRange(String)
+
+    /// The ending verse precedes the starting verse.
+    case reversedPassageRange(String)
+    
 }

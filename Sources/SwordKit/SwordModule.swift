@@ -181,6 +181,26 @@ public final class SwordModule: Hashable {
             verseCount: verseCount
         )
     }
+    /// Retrieves a same-chapter passage using a textual verse range.
+    ///
+    /// Supported examples include:
+    ///
+    /// ```swift
+    /// try module.passage("John 3:16-21")
+    /// try module.passage("1 Corinthians 13:4-8")
+    /// ```
+    ///
+    /// Cross-chapter ranges are not yet supported.
+    public func passage(
+        _ range: String
+    ) throws -> SwordPassage {
+        let parsedRange = try SwordPassageRange(range)
+
+        return try passage(
+            startingAt: parsedRange.start,
+            verseCount: parsedRange.verseCount
+        )
+    }
 }
 
 public extension SwordModule {
