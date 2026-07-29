@@ -381,3 +381,67 @@ func referenceListRejectsEmptyExpression() throws {
         try bible.references(in: "   ")
     }
 }
+
+@Test
+func moduleCanRetrieveVersesFromDisjointExpression() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: { $0.category == .bible }
+    ) else {
+        return
+    }
+
+    let verses = try bible.verses(
+        in: "John 3:16; Romans 8:28"
+    )
+
+    #expect(verses.map(\.reference.value) == [
+        "John 3:16",
+        "Romans 8:28",
+    ])
+    #expect(verses.allSatisfy { !$0.text.isEmpty })
+}
+
+@Test
+func moduleCanRetrieveVersesFromReferenceList() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: { $0.category == .bible }
+    ) else {
+        return
+    }
+
+    let references = try bible.references(
+        in: "John 3:16-18; Romans 8:28"
+    )
+    let verses = try bible.verses(in: references)
+
+    #expect(
+        verses.map(\.reference)
+            == Array(references)
+    )
+    #expect(verses.allSatisfy { $0.moduleName == bible.name })
+}
+
+@Test
+func moduleCanRetrieveCrossBookChapters() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: { $0.category == .bible }
+    ) else {
+        return
+    }
+
+    let verses = try bible.verses(
+        in: "John 21; Acts 1"
+    )
+
+    #expect(verses.count == 51)
+    #expect(verses.first?.reference.value == "John 21:1")
+    #expect(verses[24].reference.value == "John 21:25")
+    #expect(verses[25].reference.value == "Acts 1:1")
+    #expect(verses.last?.reference.value == "Acts 1:26")
+}

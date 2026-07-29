@@ -106,6 +106,27 @@ public final class SwordModule: Hashable {
             references: references
         )
     }
+
+    /// Retrieves verses from a parsed Scripture reference list.
+    ///
+    /// Verses are returned in the same order as their references.
+    public func verses(
+        in references: SwordReferenceList
+    ) throws -> [SwordVerse] {
+        try references.map(verse)
+    }
+
+    /// Parses a Scripture reference expression and retrieves its verses.
+    ///
+    /// The expression may contain ranges, disjoint references, and
+    /// references that span multiple books.
+    public func verses(
+        in expression: String
+    ) throws -> [SwordVerse] {
+        try verses(
+            in: references(in: expression)
+        )
+    }
     
     /// Retrieves a complete chapter from a Bible module.
     public func chapter(
