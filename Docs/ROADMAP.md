@@ -41,6 +41,7 @@
 - [x] Navigate previous verse
 - [x] Retrieve passages
 - [x] Retrieve chapters
+- [x] Retrieve verses from reference lists
 
 ---
 
@@ -77,55 +78,22 @@ try bible.references(
 
 # Next Milestone
 
-## Verse Retrieval from Reference Lists
-
-Current:
-
-```swift
-let references = try bible.references(
-    in: "John 3:16; Romans 8:28"
-)
-```
-
-Next:
-
-```swift
-let verses = try bible.verses(
-    in: "John 3:16; Romans 8:28"
-)
-```
-
-Also:
-
-```swift
-let references = try bible.references(
-    in: "John 21; Acts 1"
-)
-
-let verses = try bible.verses(
-    in: references
-)
-```
-
-This becomes the foundation for:
-
-- Search
-- Reading plans
-- Favorites
-- Bookmarks
-- Parallel Bibles
-
----
-
-# Upcoming Features
-
-## Search
+## Basic Phrase Search
 
 Goal:
 
 ```swift
 let results = try bible.search("grace")
 ```
+
+The first search milestone will return immutable Swift values while keeping
+SWORD search keys and ownership inside the C bridge.
+
+---
+
+# Upcoming Features
+
+## Advanced Search
 
 Future:
 
@@ -138,9 +106,8 @@ let results = try bible.search(
 )
 ```
 
-Planned:
+Planned after basic phrase search:
 
-- [ ] Phrase search
 - [ ] Multi-word search
 - [ ] Regex search
 - [ ] Strong's search
@@ -214,7 +181,8 @@ Planned:
 
 ---
 
-<<<<<<< HEAD
+## Maintenance
+
 - [ ] Finalize public naming and ownership semantics
 - [ ] Document every public declaration
 - [ ] Establish concurrency guarantees
@@ -222,32 +190,8 @@ Planned:
 - [ ] Add continuous integration
 - [ ] Publish migration and compatibility policies
 
-2.0 Vision
+---
 
-□ Parallel translation engine
-
-□ Interlinear engine
-
-□ Strong's lexicon
-
-□ Morphology parsing
-
-□ Dictionary popovers
-
-□ Commentary synchronization
-
-□ Cross references
-
-□ Original-language search
-
-□ Reading workspace
-
-□ Split panes
-
-□ Multi-column comparison
-
-□ Study layouts
-=======
 ## Concurrency
 
 - [ ] Async APIs
@@ -346,4 +290,3 @@ Public Swift API
 
 Long-Term Vision
 ██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 15%
->>>>>>> refs/remotes/origin/main
