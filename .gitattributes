@@ -1,0 +1,33 @@
+# Normalize line endings
+* text=auto
+
+# Swift
+*.swift text
+
+# C / C++
+*.c text
+*.cpp text
+*.cc text
+*.cxx text
+*.h text
+*.hpp text
+
+# Shell scripts
+*.sh text eol=lf
+
+# Markdown
+*.md text
+
+# CMake
+CMakeLists.txt text
+*.cmake text
+
+# Binary files
+*.a binary
+*.dylib binary
+*.so binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.pdf binary

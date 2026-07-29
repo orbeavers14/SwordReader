@@ -103,3 +103,29 @@ than the core SwordKit library.
 - [ ] Add complete integration tests
 - [ ] Add continuous integration
 - [ ] Publish migration and compatibility policies
+
+2.0 Vision
+
+□ Parallel translation engine
+
+□ Interlinear engine
+
+□ Strong's lexicon
+
+□ Morphology parsing
+
+□ Dictionary popovers
+
+□ Commentary synchronization
+
+□ Cross references
+
+□ Original-language search
+
+□ Reading workspace
+
+□ Split panes
+
+□ Multi-column comparison
+
+□ Study layouts

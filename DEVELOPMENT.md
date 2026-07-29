@@ -82,6 +82,14 @@ Tests describe the expected behavior of the public Swift API.
 
 Tests should generally call `SwordKit`, rather than calling `CSwordBridge` directly. Direct bridge tests may be added when native behavior cannot be verified adequately through the public API.
 
+## Running tests
+
+SWORD integration tests must currently run serially because the native
+engine and module state are not yet guaranteed to be thread-safe.
+
+```bash
+./Scripts/test.sh
+
 ## Design principles
 
 ### Swift owns the public API

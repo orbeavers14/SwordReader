@@ -1,34 +1,82 @@
-.DS_Store
-/.build
-/Packages
-xcuserdata/
-DerivedData/
-.swiftpm/configuration/registries.json
-.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
-.netrc
+# ==========================================================
+# SwordKit .gitignore
+# ==========================================================
 
-# macOS
-.DS_Store
-
-# Xcode
-DerivedData/
+# ----------------------------------------------------------
+# Swift Package Manager
+# ----------------------------------------------------------
 .build/
-Vendor/libsword/build/
 .swiftpm/
-*.xcodeproj/xcuserdata/
-*.xcworkspace/xcuserdata/
 
+# ----------------------------------------------------------
+# Vendored SWORD build products
+# (Keep Vendor/libsword source, ignore generated artifacts)
+# ----------------------------------------------------------
+Vendor/libsword/build/
+
+# ----------------------------------------------------------
+# SWORD source metadata
+# ----------------------------------------------------------
+Vendor/libsword/.svn/
+Vendor/libsword/autom4te.cache/
+
+# ----------------------------------------------------------
+# Xcode
+# ----------------------------------------------------------
+DerivedData/
+*.xcworkspace
+!Package.xcworkspace
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+
+# ----------------------------------------------------------
+# macOS
+# ----------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ----------------------------------------------------------
+# Editor files
+# ----------------------------------------------------------
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# ----------------------------------------------------------
 # CMake
-build/
-CMakeFiles/
+# ----------------------------------------------------------
 CMakeCache.txt
+CMakeFiles/
 cmake_install.cmake
+CTestTestfile.cmake
+compile_commands.json
 Makefile
+install_manifest.txt
 
-# Compiled libraries
+# ----------------------------------------------------------
+# Native build artifacts
+# ----------------------------------------------------------
+*.o
+*.obj
 *.a
-*.dylib
 *.so
+*.dylib
+*.dll
+*.lib
+*.exp
+*.pdb
 
+# ----------------------------------------------------------
 # Logs
+# ----------------------------------------------------------
 *.log
+
+# ----------------------------------------------------------
+# Temporary files
+# ----------------------------------------------------------
+tmp/
+temp/
