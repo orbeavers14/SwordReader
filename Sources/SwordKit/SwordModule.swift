@@ -46,6 +46,56 @@ public final class SwordModule: Hashable {
         self.category = Category(swordType: type)
     }
     
+    /// Retrieves a complete chapter from a Bible module.
+    public func chapter(
+        _ reference: SwordChapterReference
+    ) throws -> SwordChapter {
+        guard category == .bible else {
+            throw SwordError.unsupportedModuleType
+        }
+
+        let firstVerse = try verse(reference.firstVerse)
+
+        var verses = [firstVerse]
+
+        let chapterPrefix = "\(reference.book) \(reference.chapterNumber):"
+
+        while true {
+            let previousReference = currentReference
+
+            advance()
+
+            guard let nextVerse = currentVerse else {
+                break
+            }
+
+            guard nextVerse.reference != previousReference else {
+                break
+            }
+
+            guard nextVerse.reference.value.hasPrefix(chapterPrefix) else {
+                break
+            }
+
+            verses.append(nextVerse)
+        }
+
+        return SwordChapter(
+            reference: reference.value,
+            moduleName: name,
+            verses: verses
+        )
+    }
+
+    /// Retrieves a complete chapter using a textual reference.
+    public func chapter(
+        _ reference: String
+    ) throws -> SwordChapter {
+        try chapter(
+            SwordChapterReference(reference)
+        )
+    }
+    
     /// Retrieves a verse from this module.
     ///
     /// - Parameter reference: A Scripture reference such as

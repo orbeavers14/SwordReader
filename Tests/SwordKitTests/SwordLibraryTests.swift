@@ -281,3 +281,48 @@ func moduleCanRetrievePassageRange() throws {
     #expect(passage.verses[1].reference.value == "John 3:17")
     #expect(passage.verses[2].reference.value == "John 3:18")
 }
+
+@Test
+func chapterReferenceParsesBookAndChapter() throws {
+    let reference = try SwordChapterReference("John 3")
+
+    #expect(reference.value == "John 3")
+    #expect(reference.book == "John")
+    #expect(reference.chapterNumber == 3)
+}
+
+@Test
+func chapterReferenceSupportsNumberedBooks() throws {
+    let reference = try SwordChapterReference(
+        "1 Corinthians 13"
+    )
+
+    #expect(reference.value == "1 Corinthians 13")
+    #expect(reference.book == "1 Corinthians")
+    #expect(reference.chapterNumber == 13)
+}
+
+@Test
+func chapterReferenceRejectsVerseReference() {
+    #expect(throws: SwordError.self) {
+        try SwordChapterReference("John 3:16")
+    }
+}
+
+@Test
+func moduleCanRetrieveChapter() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: { $0.category == .bible }
+    ) else {
+        return
+    }
+
+    let chapter = try bible.chapter("John 3")
+
+    #expect(chapter.reference == "John 3")
+    #expect(!chapter.verses.isEmpty)
+    #expect(chapter.verses.first?.reference.value == "John 3:1")
+    #expect(chapter.verses.last?.reference.value == "John 3:36")
+}
