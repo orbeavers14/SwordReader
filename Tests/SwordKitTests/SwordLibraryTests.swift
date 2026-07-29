@@ -632,3 +632,43 @@ func bibleModuleCanSearchByMorphology() throws {
         }
     )
 }
+
+@Test
+func bibleModuleCanSearchWithinScope() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let results = try bible.search(
+        "faith",
+        caseSensitive: false,
+        scope: "Romans"
+    )
+
+    #expect(!results.isEmpty)
+    #expect(
+        results.allSatisfy {
+            $0.reference.value.hasPrefix("Romans ")
+        }
+    )
+}
+
+@Test
+func searchRejectsEmptyScope() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: { $0.category == .bible }
+    ) else {
+        return
+    }
+
+    #expect(throws: SwordError.invalidReferenceList("   ")) {
+        try bible.search(
+            "faith",
+            scope: "   "
+        )
+    }
+}

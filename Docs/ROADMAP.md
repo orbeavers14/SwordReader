@@ -84,6 +84,7 @@ try bible.references(
 - [x] Case-insensitive search
 - [x] Strong's-number search
 - [x] Morphology search
+- [x] Scoped search
 - [x] Swift-native `SwordSearchType`
 - [x] Immutable `SwordSearchResult` values
 - [x] SWORD relevance scores
@@ -98,19 +99,20 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Scoped Search
+## Search Cancellation
 
 Goal:
 
 ```swift
-let results = try bible.search(
-    "faith",
-    scope: "Romans"
-)
+let task = Task {
+    try await bible.search("faith")
+}
+
+task.cancel()
 ```
 
-The next search milestone will constrain matching to a Scripture reference
-expression parsed using the module's native versification.
+The next search milestone will establish cancellable asynchronous searching
+without exposing SWORD's mutable search state.
 
 ---
 
@@ -131,7 +133,6 @@ let results = try bible.search(
 
 Planned:
 
-- [ ] Scoped search
 - [ ] Search cancellation
 - [ ] Progress reporting
 - [ ] Search result ranking

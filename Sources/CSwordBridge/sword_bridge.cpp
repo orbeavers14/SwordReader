@@ -164,6 +164,7 @@ void SwordModuleClearParsedReferences(
 size_t SwordModuleSearchCount(
     SwordModuleHandle *module,
     const char *query,
+    const char *scope,
     int searchType,
     int attributeType,
     int caseSensitive
@@ -213,10 +214,30 @@ size_t SwordModuleSearchCount(
                 + "/" + searchQuery + "/";
         }
 
+        sword::ListKey scopeKeys;
+        sword::SWKey *searchScope = nullptr;
+
+        if (scope != nullptr && scope[0] != '\0') {
+            sword::VerseKey parser;
+
+            scopeKeys = parser.parseVerseList(
+                scope,
+                module->module->getKeyText(),
+                true
+            );
+
+            if (scopeKeys.getCount() <= 0) {
+                return 0;
+            }
+
+            searchScope = &scopeKeys;
+        }
+
         sword::ListKey results = module->module->search(
             searchQuery.c_str(),
             searchType,
-            caseSensitive ? 0 : REG_ICASE
+            caseSensitive ? 0 : REG_ICASE,
+            searchScope
         );
 
         const int count = results.getCount();

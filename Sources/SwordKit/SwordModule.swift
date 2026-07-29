@@ -134,11 +134,13 @@ public final class SwordModule: Hashable {
     ///   - query: The nonempty text to find.
     ///   - type: The matching strategy. The default is exact phrase search.
     ///   - caseSensitive: Whether letter case must match. The default is `true`.
+    ///   - scope: An optional Scripture reference expression to search within.
     /// - Returns: Matching verses in the order returned by SWORD.
     public func search(
         _ query: String,
         type: SwordSearchType = .phrase,
-        caseSensitive: Bool = true
+        caseSensitive: Bool = true,
+        scope: String? = nil
     ) throws -> [SwordSearchResult] {
         guard category == .bible else {
             throw SwordError.unsupportedModuleType
@@ -156,20 +158,37 @@ public final class SwordModule: Hashable {
             trimmedQuery
         )
 
+        let normalizedScope: String
+
+        if let scope {
+            normalizedScope = scope.trimmingCharacters(
+                in: .whitespacesAndNewlines
+            )
+
+            guard !normalizedScope.isEmpty else {
+                throw SwordError.invalidReferenceList(scope)
+            }
+        } else {
+            normalizedScope = ""
+        }
+
         SwordModuleClearSearchResults(handle)
 
         defer {
             SwordModuleClearSearchResults(handle)
         }
 
-        let count = normalizedQuery.withCString { pointer in
-            SwordModuleSearchCount(
-                handle,
-                pointer,
-                type.bridgeValue,
-                type.bridgeAttributeType,
-                caseSensitive ? 1 : 0
-            )
+        let count = normalizedQuery.withCString { queryPointer in
+            normalizedScope.withCString { scopePointer in
+                SwordModuleSearchCount(
+                    handle,
+                    queryPointer,
+                    scopePointer,
+                    type.bridgeValue,
+                    type.bridgeAttributeType,
+                    caseSensitive ? 1 : 0
+                )
+            }
         }
 
         var results: [SwordSearchResult] = []
