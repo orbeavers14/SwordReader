@@ -99,6 +99,10 @@ void SwordModuleClearSearchResults(
     SwordModuleHandle *module
 );
 
+void SwordModuleTerminateSearch(
+    SwordModuleHandle *module
+);
+
 #ifdef __cplusplus
 }
 #endif

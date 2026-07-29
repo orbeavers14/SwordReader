@@ -672,3 +672,48 @@ func searchRejectsEmptyScope() throws {
         )
     }
 }
+
+@Test
+func bibleModuleCanSearchAsynchronously() async throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let results = try await bible.searchAsync(
+        "Jesus wept",
+        scope: "John 11"
+    )
+
+    #expect(
+        results.contains {
+            $0.reference.value == "John 11:35"
+        }
+    )
+}
+
+@Test
+func asynchronousSearchCanBeCancelled() async throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let task = Task {
+        try await bible.searchAsync(
+            "the",
+            caseSensitive: false
+        )
+    }
+
+    task.cancel()
+
+    do {
+        _ = try await task.value
+        Issue.record("Expected the search to be cancelled")
+    } catch is CancellationError {
+        // Expected.
+    }
+}

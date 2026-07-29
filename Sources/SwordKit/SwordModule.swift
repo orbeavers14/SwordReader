@@ -227,6 +227,37 @@ public final class SwordModule: Hashable {
 
         return results
     }
+
+    /// Searches a Bible module with cooperative task cancellation.
+    ///
+    /// Cancelling the calling task signals SWORD to terminate its active
+    /// search and causes this method to throw ``CancellationError``.
+    public func searchAsync(
+        _ query: String,
+        type: SwordSearchType = .phrase,
+        caseSensitive: Bool = true,
+        scope: String? = nil
+    ) async throws -> [SwordSearchResult] {
+        let nativeHandle = SendableSwordModuleHandle(
+            value: handle
+        )
+
+        return try await withTaskCancellationHandler {
+            try Task.checkCancellation()
+
+            let results = try search(
+                query,
+                type: type,
+                caseSensitive: caseSensitive,
+                scope: scope
+            )
+
+            try Task.checkCancellation()
+            return results
+        } onCancel: {
+            SwordModuleTerminateSearch(nativeHandle.value)
+        }
+    }
     
     /// Retrieves a complete chapter from a Bible module.
     public func chapter(
@@ -433,6 +464,11 @@ public final class SwordModule: Hashable {
             verseCount: parsedRange.verseCount
         )
     }
+}
+
+// SWORD permits its termination flag to be set from a cancellation handler.
+private struct SendableSwordModuleHandle: @unchecked Sendable {
+    let value: OpaquePointer
 }
 
 public extension SwordModule {

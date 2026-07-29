@@ -85,6 +85,7 @@ try bible.references(
 - [x] Strong's-number search
 - [x] Morphology search
 - [x] Scoped search
+- [x] Cancellable asynchronous search
 - [x] Swift-native `SwordSearchType`
 - [x] Immutable `SwordSearchResult` values
 - [x] SWORD relevance scores
@@ -99,20 +100,21 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Search Cancellation
+## Search Progress Reporting
 
 Goal:
 
 ```swift
-let task = Task {
-    try await bible.search("faith")
-}
-
-task.cancel()
+let results = try await bible.searchAsync(
+    "faith",
+    progress: { percentage in
+        print(percentage)
+    }
+)
 ```
 
-The next search milestone will establish cancellable asynchronous searching
-without exposing SWORD's mutable search state.
+The next search milestone will expose SWORD's progress callback through a
+Swift-native reporting closure.
 
 ---
 
@@ -133,7 +135,6 @@ let results = try bible.search(
 
 Planned:
 
-- [ ] Search cancellation
 - [ ] Progress reporting
 - [ ] Search result ranking
 

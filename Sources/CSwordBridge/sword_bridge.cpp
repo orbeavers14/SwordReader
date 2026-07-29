@@ -329,6 +329,16 @@ void SwordModuleClearSearchResults(
     module->searchResultReferenceBuffer.clear();
 }
 
+void SwordModuleTerminateSearch(
+    SwordModuleHandle *module
+) {
+    if (module == nullptr || module->module == nullptr) {
+        return;
+    }
+
+    module->module->terminateSearch = true;
+}
+
 const char *SwordBridgeVersion(void) {
     return "0.1.0";
 }
