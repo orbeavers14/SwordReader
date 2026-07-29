@@ -30,5 +30,8 @@ public enum SwordError: Error, Equatable, Sendable {
 
     /// A search query contained no non-whitespace characters.
     case invalidSearchQuery(String)
+
+    /// A Strong's number was not a `G` or `H` followed by digits.
+    case invalidStrongsNumber(String)
     
 }

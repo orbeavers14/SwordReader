@@ -82,6 +82,7 @@ try bible.references(
 - [x] Multi-word search
 - [x] Regular-expression search
 - [x] Case-insensitive search
+- [x] Strong's-number search
 - [x] Swift-native `SwordSearchType`
 - [x] Immutable `SwordSearchResult` values
 - [x] SWORD relevance scores
@@ -96,19 +97,19 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Strong's Number Search
+## Morphology Search
 
 Goal:
 
 ```swift
 let results = try bible.search(
-    "G5485",
-    type: .strongs
+    "V-AAI-3S",
+    type: .morphology
 )
 ```
 
-The next search milestone will expose searches over SWORD's Strong's-number
-entry attributes.
+The next search milestone will expose searches over SWORD's morphology entry
+attributes.
 
 ---
 
@@ -129,7 +130,6 @@ let results = try bible.search(
 
 Planned:
 
-- [ ] Strong's search
 - [ ] Morphology search
 - [ ] Scoped search
 - [ ] Search cancellation

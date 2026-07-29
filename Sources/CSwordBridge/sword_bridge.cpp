@@ -172,6 +172,7 @@ size_t SwordModuleSearchCount(
             searchType != sword::SWModule::SEARCHTYPE_PHRASE
             && searchType != sword::SWModule::SEARCHTYPE_MULTIWORD
             && searchType != sword::SWModule::SEARCHTYPE_REGEX
+            && searchType != sword::SWModule::SEARCHTYPE_ENTRYATTR
         )
         || (caseSensitive != 0 && caseSensitive != 1)
     ) {
@@ -183,8 +184,17 @@ size_t SwordModuleSearchCount(
     module->searchResultReferenceBuffer.clear();
 
     try {
+        std::string searchQuery = query;
+
+        if (
+            searchType == sword::SWModule::SEARCHTYPE_ENTRYATTR
+        ) {
+            searchQuery =
+                "Word//Lemma./" + searchQuery + "/";
+        }
+
         sword::ListKey results = module->module->search(
-            query,
+            searchQuery.c_str(),
             searchType,
             caseSensitive ? 0 : REG_ICASE
         );

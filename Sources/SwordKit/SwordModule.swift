@@ -152,13 +152,17 @@ public final class SwordModule: Hashable {
             throw SwordError.invalidSearchQuery(query)
         }
 
+        let normalizedQuery = try type.normalizedQuery(
+            trimmedQuery
+        )
+
         SwordModuleClearSearchResults(handle)
 
         defer {
             SwordModuleClearSearchResults(handle)
         }
 
-        let count = trimmedQuery.withCString { pointer in
+        let count = normalizedQuery.withCString { pointer in
             SwordModuleSearchCount(
                 handle,
                 pointer,

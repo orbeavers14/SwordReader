@@ -574,3 +574,41 @@ func bibleModuleCanSearchIgnoringCase() throws {
         }
     )
 }
+
+@Test
+func bibleModuleCanSearchByStrongsNumber() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let results = try bible.search(
+        "G25",
+        type: .strongs
+    )
+
+    #expect(
+        results.contains {
+            $0.reference.value == "John 3:16"
+        }
+    )
+}
+
+@Test
+func strongsSearchRejectsInvalidNumber() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: { $0.category == .bible }
+    ) else {
+        return
+    }
+
+    #expect(throws: SwordError.invalidStrongsNumber("grace")) {
+        try bible.search(
+            "grace",
+            type: .strongs
+        )
+    }
+}
