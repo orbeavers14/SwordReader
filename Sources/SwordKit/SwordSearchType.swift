@@ -6,6 +6,9 @@ public enum SwordSearchType: Hashable, Sendable {
     /// Matches entries containing every word in the query.
     case multiWord
 
+    /// Matches entries using a POSIX extended regular expression.
+    case regularExpression
+
     internal var bridgeValue: Int32 {
         switch self {
         case .phrase:
@@ -13,6 +16,9 @@ public enum SwordSearchType: Hashable, Sendable {
 
         case .multiWord:
             -2
+
+        case .regularExpression:
+            0
         }
     }
 }

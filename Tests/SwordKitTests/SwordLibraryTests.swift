@@ -524,3 +524,28 @@ func bibleModuleCanSearchForMultipleWords() throws {
         }
     )
 }
+
+@Test
+func bibleModuleCanSearchWithRegularExpression() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: {
+            $0.category == .bible
+                && $0.language.lowercased().hasPrefix("en")
+        }
+    ) else {
+        return
+    }
+
+    let results = try bible.search(
+        "Jesus (wept|cried)",
+        type: .regularExpression
+    )
+
+    #expect(
+        results.contains {
+            $0.reference.value == "John 11:35"
+        }
+    )
+}

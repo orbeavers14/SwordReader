@@ -169,6 +169,7 @@ size_t SwordModuleSearchCount(
         || (
             searchType != sword::SWModule::SEARCHTYPE_PHRASE
             && searchType != sword::SWModule::SEARCHTYPE_MULTIWORD
+            && searchType != sword::SWModule::SEARCHTYPE_REGEX
         )
     ) {
         return 0;
