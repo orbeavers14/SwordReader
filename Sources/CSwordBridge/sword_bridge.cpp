@@ -79,6 +79,10 @@ struct SwordModuleHandle {
     std::vector<std::string> wordAttributeTexts;
     std::vector<std::string> wordAttributeLemmas;
     std::vector<std::string> wordAttributeMorphologies;
+    std::vector<std::string> footnoteIdentifiers;
+    std::vector<std::string> footnoteBodies;
+    std::vector<std::string> footnoteTypes;
+    std::vector<std::string> footnoteReferenceLists;
     
     std::vector<std::string> parsedReferences;
     std::string parsedReferenceBuffer;
@@ -530,6 +534,10 @@ const char *SwordModuleRenderText(
         module->wordAttributeTexts.clear();
         module->wordAttributeLemmas.clear();
         module->wordAttributeMorphologies.clear();
+        module->footnoteIdentifiers.clear();
+        module->footnoteBodies.clear();
+        module->footnoteTypes.clear();
+        module->footnoteReferenceLists.clear();
         module->module->setProcessEntryAttributes(true);
         module->renderedText =
         module->module->renderText().c_str();
@@ -579,6 +587,35 @@ const char *SwordModuleRenderText(
                             : morphology->second.c_str()
                     );
                 }
+            }
+        }
+
+        const auto footnotes = attributes.find("Footnote");
+
+        if (footnotes != attributes.end()) {
+            for (const auto &footnote : footnotes->second) {
+                if (footnote.first == "count") {
+                    continue;
+                }
+
+                const auto body = footnote.second.find("body");
+                const auto type = footnote.second.find("type");
+                const auto references = footnote.second.find("refList");
+
+                module->footnoteIdentifiers.emplace_back(
+                    footnote.first.c_str()
+                );
+                module->footnoteBodies.emplace_back(
+                    body == footnote.second.end() ? "" : body->second.c_str()
+                );
+                module->footnoteTypes.emplace_back(
+                    type == footnote.second.end() ? "" : type->second.c_str()
+                );
+                module->footnoteReferenceLists.emplace_back(
+                    references == footnote.second.end()
+                        ? ""
+                        : references->second.c_str()
+                );
             }
         }
         
@@ -647,6 +684,29 @@ const char *SwordModuleWordAttributeMorphology(
 
     return module->wordAttributeMorphologies[index].c_str();
 }
+
+size_t SwordModuleFootnoteCount(const SwordModuleHandle *module) {
+    return module == nullptr ? 0 : module->footnoteIdentifiers.size();
+}
+
+#define SWORD_FOOTNOTE_GETTER(functionName, field) \
+const char *functionName(const SwordModuleHandle *module, size_t index) { \
+    if (module == nullptr || index >= module->field.size()) return ""; \
+    return module->field[index].c_str(); \
+}
+
+SWORD_FOOTNOTE_GETTER(
+    SwordModuleFootnoteIdentifier,
+    footnoteIdentifiers
+)
+SWORD_FOOTNOTE_GETTER(SwordModuleFootnoteBody, footnoteBodies)
+SWORD_FOOTNOTE_GETTER(SwordModuleFootnoteType, footnoteTypes)
+SWORD_FOOTNOTE_GETTER(
+    SwordModuleFootnoteReferenceList,
+    footnoteReferenceLists
+)
+
+#undef SWORD_FOOTNOTE_GETTER
 
 void SwordModuleIncrement(
     SwordModuleHandle *module

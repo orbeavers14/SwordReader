@@ -141,6 +141,21 @@ func verseStoresRetrievedValues() throws {
 }
 
 @Test
+func footnoteStoresEntryMetadata() {
+    let footnote = SwordFootnote(
+        identifier: "1",
+        body: "See the alternate reading.",
+        type: "crossReference",
+        referenceList: "John 1:1"
+    )
+
+    #expect(footnote.identifier == "1")
+    #expect(footnote.body == "See the alternate reading.")
+    #expect(footnote.type == "crossReference")
+    #expect(footnote.referenceList == "John 1:1")
+}
+
+@Test
 func bibleModuleCanRetrieveVerse() throws {
     let library = SwordLibrary()
 

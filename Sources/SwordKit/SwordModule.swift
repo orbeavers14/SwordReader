@@ -391,12 +391,30 @@ public final class SwordModule: Hashable {
                 ).nilIfEmpty
             )
         }
+
+        let footnotes = (0..<SwordModuleFootnoteCount(handle)).map {
+            SwordFootnote(
+                identifier: SwordLibrary.string(
+                    from: SwordModuleFootnoteIdentifier(handle, $0)
+                ),
+                body: SwordLibrary.string(
+                    from: SwordModuleFootnoteBody(handle, $0)
+                ),
+                type: SwordLibrary.string(
+                    from: SwordModuleFootnoteType(handle, $0)
+                ).nilIfEmpty,
+                referenceList: SwordLibrary.string(
+                    from: SwordModuleFootnoteReferenceList(handle, $0)
+                ).nilIfEmpty
+            )
+        }
         
         return SwordVerse(
             reference: resolvedReference,
             moduleName: name,
             text: text,
-            lexicalAttributes: lexicalAttributes
+            lexicalAttributes: lexicalAttributes,
+            footnotes: footnotes
         )
     }
     

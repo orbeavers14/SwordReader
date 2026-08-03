@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Footnote Metadata
+## Cross-Reference Metadata
 
 Goal:
 
@@ -115,8 +115,8 @@ let passage = try library.parallelPassage(
 let text = try bible.attributedString("John 3:16")
 ```
 
-The next milestone will expose SWORD footnote entry attributes as immutable
-Swift values associated with a verse.
+The next milestone will provide typed cross-reference values derived from
+footnote reference lists.
 
 ---
 
@@ -163,7 +163,7 @@ Long-term direction:
 - [x] AttributedString rendering
 - [x] Strong's numbers
 - [x] Morphology
-- [ ] Footnotes
+- [x] Footnotes
 - [ ] Cross references
 - [ ] Headings
 - [ ] Red-letter text

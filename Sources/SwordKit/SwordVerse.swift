@@ -11,18 +11,41 @@ public struct SwordVerse: Hashable, Sendable {
 
     /// Lexical annotations supplied by the SWORD module for this entry.
     public let lexicalAttributes: [SwordLexicalAttribute]
+    public let footnotes: [SwordFootnote]
 
     /// Creates a retrieved verse value.
     public init(
         reference: SwordReference,
         moduleName: String,
         text: String,
-        lexicalAttributes: [SwordLexicalAttribute] = []
+        lexicalAttributes: [SwordLexicalAttribute] = [],
+        footnotes: [SwordFootnote] = []
     ) {
         self.reference = reference
         self.moduleName = moduleName
         self.text = text
         self.lexicalAttributes = lexicalAttributes
+        self.footnotes = footnotes
+    }
+}
+
+/// Footnote metadata attached to a SWORD entry.
+public struct SwordFootnote: Hashable, Sendable {
+    public let identifier: String
+    public let body: String
+    public let type: String?
+    public let referenceList: String?
+
+    public init(
+        identifier: String,
+        body: String,
+        type: String? = nil,
+        referenceList: String? = nil
+    ) {
+        self.identifier = identifier
+        self.body = body
+        self.type = type
+        self.referenceList = referenceList
     }
 }
 

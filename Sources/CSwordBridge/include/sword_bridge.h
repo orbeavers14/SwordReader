@@ -89,6 +89,24 @@ const char *SwordModuleWordAttributeMorphology(
     size_t index
 );
 
+size_t SwordModuleFootnoteCount(const SwordModuleHandle *module);
+const char *SwordModuleFootnoteIdentifier(
+    const SwordModuleHandle *module,
+    size_t index
+);
+const char *SwordModuleFootnoteBody(
+    const SwordModuleHandle *module,
+    size_t index
+);
+const char *SwordModuleFootnoteType(
+    const SwordModuleHandle *module,
+    size_t index
+);
+const char *SwordModuleFootnoteReferenceList(
+    const SwordModuleHandle *module,
+    size_t index
+);
+
 size_t SwordModuleParseReferenceCount(
     SwordModuleHandle *module,
     const char *reference
