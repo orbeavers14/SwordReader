@@ -319,6 +319,37 @@ func parallelPassageRejectsUnknownModule() {
 }
 
 @Test
+func parallelPassageReportsMissingReferencesByModule() throws {
+    let range = try SwordPassageRange("John 3:16-18")
+    let passage = SwordParallelPassage(
+        reference: range,
+        passages: [
+            SwordPassage(
+                reference: try SwordReference("John 3:16"),
+                moduleName: "KJV",
+                verses: [
+                    SwordVerse(
+                        reference: try SwordReference("John 3:16"),
+                        moduleName: "KJV",
+                        text: "First"
+                    ),
+                    SwordVerse(
+                        reference: try SwordReference("John 3:18"),
+                        moduleName: "KJV",
+                        text: "Third"
+                    )
+                ]
+            )
+        ]
+    )
+
+    #expect(
+        passage.missingReferences["KJV"]?.map(\.value)
+            == ["John 3:17"]
+    )
+}
+
+@Test
 func chapterReferenceParsesBookAndChapter() throws {
     let reference = try SwordChapterReference("John 3")
 

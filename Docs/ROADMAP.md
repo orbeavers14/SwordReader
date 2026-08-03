@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Missing Verse Detection
+## Verse Alignment
 
 Goal:
 
@@ -112,11 +112,11 @@ let passage = try library.parallelPassage(
     modules: ["KJV", "ASV"]
 )
 
-let gaps = passage.missingReferences
+let rows = passage.alignedVerses
 ```
 
-The next milestone will identify references that are absent from one or more
-parallel passages before deeper verse alignment is added.
+The next milestone will turn parallel passages and their detected gaps into
+reference-keyed rows suitable for side-by-side presentation.
 
 ---
 
@@ -140,7 +140,7 @@ let passage = try library.parallelPassage(
 Planned:
 
 - [x] Side-by-side verses
-- [ ] Missing verse detection
+- [x] Missing verse detection
 - [ ] Verse alignment
 - [ ] Translation comparison
 
