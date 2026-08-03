@@ -296,6 +296,23 @@ func readingPlanRejectsDuplicateDayIdentifiers() throws {
 }
 
 @Test
+func favoriteStoresPortableVerseIdentity() throws {
+    let id = UUID()
+    let createdAt = Date(timeIntervalSince1970: 1_700_000_000)
+    let favorite = SwordFavorite(
+        id: id,
+        reference: try SwordReference("John 3:16"),
+        moduleName: "KJV",
+        createdAt: createdAt
+    )
+
+    #expect(favorite.id == id)
+    #expect(favorite.reference.value == "John 3:16")
+    #expect(favorite.moduleName == "KJV")
+    #expect(favorite.createdAt == createdAt)
+}
+
+@Test
 func knownSwordCategoriesAreMapped() {
     #expect(
         SwordModule.Category(swordType: "Biblical Texts") == .bible
