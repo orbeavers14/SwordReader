@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## One-to-Many and Missing-Word Alignment
+## HTML Rendering
 
 Goal:
 
@@ -112,12 +112,11 @@ let passage = try library.parallelPassage(
     modules: ["KJV", "ASV"]
 )
 
-let links = comparison.wordLinks
-let unlinked = comparison.unlinkedWordLocations
+let html = try bible.html("John 3:16")
 ```
 
-The next milestone will verify multi-token link groups and expose tokens that
-cannot be linked across modules.
+The next milestone will expose module-rendered HTML while keeping plain-text
+verse retrieval unchanged.
 
 ---
 
@@ -154,7 +153,7 @@ Long-term direction:
 - [x] Strong's-number and lemma alignment
 - [x] Morphology-aware Greek and Hebrew comparison
 - [x] Source-to-translation word links
-- [ ] One-to-many and missing-word alignment
+- [x] One-to-many and missing-word alignment
 
 ---
 

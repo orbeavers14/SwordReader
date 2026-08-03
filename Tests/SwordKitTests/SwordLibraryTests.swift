@@ -531,6 +531,37 @@ func comparisonLinksTokensAcrossModulesByStrongsNumber() throws {
 }
 
 @Test
+func comparisonSupportsOneToManyLinksAndReportsUnlinkedWords() throws {
+    let comparison = SwordVerseComparison(
+        reference: try SwordReference("John 3:16"),
+        textByModule: [
+            "Greek": "ὁ θεὸς ἠγάπησεν",
+            "English": "God truly loved"
+        ],
+        lexicalAttributesByModule: [
+            "Greek": [
+                SwordLexicalAttribute(text: "ὁ", lemma: "strong:G3588"),
+                SwordLexicalAttribute(text: "θεὸς", lemma: "strong:G2316"),
+                SwordLexicalAttribute(text: "ἠγάπησεν", lemma: "strong:G25")
+            ],
+            "English": [
+                SwordLexicalAttribute(text: "God", lemma: "strong:G2316"),
+                SwordLexicalAttribute(text: "truly", lemma: "strong:G25"),
+                SwordLexicalAttribute(text: "loved", lemma: "strong:G25")
+            ]
+        ]
+    )
+
+    let love = try #require(
+        comparison.wordLinks.first { $0.strongsNumber == "G25" }
+    )
+    #expect(love.locations.count == 3)
+    #expect(
+        comparison.unlinkedWordLocations.map(\.token.text) == ["ὁ"]
+    )
+}
+
+@Test
 func chapterReferenceParsesBookAndChapter() throws {
     let reference = try SwordChapterReference("John 3")
 

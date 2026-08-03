@@ -188,6 +188,34 @@ public struct SwordVerseComparison: Hashable, Sendable {
         }
     }
 
+    /// Token locations that do not participate in a cross-module word link.
+    public var unlinkedWordLocations: [SwordWordLocation] {
+        let linked = Set(wordLinks.flatMap(\.locations))
+        var unlinked: [SwordWordLocation] = []
+
+        for (moduleName, tokens) in tokensByModule {
+            for (index, token) in tokens.enumerated() {
+                let location = SwordWordLocation(
+                    moduleName: moduleName,
+                    tokenIndex: index,
+                    token: token
+                )
+
+                if !linked.contains(location) {
+                    unlinked.append(location)
+                }
+            }
+        }
+
+        return unlinked.sorted {
+            if $0.moduleName != $1.moduleName {
+                return $0.moduleName < $1.moduleName
+            }
+
+            return $0.tokenIndex < $1.tokenIndex
+        }
+    }
+
     public init(
         reference: SwordReference,
         textByModule: [String: String],
