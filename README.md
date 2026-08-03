@@ -2,7 +2,8 @@
 
 [![CI](https://github.com/orbeavers14/SwordKit/actions/workflows/ci.yml/badge.svg)](https://github.com/orbeavers14/SwordKit/actions/workflows/ci.yml)
 
-SwordKit is an experimental Swift interface to the CrossWire SWORD engine.
+SwordKit is an experimental Swift interface to the CrossWire SWORD engine for
+the Apple platform family.
 
 It provides an idiomatic Swift API while hiding the underlying SWORD C++ implementation behind a small C-compatible bridge.
 
@@ -31,6 +32,9 @@ guarantees.
 
 See [Docs/COMPATIBILITY.md](Docs/COMPATIBILITY.md) for supported environments,
 versioning, and migration policy.
+
+See [Docs/PLATFORMS.md](Docs/PLATFORMS.md) for the macOS, iOS, iPadOS, tvOS,
+visionOS, and watchOS delivery strategy.
 
 ## Requirements
 

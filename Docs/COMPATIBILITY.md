@@ -26,8 +26,11 @@ baseline is:
 - Xcode 26 or a compatible Swift toolchain
 - The vendored CrossWire SWORD source included in this repository
 
-iOS and iPadOS remain project targets, but they are not supported release
-platforms until they appear in `Package.swift` and continuous integration.
+iOS, iPadOS, tvOS, and visionOS are planned full-framework targets. watchOS is a
+planned companion target with full native-engine support subject to resource and
+storage validation. They are not supported release platforms until they appear
+in `Package.swift` and continuous integration. See `PLATFORMS.md` for the staged
+delivery requirements.
 
 Support for an older platform or toolchain may be removed in a minor release
 before 1.0. After 1.0, raising a platform or toolchain minimum requires advance

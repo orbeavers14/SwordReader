@@ -14,7 +14,7 @@
 > - Value-oriented types
 > - Safe memory management
 > - Modern concurrency
-> - Cross-platform (macOS, iOS, iPadOS)
+> - Cross-platform (macOS, iOS, iPadOS, tvOS, visionOS, and watchOS)
 > - Excellent documentation
 > - Stable public API
 
@@ -102,16 +102,30 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Thread-Safe Module Access
+## Multi-Platform Native SWORD Build
 
 Goal:
 
-Serialize access to mutable native module state so live modules can safely support
-well-defined cross-task workflows without exposing raw SWORD handles.
+Produce reproducible device and simulator SWORD artifacts for macOS, iOS, tvOS,
+and visionOS, with an experimental watchOS slice for feasibility testing.
 
 ---
 
 # Upcoming Features
+
+## Apple Platform Support
+
+- [x] Define platform support and delivery matrix
+- [ ] Build multi-SDK SWORD artifacts
+- [ ] Integrate platform-aware native artifacts with SwiftPM
+- [ ] Declare iOS and iPadOS support
+- [ ] Declare tvOS support
+- [ ] Declare visionOS support
+- [ ] Validate watchOS native-engine feasibility
+- [ ] Add sandbox-aware module locations
+- [ ] Add platform compile and integration CI
+
+---
 
 ## Parallel Bible Support
 
