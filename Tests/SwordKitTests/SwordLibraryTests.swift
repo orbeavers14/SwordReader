@@ -402,6 +402,31 @@ func alignedVerseComparesRenderedTextByModule() throws {
 }
 
 @Test
+func verseComparisonTokenizesGreekHebrewAndEnglishText() throws {
+    let comparison = SwordVerseComparison(
+        reference: try SwordReference("John 1:1"),
+        textByModule: [
+            "Greek": "Ἐν ἀρχῇ ἦν ὁ λόγος.",
+            "Hebrew": "בְּרֵאשִׁית בָּרָא אֱלֹהִים׃",
+            "English": "In the beginning, God created."
+        ]
+    )
+
+    #expect(
+        comparison.tokensByModule["Greek"]?.map(\.text)
+            == ["Ἐν", "ἀρχῇ", "ἦν", "ὁ", "λόγος"]
+    )
+    #expect(
+        comparison.tokensByModule["Hebrew"]?.map(\.text)
+            == ["בְּרֵאשִׁית", "בָּרָא", "אֱלֹהִים"]
+    )
+    #expect(
+        comparison.tokensByModule["English"]?.map(\.text)
+            == ["In", "the", "beginning", "God", "created"]
+    )
+}
+
+@Test
 func chapterReferenceParsesBookAndChapter() throws {
     let reference = try SwordChapterReference("John 3")
 

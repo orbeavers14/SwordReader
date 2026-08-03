@@ -98,6 +98,16 @@ public struct SwordVerseComparison: Hashable, Sendable {
     public let reference: SwordReference
     public let textByModule: [String: String]
 
+    /// Unicode-aware word tokens grouped by module.
+    public var tokensByModule: [String: [SwordWordToken]] {
+        textByModule.mapValues { text in
+            text.split { character in
+                !character.isLetter && !character.isNumber
+            }
+            .map { SwordWordToken(text: String($0)) }
+        }
+    }
+
     /// Whether the available modules contain more than one distinct text.
     public var hasTextDifferences: Bool {
         Set(textByModule.values).count > 1
@@ -109,5 +119,14 @@ public struct SwordVerseComparison: Hashable, Sendable {
     ) {
         self.reference = reference
         self.textByModule = textByModule
+    }
+}
+
+/// A word token retaining the exact text supplied by its module.
+public struct SwordWordToken: Hashable, Sendable {
+    public let text: String
+
+    public init(text: String) {
+        self.text = text
     }
 }

@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Unicode-Aware Word Tokenization
+## Normalized Word Comparison
 
 Goal:
 
@@ -112,11 +112,11 @@ let passage = try library.parallelPassage(
     modules: ["KJV", "ASV"]
 )
 
-let words = comparison.tokensByModule
+let normalized = comparison.tokensByModule["Greek"]?.map(\.normalizedText)
 ```
 
-The next milestone will preserve original Greek, Hebrew, and translated word
-forms while producing normalized tokens suitable for later linguistic links.
+The next milestone will add comparison forms for case and canonical Unicode
+differences while retaining each token's original module text.
 
 ---
 
@@ -148,7 +148,7 @@ Planned:
 
 Long-term direction:
 
-- [ ] Unicode-aware tokenization for Greek, Hebrew, and translated text
+- [x] Unicode-aware tokenization for Greek, Hebrew, and translated text
 - [ ] Normalized word comparison without losing original display text
 - [ ] Strong's-number and lemma alignment
 - [ ] Morphology-aware Greek and Hebrew comparison
