@@ -463,6 +463,57 @@ func searchResultStoresRetrievedValues() throws {
 }
 
 @Test
+func searchResultsCanBeRankedByDescendingRelevance() throws {
+    let results = [
+        SwordSearchResult(
+            reference: try SwordReference("John 1:1"),
+            moduleName: "KJV",
+            text: "First",
+            score: 10
+        ),
+        SwordSearchResult(
+            reference: try SwordReference("John 1:2"),
+            moduleName: "KJV",
+            text: "Second",
+            score: 30
+        ),
+        SwordSearchResult(
+            reference: try SwordReference("John 1:3"),
+            moduleName: "KJV",
+            text: "Third",
+            score: 20
+        )
+    ]
+
+    #expect(
+        results.rankedByRelevance().map(\.score) == [30, 20, 10]
+    )
+}
+
+@Test
+func relevanceRankingPreservesOriginalOrderForTies() throws {
+    let results = [
+        SwordSearchResult(
+            reference: try SwordReference("John 1:1"),
+            moduleName: "KJV",
+            text: "First",
+            score: 20
+        ),
+        SwordSearchResult(
+            reference: try SwordReference("John 1:2"),
+            moduleName: "KJV",
+            text: "Second",
+            score: 20
+        )
+    ]
+
+    #expect(
+        results.rankedByRelevance().map(\.reference.value)
+            == ["John 1:1", "John 1:2"]
+    )
+}
+
+@Test
 func bibleModuleCanSearchForPhrase() throws {
     let library = SwordLibrary()
 

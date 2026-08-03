@@ -87,6 +87,7 @@ try bible.references(
 - [x] Scoped search
 - [x] Cancellable asynchronous search
 - [x] Search progress reporting
+- [x] Search result ranking
 - [x] Swift-native `SwordSearchType`
 - [x] Immutable `SwordSearchResult` values
 - [x] SWORD relevance scores
@@ -101,40 +102,23 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Search Result Ranking
+## Parallel Bible Support
 
 Goal:
 
 ```swift
-let results = try bible.search("faith").rankedByRelevance()
+let passage = try library.parallelPassage(
+    "John 3:16-18",
+    modules: ["KJV", "ASV"]
+)
 ```
 
-The next search milestone will provide a Swift-native way to order results by
-their SWORD relevance scores while preserving the engine's original order by
-default.
+The next milestone will retrieve the same passage from multiple Bible modules
+and return aligned, immutable results.
 
 ---
 
 # Upcoming Features
-
-## Advanced Search
-
-Future:
-
-```swift
-let results = try bible.search(
-    "faith",
-    type: .multiWord,
-    caseSensitive: false,
-    scope: "Romans"
-)
-```
-
-Planned:
-
-- [ ] Search result ranking
-
----
 
 ## Parallel Bible Support
 

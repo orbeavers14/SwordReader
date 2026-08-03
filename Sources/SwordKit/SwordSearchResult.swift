@@ -25,3 +25,20 @@ public struct SwordSearchResult: Hashable, Sendable {
         self.score = score
     }
 }
+
+public extension Collection where Element == SwordSearchResult {
+    /// Returns the results ordered by descending SWORD relevance score.
+    ///
+    /// Results with equal scores retain their original relative order.
+    func rankedByRelevance() -> [SwordSearchResult] {
+        enumerated()
+            .sorted { lhs, rhs in
+                if lhs.element.score != rhs.element.score {
+                    return lhs.element.score > rhs.element.score
+                }
+
+                return lhs.offset < rhs.offset
+            }
+            .map(\.element)
+    }
+}
