@@ -400,6 +400,30 @@ func readingHistoryStoresAccessContext() throws {
 }
 
 @Test
+func savedSearchPreservesReproducibleOptions() throws {
+    let search = try SwordSavedSearch(
+        query: "  faith hope  ",
+        type: .multiWord,
+        caseSensitive: false,
+        scope: "Romans",
+        moduleName: "KJV"
+    )
+
+    #expect(search.query == "faith hope")
+    #expect(search.type == .multiWord)
+    #expect(!search.caseSensitive)
+    #expect(search.scope == "Romans")
+    #expect(search.moduleName == "KJV")
+}
+
+@Test
+func savedSearchRejectsBlankQuery() {
+    #expect(throws: SwordError.invalidSearchQuery("")) {
+        try SwordSavedSearch(query: "   ")
+    }
+}
+
+@Test
 func knownSwordCategoriesAreMapped() {
     #expect(
         SwordModule.Category(swordType: "Biblical Texts") == .bible

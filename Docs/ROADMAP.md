@@ -102,21 +102,19 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Saved Searches
+## Verse Collections
 
 Goal:
 
 ```swift
-let passage = try library.parallelPassage(
-    "John 3:16-18",
-    modules: ["KJV", "ASV"]
+let collection = try SwordVerseCollection(
+    title: "Promises",
+    references: [try SwordReference("John 3:16")]
 )
-
-let text = try bible.attributedString("John 3:16")
 ```
 
-The next milestone will add immutable saved-search values that preserve query,
-search type, case sensitivity, scope, and module context.
+The next milestone will add immutable named collections of portable verse
+references.
 
 ---
 
@@ -192,7 +190,7 @@ Long-term direction:
 - [x] Highlights
 - [x] Notes
 - [x] Reading history
-- [ ] Saved searches
+- [x] Saved searches
 - [ ] Verse collections
 
 ---
