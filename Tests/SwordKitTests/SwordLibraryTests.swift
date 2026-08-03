@@ -264,6 +264,38 @@ func installerCopiesModuleFromLocalCatalog() throws {
 }
 
 @Test
+func readingPlanTracksImmutableProgress() throws {
+    let plan = try SwordReadingPlan(
+        id: "gospel-week",
+        title: "A Week in John",
+        days: [
+            try SwordReadingPlanDay(id: 1, readings: ["John 1"]),
+            try SwordReadingPlanDay(id: 2, readings: ["John 2"])
+        ]
+    )
+    let initial = SwordReadingPlanProgress(planID: plan.id)
+    let updated = initial.completing(dayID: 1)
+
+    #expect(initial.completedDayIDs.isEmpty)
+    #expect(updated.completedDayIDs == [1])
+    #expect(updated.completionFraction(for: plan) == 0.5)
+}
+
+@Test
+func readingPlanRejectsDuplicateDayIdentifiers() throws {
+    let first = try SwordReadingPlanDay(id: 1, readings: ["John 1"])
+    let duplicate = try SwordReadingPlanDay(id: 1, readings: ["John 2"])
+
+    #expect(throws: SwordError.invalidReadingPlan("duplicate")) {
+        try SwordReadingPlan(
+            id: "duplicate",
+            title: "Duplicate",
+            days: [first, duplicate]
+        )
+    }
+}
+
+@Test
 func knownSwordCategoriesAreMapped() {
     #expect(
         SwordModule.Category(swordType: "Biblical Texts") == .bible

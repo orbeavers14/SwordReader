@@ -54,5 +54,11 @@ public enum SwordError: Error, Equatable, Sendable {
 
     /// SWORD could not remove a selected module.
     case moduleRemovalFailed(module: String, status: Int32)
+
+    /// A reading plan omitted required identity, title, or unique days.
+    case invalidReadingPlan(String)
+
+    /// A reading-plan day had an invalid identifier or reading expression.
+    case invalidReadingPlanDay(Int)
     
 }
