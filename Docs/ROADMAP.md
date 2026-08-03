@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Validate watchOS Native-Engine Feasibility
+## Sandbox-Aware Module Locations
 
 Goal:
 
-Measure the full native engine on watchOS and decide whether SwordKit should ship
-it directly or expose a companion-first subset backed by the paired iPhone.
+Provide safe default module directories for each Apple platform while preserving
+explicit host-app control over storage and restoration policies.
 
 ---
 
@@ -121,7 +121,7 @@ it directly or expose a companion-first subset backed by the paired iPhone.
 - [x] Declare iOS and iPadOS support
 - [x] Declare tvOS support
 - [x] Declare visionOS support
-- [ ] Validate watchOS native-engine feasibility
+- [x] Validate watchOS native-engine feasibility
 - [ ] Add sandbox-aware module locations
 - [ ] Add platform compile and integration CI
 

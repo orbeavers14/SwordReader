@@ -12,12 +12,12 @@ platform integration tests all cover that destination.
 | iOS and iPadOS | iOS 17 | Full framework with sandbox-aware module storage and installation |
 | tvOS | tvOS 17 | Reading, search, comparison, and app-managed module storage |
 | visionOS | visionOS 1 | Full reading and study framework with app-managed module storage |
-| watchOS | watchOS 10 | Companion-first values and reading features; full native engine subject to validation |
+| watchOS | watchOS 10 | Full framework for compact local libraries, with companion-assisted content delivery recommended |
 
 These baselines align the first cross-platform release around the same generation
-of Foundation, Swift concurrency, and attributed-string APIs. macOS, iOS/iPadOS,
-tvOS, and visionOS are declared in `Package.swift`; continuous-integration and
-runtime validation still gate their first supported release.
+of Foundation, Swift concurrency, and attributed-string APIs. All listed
+platforms are declared in `Package.swift`; continuous-integration and runtime
+validation still gate their first supported release.
 
 ## Portable today
 
@@ -53,8 +53,9 @@ flags. The C bridge must compile against every supported SDK without importing U
 frameworks.
 
 The iOS, tvOS, visionOS, and watchOS simulator builds have been validated. The
-watchOS result establishes build feasibility only; runtime, storage, memory, and
-package-size validation still determine whether the complete engine ships there.
+full package compiles for watchOS and its native device slice is approximately
+3 MB, making the engine feasible there. Apps should still keep on-watch module
+sets compact and prefer paired-iPhone delivery over direct remote installation.
 
 ## Storage and installation
 
