@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Publish Migration and Compatibility Policies
+## Expand Async APIs
 
 Goal:
 
-Define semantic-versioning expectations, supported platform and toolchain ranges,
-deprecation practices, and migration guidance for API changes.
+Add asynchronous entry points for longer-running retrieval and module-management
+operations while preserving the documented native-object isolation model.
 
 ---
 
@@ -195,7 +195,7 @@ Long-term direction:
 - [x] Establish concurrency guarantees
 - [x] Add complete integration tests
 - [x] Add continuous integration
-- [ ] Publish migration and compatibility policies
+- [x] Publish migration and compatibility policies
 
 ---
 

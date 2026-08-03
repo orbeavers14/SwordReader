@@ -29,6 +29,9 @@ See [Docs/ROADMAP.md](Docs/ROADMAP.md) for planned milestones.
 See [Docs/CONCURRENCY.md](Docs/CONCURRENCY.md) for task and actor isolation
 guarantees.
 
+See [Docs/COMPATIBILITY.md](Docs/COMPATIBILITY.md) for supported environments,
+versioning, and migration policy.
+
 ## Requirements
 
 - macOS 14 or later
