@@ -438,6 +438,47 @@ func wordTokensNormalizeCaseAndCanonicalUnicode() {
 }
 
 @Test
+func lexicalAttributesNormalizeStrongsLemmaIdentifiers() {
+    #expect(
+        SwordLexicalAttribute(text: "ἀγάπη", lemma: "strong:G26")
+            .strongsNumber == "G26"
+    )
+}
+
+@Test
+func verseRetrievalIncludesLexicalAttributes() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let verse = try bible.verse("John 3:16")
+
+    #expect(!verse.lexicalAttributes.isEmpty)
+    #expect(verse.lexicalAttributes.contains { $0.strongsNumber == "G25" })
+}
+
+@Test
+func comparisonTokensCarryMatchingLexicalAttributes() throws {
+    let comparison = SwordVerseComparison(
+        reference: try SwordReference("John 3:16"),
+        textByModule: ["Greek": "θεὸς ἀγάπη"],
+        lexicalAttributesByModule: [
+            "Greek": [
+                SwordLexicalAttribute(text: "θεὸς", lemma: "strong:G2316"),
+                SwordLexicalAttribute(text: "ἀγάπη", lemma: "strong:G26")
+            ]
+        ]
+    )
+
+    #expect(
+        comparison.tokensByModule["Greek"]?.map(\.strongsNumber)
+            == ["G2316", "G26"]
+    )
+}
+
+@Test
 func chapterReferenceParsesBookAndChapter() throws {
     let reference = try SwordChapterReference("John 3")
 

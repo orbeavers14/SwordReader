@@ -66,6 +66,20 @@ const char *SwordModuleRenderText(
     SwordModuleHandle *module
 );
 
+size_t SwordModuleWordAttributeCount(
+    const SwordModuleHandle *module
+);
+
+const char *SwordModuleWordAttributeText(
+    const SwordModuleHandle *module,
+    size_t index
+);
+
+const char *SwordModuleWordAttributeLemma(
+    const SwordModuleHandle *module,
+    size_t index
+);
+
 size_t SwordModuleParseReferenceCount(
     SwordModuleHandle *module,
     const char *reference

@@ -1,6 +1,7 @@
 #include "sword_bridge.h"
 
 #include <algorithm>
+#include <cstdlib>
 #include <regex.h>
 #include <string>
 #include <vector>
@@ -70,6 +71,8 @@ struct SwordModuleHandle {
     sword::SWModule *module;
     std::string currentKey;
     std::string renderedText;
+    std::vector<std::string> wordAttributeTexts;
+    std::vector<std::string> wordAttributeLemmas;
     
     std::vector<std::string> parsedReferences;
     std::string parsedReferenceBuffer;
@@ -510,14 +513,79 @@ const char *SwordModuleRenderText(
     }
     
     try {
+        module->wordAttributeTexts.clear();
+        module->wordAttributeLemmas.clear();
+        module->module->setProcessEntryAttributes(true);
         module->renderedText =
         module->module->renderText().c_str();
+
+        auto &attributes = module->module->getEntryAttributes();
+        const auto words = attributes.find("Word");
+
+        if (words != attributes.end()) {
+            for (const auto &word : words->second) {
+                const auto text = word.second.find("Text");
+                const auto partCountValue = word.second.find("PartCount");
+                int partCount = partCountValue == word.second.end()
+                    ? 1
+                    : std::max(1, std::atoi(partCountValue->second.c_str()));
+
+                for (int part = 0; part < partCount; ++part) {
+                    std::string lemmaKey = "Lemma";
+
+                    if (partCount > 1) {
+                        lemmaKey += "." + std::to_string(part + 1);
+                    }
+
+                    const auto lemma = word.second.find(lemmaKey.c_str());
+
+                    if (lemma == word.second.end()) {
+                        continue;
+                    }
+
+                    module->wordAttributeTexts.emplace_back(
+                        text == word.second.end() ? "" : text->second.c_str()
+                    );
+                    module->wordAttributeLemmas.emplace_back(
+                        lemma->second.c_str()
+                    );
+                }
+            }
+        }
         
         return module->renderedText.c_str();
     } catch (...) {
         module->renderedText.clear();
         return "";
     }
+}
+
+size_t SwordModuleWordAttributeCount(
+    const SwordModuleHandle *module
+) {
+    return module == nullptr ? 0 : module->wordAttributeLemmas.size();
+}
+
+const char *SwordModuleWordAttributeText(
+    const SwordModuleHandle *module,
+    size_t index
+) {
+    if (module == nullptr || index >= module->wordAttributeTexts.size()) {
+        return "";
+    }
+
+    return module->wordAttributeTexts[index].c_str();
+}
+
+const char *SwordModuleWordAttributeLemma(
+    const SwordModuleHandle *module,
+    size_t index
+) {
+    if (module == nullptr || index >= module->wordAttributeLemmas.size()) {
+        return "";
+    }
+
+    return module->wordAttributeLemmas[index].c_str();
 }
 
 void SwordModuleIncrement(

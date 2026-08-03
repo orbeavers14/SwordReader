@@ -82,7 +82,10 @@ public struct SwordAlignedVerse: Hashable, Sendable {
     public var comparison: SwordVerseComparison {
         SwordVerseComparison(
             reference: reference,
-            textByModule: versesByModule.mapValues(\.text)
+            textByModule: versesByModule.mapValues(\.text),
+            lexicalAttributesByModule: versesByModule.mapValues(
+                \.lexicalAttributes
+            )
         )
     }
 
@@ -99,15 +102,34 @@ public struct SwordAlignedVerse: Hashable, Sendable {
 public struct SwordVerseComparison: Hashable, Sendable {
     public let reference: SwordReference
     public let textByModule: [String: String]
+    public let lexicalAttributesByModule: [String: [SwordLexicalAttribute]]
 
     /// Unicode-aware word tokens grouped by module.
     public var tokensByModule: [String: [SwordWordToken]] {
-        textByModule.mapValues { text in
-            text.split { character in
+        Dictionary(uniqueKeysWithValues: textByModule.map { module, text in
+            var remainingAttributes = lexicalAttributesByModule[module] ?? []
+
+            let tokens = text.split { character in
                 !character.isLetter && !character.isNumber
             }
-            .map { SwordWordToken(text: String($0)) }
-        }
+            .map { substring in
+                let tokenText = String(substring)
+                let normalized = SwordWordToken(text: tokenText).normalizedText
+                let attributeIndex = remainingAttributes.firstIndex {
+                    SwordWordToken(text: $0.text).normalizedText == normalized
+                }
+                let attribute = attributeIndex.map {
+                    remainingAttributes.remove(at: $0)
+                }
+
+                return SwordWordToken(
+                    text: tokenText,
+                    lemma: attribute?.lemma
+                )
+            }
+
+            return (module, tokens)
+        })
     }
 
     /// Whether the available modules contain more than one distinct text.
@@ -117,16 +139,24 @@ public struct SwordVerseComparison: Hashable, Sendable {
 
     public init(
         reference: SwordReference,
-        textByModule: [String: String]
+        textByModule: [String: String],
+        lexicalAttributesByModule: [String: [SwordLexicalAttribute]] = [:]
     ) {
         self.reference = reference
         self.textByModule = textByModule
+        self.lexicalAttributesByModule = lexicalAttributesByModule
     }
 }
 
 /// A word token retaining the exact text supplied by its module.
 public struct SwordWordToken: Hashable, Sendable {
     public let text: String
+    public let lemma: String?
+
+    public var strongsNumber: String? {
+        lemma.map { SwordLexicalAttribute(text: text, lemma: $0) }
+            .flatMap(\.strongsNumber)
+    }
 
     /// A case-folded, canonically composed form used for comparison.
     public var normalizedText: String {
@@ -136,7 +166,8 @@ public struct SwordWordToken: Hashable, Sendable {
         ).precomposedStringWithCanonicalMapping
     }
 
-    public init(text: String) {
+    public init(text: String, lemma: String? = nil) {
         self.text = text
+        self.lemma = lemma
     }
 }

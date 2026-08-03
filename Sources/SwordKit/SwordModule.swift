@@ -371,11 +371,23 @@ public final class SwordModule: Hashable {
                 reference: resolvedReference.value
             )
         }
+
+        let lexicalAttributes = (0..<SwordModuleWordAttributeCount(handle)).map {
+            SwordLexicalAttribute(
+                text: SwordLibrary.string(
+                    from: SwordModuleWordAttributeText(handle, $0)
+                ),
+                lemma: SwordLibrary.string(
+                    from: SwordModuleWordAttributeLemma(handle, $0)
+                )
+            )
+        }
         
         return SwordVerse(
             reference: resolvedReference,
             moduleName: name,
-            text: text
+            text: text,
+            lexicalAttributes: lexicalAttributes
         )
     }
     
