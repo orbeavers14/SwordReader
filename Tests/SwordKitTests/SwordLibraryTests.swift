@@ -386,6 +386,20 @@ func noteRejectsBlankContent() throws {
 }
 
 @Test
+func readingHistoryStoresAccessContext() throws {
+    let accessedAt = Date(timeIntervalSince1970: 1_700_000_100)
+    let entry = SwordReadingHistoryEntry(
+        reference: try SwordReference("Luke 15:11"),
+        moduleName: "KJV",
+        accessedAt: accessedAt
+    )
+
+    #expect(entry.reference.value == "Luke 15:11")
+    #expect(entry.moduleName == "KJV")
+    #expect(entry.accessedAt == accessedAt)
+}
+
+@Test
 func knownSwordCategoriesAreMapped() {
     #expect(
         SwordModule.Category(swordType: "Biblical Texts") == .bible
