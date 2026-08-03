@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Cross-Reference Metadata
+## Heading Metadata
 
 Goal:
 
@@ -115,8 +115,8 @@ let passage = try library.parallelPassage(
 let text = try bible.attributedString("John 3:16")
 ```
 
-The next milestone will provide typed cross-reference values derived from
-footnote reference lists.
+The next milestone will expose SWORD pre-verse and inter-verse headings as
+immutable values associated with retrieved verses.
 
 ---
 
@@ -164,7 +164,7 @@ Long-term direction:
 - [x] Strong's numbers
 - [x] Morphology
 - [x] Footnotes
-- [ ] Cross references
+- [x] Cross references
 - [ ] Headings
 - [ ] Red-letter text
 

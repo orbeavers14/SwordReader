@@ -12,6 +12,7 @@ public struct SwordVerse: Hashable, Sendable {
     /// Lexical annotations supplied by the SWORD module for this entry.
     public let lexicalAttributes: [SwordLexicalAttribute]
     public let footnotes: [SwordFootnote]
+    public let crossReferences: [SwordCrossReference]
 
     /// Creates a retrieved verse value.
     public init(
@@ -19,13 +20,29 @@ public struct SwordVerse: Hashable, Sendable {
         moduleName: String,
         text: String,
         lexicalAttributes: [SwordLexicalAttribute] = [],
-        footnotes: [SwordFootnote] = []
+        footnotes: [SwordFootnote] = [],
+        crossReferences: [SwordCrossReference] = []
     ) {
         self.reference = reference
         self.moduleName = moduleName
         self.text = text
         self.lexicalAttributes = lexicalAttributes
         self.footnotes = footnotes
+        self.crossReferences = crossReferences
+    }
+}
+
+/// Scripture references associated with a cross-reference footnote.
+public struct SwordCrossReference: Hashable, Sendable {
+    public let footnoteIdentifier: String
+    public let references: [SwordReference]
+
+    public init(
+        footnoteIdentifier: String,
+        references: [SwordReference]
+    ) {
+        self.footnoteIdentifier = footnoteIdentifier
+        self.references = references
     }
 }
 

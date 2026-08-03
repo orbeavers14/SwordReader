@@ -156,6 +156,23 @@ func footnoteStoresEntryMetadata() {
 }
 
 @Test
+func crossReferenceStoresTypedReferences() throws {
+    let crossReference = SwordCrossReference(
+        footnoteIdentifier: "2",
+        references: [
+            try SwordReference("John 1:1"),
+            try SwordReference("Genesis 1:1")
+        ]
+    )
+
+    #expect(crossReference.footnoteIdentifier == "2")
+    #expect(
+        crossReference.references.map(\.value)
+            == ["John 1:1", "Genesis 1:1"]
+    )
+}
+
+@Test
 func bibleModuleCanRetrieveVerse() throws {
     let library = SwordLibrary()
 

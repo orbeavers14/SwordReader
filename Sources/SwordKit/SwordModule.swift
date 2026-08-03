@@ -408,13 +408,31 @@ public final class SwordModule: Hashable {
                 ).nilIfEmpty
             )
         }
+
+        let crossReferences: [SwordCrossReference] = footnotes.compactMap {
+            (footnote: SwordFootnote) -> SwordCrossReference? in
+            guard
+                footnote.type == "crossReference",
+                let expression = footnote.referenceList,
+                let parsedReferences = try? references(in: expression),
+                !parsedReferences.isEmpty
+            else {
+                return nil
+            }
+
+            return SwordCrossReference(
+                footnoteIdentifier: footnote.identifier,
+                references: parsedReferences.references
+            )
+        }
         
         return SwordVerse(
             reference: resolvedReference,
             moduleName: name,
             text: text,
             lexicalAttributes: lexicalAttributes,
-            footnotes: footnotes
+            footnotes: footnotes,
+            crossReferences: crossReferences
         )
     }
     
