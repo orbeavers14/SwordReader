@@ -68,6 +68,26 @@ func subscriptLooksUpModule() {
 }
 
 @Test
+func libraryFiltersModulesByCategoryAndLanguage() {
+    let library = SwordLibrary()
+    let englishBibles = library.modules(
+        category: .bible,
+        language: "EN"
+    )
+
+    #expect(englishBibles.allSatisfy { $0.category == .bible })
+    #expect(
+        englishBibles.allSatisfy {
+            $0.language.caseInsensitiveCompare("en") == .orderedSame
+        }
+    )
+    #expect(
+        englishBibles.map(\.name)
+            == englishBibles.map(\.name).sorted()
+    )
+}
+
+@Test
 func knownSwordCategoriesAreMapped() {
     #expect(
         SwordModule.Category(swordType: "Biblical Texts") == .bible

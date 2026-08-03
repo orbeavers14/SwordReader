@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Module Filtering
+## Module Installation
 
 Goal:
 
@@ -115,8 +115,8 @@ let passage = try library.parallelPassage(
 let text = try bible.attributedString("John 3:16")
 ```
 
-The next milestone will add Swift-native filtering by module category and
-language.
+The next milestone will wrap SWORD's installer APIs with explicit source and
+destination configuration.
 
 ---
 
@@ -173,7 +173,7 @@ Long-term direction:
 ## Module Management
 
 - [x] Open by module name
-- [ ] Filter modules
+- [x] Filter modules
 - [ ] Install modules
 - [ ] Remove modules
 - [ ] Refresh library

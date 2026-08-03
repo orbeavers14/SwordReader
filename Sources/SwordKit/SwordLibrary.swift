@@ -1,4 +1,5 @@
 import CSwordBridge
+import Foundation
 
 /// Provides access to the SWORD engine and its installed modules.
 public final class SwordLibrary {
@@ -59,6 +60,23 @@ public final class SwordLibrary {
     /// Module-name matching is case-insensitive.
     public subscript(name: String) -> SwordModule? {
         module(named: name)
+    }
+
+    /// Returns installed modules matching optional category and language.
+    public func modules(
+        category: SwordModule.Category? = nil,
+        language: String? = nil
+    ) -> [SwordModule] {
+        modules.filter { module in
+            let matchesCategory = category.map {
+                module.category == $0
+            } ?? true
+            let matchesLanguage = language.map {
+                module.language.caseInsensitiveCompare($0) == .orderedSame
+            } ?? true
+
+            return matchesCategory && matchesLanguage
+        }
     }
 
     /// Retrieves the same Scripture range from multiple Bible modules.
