@@ -186,6 +186,22 @@ func bibleModuleCanRenderAttributedString() throws {
 }
 
 @Test
+func attributedStringIncludesStrongsAnnotations() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let attributedText = try bible.attributedString("John 3:16")
+    let strongsNumbers = attributedText.runs.compactMap {
+        $0[SwordStrongsNumberAttribute.self]
+    }
+
+    #expect(strongsNumbers.contains("G25"))
+}
+
+@Test
 func verseLookupRejectsNonBibleModule() {
     let library = SwordLibrary()
 

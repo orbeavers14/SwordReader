@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Strong's Rich-Text Annotations
+## Morphology Rich-Text Annotations
 
 Goal:
 
@@ -115,8 +115,8 @@ let passage = try library.parallelPassage(
 let text = try bible.attributedString("John 3:16")
 ```
 
-The next milestone will attach Strong's identifiers to attributed word ranges
-using Swift-native custom attributes.
+The next milestone will attach morphology codes beside Strong's identifiers on
+the same attributed word ranges.
 
 ---
 
@@ -161,7 +161,7 @@ Long-term direction:
 
 - [x] HTML rendering
 - [x] AttributedString rendering
-- [ ] Strong's numbers
+- [x] Strong's numbers
 - [ ] Morphology
 - [ ] Footnotes
 - [ ] Cross references

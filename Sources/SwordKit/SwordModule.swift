@@ -433,7 +433,10 @@ public final class SwordModule: Hashable {
     public func attributedString(
         _ reference: String
     ) throws -> AttributedString {
+        let verse = try verse(reference)
         let html = try html(reference)
+
+        let attributedText: AttributedString
 
         #if canImport(AppKit) || canImport(UIKit)
         if let data = html.data(using: .utf8),
@@ -445,11 +448,17 @@ public final class SwordModule: Hashable {
                ],
                documentAttributes: nil
            ) {
-            return AttributedString(value)
+            attributedText = AttributedString(value)
+        } else {
+            attributedText = AttributedString(verse.text)
         }
+        #else
+        attributedText = AttributedString(verse.text)
         #endif
 
-        return AttributedString(try verse(reference).text)
+        return attributedText.addingLexicalAttributes(
+            verse.lexicalAttributes
+        )
     }
     
     deinit {
@@ -577,6 +586,30 @@ private let reportSearchProgress:
 private extension String {
     var nilIfEmpty: String? {
         isEmpty ? nil : self
+    }
+}
+
+private extension AttributedString {
+    func addingLexicalAttributes(
+        _ attributes: [SwordLexicalAttribute]
+    ) -> AttributedString {
+        var result = self
+        var searchStart = result.startIndex
+
+        for attribute in attributes {
+            guard
+                let strongsNumber = attribute.strongsNumber,
+                !attribute.text.isEmpty,
+                let range = result[searchStart...].range(of: attribute.text)
+            else {
+                continue
+            }
+
+            result[range][SwordStrongsNumberAttribute.self] = strongsNumber
+            searchStart = range.upperBound
+        }
+
+        return result
     }
 }
 
