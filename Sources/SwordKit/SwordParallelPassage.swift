@@ -1,3 +1,5 @@
+import Foundation
+
 /// A passage retrieved from multiple Bible modules in caller-supplied order.
 public struct SwordParallelPassage: Hashable, Sendable {
     /// The requested Scripture range.
@@ -125,6 +127,14 @@ public struct SwordVerseComparison: Hashable, Sendable {
 /// A word token retaining the exact text supplied by its module.
 public struct SwordWordToken: Hashable, Sendable {
     public let text: String
+
+    /// A case-folded, canonically composed form used for comparison.
+    public var normalizedText: String {
+        text.folding(
+            options: [.caseInsensitive],
+            locale: Locale(identifier: "und")
+        ).precomposedStringWithCanonicalMapping
+    }
 
     public init(text: String) {
         self.text = text

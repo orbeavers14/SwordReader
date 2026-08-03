@@ -427,6 +427,17 @@ func verseComparisonTokenizesGreekHebrewAndEnglishText() throws {
 }
 
 @Test
+func wordTokensNormalizeCaseAndCanonicalUnicode() {
+    let uppercase = SwordWordToken(text: "ΛΌΓΟΣ")
+    let decomposed = SwordWordToken(text: "λο\u{0301}γος")
+
+    #expect(uppercase.normalizedText == "λόγοσ")
+    #expect(decomposed.normalizedText == "λόγοσ")
+    #expect(uppercase.text == "ΛΌΓΟΣ")
+    #expect(decomposed.text == "λο\u{0301}γος")
+}
+
+@Test
 func chapterReferenceParsesBookAndChapter() throws {
     let reference = try SwordChapterReference("John 3")
 

@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Normalized Word Comparison
+## Strong's-Number and Lemma Alignment
 
 Goal:
 
@@ -112,11 +112,11 @@ let passage = try library.parallelPassage(
     modules: ["KJV", "ASV"]
 )
 
-let normalized = comparison.tokensByModule["Greek"]?.map(\.normalizedText)
+let linkedWords = comparison.tokensByModule["Greek"]
 ```
 
-The next milestone will add comparison forms for case and canonical Unicode
-differences while retaining each token's original module text.
+The next milestone will carry SWORD word attributes into tokens so source words
+can be aligned by Strong's number and lemma rather than spelling alone.
 
 ---
 
@@ -149,7 +149,7 @@ Planned:
 Long-term direction:
 
 - [x] Unicode-aware tokenization for Greek, Hebrew, and translated text
-- [ ] Normalized word comparison without losing original display text
+- [x] Normalized word comparison without losing original display text
 - [ ] Strong's-number and lemma alignment
 - [ ] Morphology-aware Greek and Hebrew comparison
 - [ ] Source-to-translation word links
