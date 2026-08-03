@@ -1,5 +1,11 @@
 import CSwordBridge
 
+#if canImport(AppKit)
+import AppKit
+#elseif canImport(UIKit)
+import UIKit
+#endif
+
 /// An installed module provided by the SWORD engine.
 ///
 /// A module may represent a Bible, commentary, dictionary, lexicon,
@@ -421,6 +427,29 @@ public final class SwordModule: Hashable {
         }
 
         return html
+    }
+
+    /// Renders a Bible entry as a Swift-native attributed string.
+    public func attributedString(
+        _ reference: String
+    ) throws -> AttributedString {
+        let html = try html(reference)
+
+        #if canImport(AppKit) || canImport(UIKit)
+        if let data = html.data(using: .utf8),
+           let value = try? NSAttributedString(
+               data: data,
+               options: [
+                   .documentType: NSAttributedString.DocumentType.html,
+                   .characterEncoding: String.Encoding.utf8.rawValue
+               ],
+               documentAttributes: nil
+           ) {
+            return AttributedString(value)
+        }
+        #endif
+
+        return AttributedString(try verse(reference).text)
     }
     
     deinit {

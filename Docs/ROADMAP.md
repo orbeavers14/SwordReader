@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## AttributedString Rendering
+## Strong's Rich-Text Annotations
 
 Goal:
 
@@ -115,8 +115,8 @@ let passage = try library.parallelPassage(
 let text = try bible.attributedString("John 3:16")
 ```
 
-The next milestone will convert SWORD-rendered XHTML into a Swift-native
-`AttributedString` while retaining the HTML API for web-based presentation.
+The next milestone will attach Strong's identifiers to attributed word ranges
+using Swift-native custom attributes.
 
 ---
 
@@ -160,7 +160,7 @@ Long-term direction:
 ## Rich Text
 
 - [x] HTML rendering
-- [ ] AttributedString rendering
+- [x] AttributedString rendering
 - [ ] Strong's numbers
 - [ ] Morphology
 - [ ] Footnotes

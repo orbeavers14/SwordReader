@@ -173,6 +173,19 @@ func bibleModuleCanRenderHTML() throws {
 }
 
 @Test
+func bibleModuleCanRenderAttributedString() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let attributedText = try bible.attributedString("John 3:16")
+
+    #expect(String(attributedText.characters).contains("God"))
+}
+
+@Test
 func verseLookupRejectsNonBibleModule() {
     let library = SwordLibrary()
 
