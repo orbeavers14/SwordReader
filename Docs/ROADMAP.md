@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Source-to-Translation Word Links
+## One-to-Many and Missing-Word Alignment
 
 Goal:
 
@@ -113,10 +113,11 @@ let passage = try library.parallelPassage(
 )
 
 let links = comparison.wordLinks
+let unlinked = comparison.unlinkedWordLocations
 ```
 
-The next milestone will represent explicit links between source-language and
-translated tokens without assuming a one-to-one word relationship.
+The next milestone will verify multi-token link groups and expose tokens that
+cannot be linked across modules.
 
 ---
 
@@ -152,7 +153,7 @@ Long-term direction:
 - [x] Normalized word comparison without losing original display text
 - [x] Strong's-number and lemma alignment
 - [x] Morphology-aware Greek and Hebrew comparison
-- [ ] Source-to-translation word links
+- [x] Source-to-translation word links
 - [ ] One-to-many and missing-word alignment
 
 ---

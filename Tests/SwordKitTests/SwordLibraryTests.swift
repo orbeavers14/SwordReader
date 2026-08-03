@@ -501,6 +501,36 @@ func comparisonTokensCarryMorphology() throws {
 }
 
 @Test
+func comparisonLinksTokensAcrossModulesByStrongsNumber() throws {
+    let comparison = SwordVerseComparison(
+        reference: try SwordReference("John 3:16"),
+        textByModule: [
+            "Greek": "ἠγάπησεν",
+            "English": "loved"
+        ],
+        lexicalAttributesByModule: [
+            "Greek": [
+                SwordLexicalAttribute(
+                    text: "ἠγάπησεν",
+                    lemma: "strong:G25"
+                )
+            ],
+            "English": [
+                SwordLexicalAttribute(
+                    text: "loved",
+                    lemma: "strong:G25"
+                )
+            ]
+        ]
+    )
+
+    let link = try #require(comparison.wordLinks.first)
+    #expect(link.strongsNumber == "G25")
+    #expect(link.locations.map(\.moduleName) == ["English", "Greek"])
+    #expect(link.locations.map(\.token.text) == ["loved", "ἠγάπησεν"])
+}
+
+@Test
 func chapterReferenceParsesBookAndChapter() throws {
     let reference = try SwordChapterReference("John 3")
 

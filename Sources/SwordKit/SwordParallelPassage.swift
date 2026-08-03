@@ -138,6 +138,56 @@ public struct SwordVerseComparison: Hashable, Sendable {
         Set(textByModule.values).count > 1
     }
 
+    /// Cross-module token groups sharing a Strong's identifier.
+    public var wordLinks: [SwordWordLink] {
+        var groupedLocations: [String: [SwordWordLocation]] = [:]
+
+        for (moduleName, tokens) in tokensByModule {
+            for (index, token) in tokens.enumerated() {
+                guard let strongsNumber = token.strongsNumber else {
+                    continue
+                }
+
+                let location = SwordWordLocation(
+                    moduleName: moduleName,
+                    tokenIndex: index,
+                    token: token
+                )
+
+                groupedLocations[strongsNumber, default: []].append(
+                    location
+                )
+            }
+        }
+
+        var links: [SwordWordLink] = []
+
+        for (strongsNumber, locations) in groupedLocations {
+            let moduleNames = Set(
+                locations.map { $0.moduleName }
+            )
+
+            guard moduleNames.count > 1 else {
+                continue
+            }
+
+            links.append(SwordWordLink(
+                strongsNumber: strongsNumber,
+                locations: locations.sorted {
+                    if $0.moduleName != $1.moduleName {
+                        return $0.moduleName < $1.moduleName
+                    }
+
+                    return $0.tokenIndex < $1.tokenIndex
+                }
+            ))
+        }
+
+        return links.sorted {
+            $0.strongsNumber < $1.strongsNumber
+        }
+    }
+
     public init(
         reference: SwordReference,
         textByModule: [String: String],
@@ -146,6 +196,37 @@ public struct SwordVerseComparison: Hashable, Sendable {
         self.reference = reference
         self.textByModule = textByModule
         self.lexicalAttributesByModule = lexicalAttributesByModule
+    }
+}
+
+/// A token's position within one module's rendered verse.
+public struct SwordWordLocation: Hashable, Sendable {
+    public let moduleName: String
+    public let tokenIndex: Int
+    public let token: SwordWordToken
+
+    public init(
+        moduleName: String,
+        tokenIndex: Int,
+        token: SwordWordToken
+    ) {
+        self.moduleName = moduleName
+        self.tokenIndex = tokenIndex
+        self.token = token
+    }
+}
+
+/// Tokens across modules linked by a shared Strong's identifier.
+public struct SwordWordLink: Hashable, Sendable {
+    public let strongsNumber: String
+    public let locations: [SwordWordLocation]
+
+    public init(
+        strongsNumber: String,
+        locations: [SwordWordLocation]
+    ) {
+        self.strongsNumber = strongsNumber
+        self.locations = locations
     }
 }
 
