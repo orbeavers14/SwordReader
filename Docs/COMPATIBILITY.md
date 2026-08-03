@@ -22,15 +22,19 @@ The package manifest is the authoritative compatibility declaration. The current
 baseline is:
 
 - macOS 14 or later
+- iOS and iPadOS 17 or later
+- tvOS 17 or later
+- visionOS 1 or later
+- watchOS 10 or later
 - Swift 6.3 or later
 - Xcode 26 or a compatible Swift toolchain
 - The vendored CrossWire SWORD source included in this repository
 
-iOS, iPadOS, tvOS, and visionOS are planned full-framework targets. watchOS is a
-planned companion target with full native-engine support subject to resource and
-storage validation. They are not supported release platforms until they appear
-in `Package.swift` and continuous integration. See `PLATFORMS.md` for the staged
-delivery requirements.
+The package manifest and bundled XCFramework declare all of these platforms.
+Automated platform compilation and runtime integration coverage remain release
+gates while SwordKit is experimental. On watchOS, compact local module sets and
+paired-iPhone content delivery are recommended even though the full framework
+compiles for the platform.
 
 Support for an older platform or toolchain may be removed in a minor release
 before 1.0. After 1.0, raising a platform or toolchain minimum requires advance
@@ -50,10 +54,11 @@ notes must explain the exception and the required migration.
 
 ## Native SWORD compatibility
 
-SwordKit builds and links the vendored SWORD revision in `Vendor/libsword`.
-System-installed SWORD libraries are not part of the supported binary contract.
-Updates to the vendored engine must pass the complete bridge and Swift test suite
-and must call out observable rendering, search, or module-format changes.
+SwordKit links the versioned `Artifacts/Sword.xcframework`, built from the SWORD
+revision in `Vendor/libsword`. System-installed SWORD libraries are not part of
+the supported binary contract. Updates to either the source or artifact must be
+made together, pass the complete bridge and Swift test suite, and call out
+observable rendering, search, or module-format changes.
 
 SWORD module data remains external user content. SwordKit does not promise that
 every third-party module is valid, but supported releases preserve access to

@@ -10,20 +10,14 @@ It provides an idiomatic Swift API while hiding the underlying SWORD C++ impleme
 ## Current features
 
 - Swift Package Manager library
-- Reproducible static SWORD build
+- Versioned multi-platform SWORD XCFramework
 - Thin C bridge over the SWORD C++ API
-- SWORD engine and bridge version reporting
 - Installed-module discovery
-- Swift module metadata
-- Case-insensitive module lookup
-
-## Planned features
-
-- Verse retrieval
-- Chapter and book iteration
-- Search
-- Module installation and management
-- iOS support
+- Verse, passage, chapter, and reference-list retrieval
+- Phrase, regular-expression, Strong's-number, and morphology search
+- Translation and word-level language comparison values
+- Module installation and study-feature values
+- macOS, iOS, iPadOS, tvOS, visionOS, and watchOS package support
 
 See [Docs/ROADMAP.md](Docs/ROADMAP.md) for planned milestones.
 
@@ -36,29 +30,33 @@ versioning, and migration policy.
 See [Docs/PLATFORMS.md](Docs/PLATFORMS.md) for the macOS, iOS, iPadOS, tvOS,
 visionOS, and watchOS delivery strategy.
 
+See [Docs/NATIVE_DISTRIBUTION.md](Docs/NATIVE_DISTRIBUTION.md) for why SwordKit
+ships a native XCFramework and how it is maintained.
+
 ## Requirements
 
-- macOS 14 or later
-- Swift 6
-- Xcode
-- CMake
+- macOS 14, iOS/iPadOS 17, tvOS 17, visionOS 1, or watchOS 10
+- Swift 6.3 or later
+- Xcode 26 or a compatible Swift toolchain
+
+CMake is required only when rebuilding the bundled SWORD artifact.
 
 ## Building
 
-Build the vendored SWORD library:
+Consumers build SwordKit normally; the versioned XCFramework is already included:
 
 ```bash
-./Scripts/build-libsword.sh
+swift build
 ```
 
-Build a platform-specific native slice under `.build/sword-apple`:
+Maintainers can rebuild a platform-specific native slice under
+`.build/sword-apple`:
 
 ```bash
 ./Scripts/build-libsword-apple.sh ios-simulator
 ```
 
-Use `all` to build every planned Apple destination. The watchOS destinations
-remain feasibility outputs until their resource and storage behavior is validated.
+Use `all` to rebuild every supported Apple destination.
 
 Package completed slices into an XCFramework:
 

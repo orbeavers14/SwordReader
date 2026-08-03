@@ -40,6 +40,14 @@ device and simulator SDKs. `Scripts/package-libsword-xcframework.sh` packages
 those slices into the versioned `Artifacts/Sword.xcframework`, which Swift
 Package Manager links through the `SwordNative` binary target.
 
+This is a conventional distribution model for Swift wrappers around C and C++
+libraries. Consumers receive a ready-to-link library without installing CMake or
+compiling the SWORD engine themselves. The costs are a larger repository and the
+need to regenerate every platform slice whenever the vendored engine changes.
+SwordKit keeps the artifact in the repository while the package is experimental;
+a future release may move the zipped XCFramework to release hosting and use a
+checksum-based remote SwiftPM binary target.
+
 The native build must cover:
 
 - macOS
@@ -77,10 +85,7 @@ portable values directly whenever possible.
 
 ## Delivery sequence
 
-1. Produce and validate multi-SDK native SWORD artifacts.
-2. Replace the macOS-only linker path with platform-aware package integration.
-3. Add iOS, tvOS, visionOS, and conditional watchOS declarations to
-   `Package.swift`.
-4. Add compile and integration jobs for device/simulator SDKs.
-5. Validate sandbox storage and module restoration on each platform.
-6. Publish support only after all required checks pass.
+1. Add compile and integration jobs for device and simulator SDKs.
+2. Validate sandbox storage and module restoration on each platform.
+3. Measure watchOS runtime memory and storage with representative modules.
+4. Publish support only after all required checks pass.
