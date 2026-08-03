@@ -80,6 +80,11 @@ const char *SwordModuleWordAttributeLemma(
     size_t index
 );
 
+const char *SwordModuleWordAttributeMorphology(
+    const SwordModuleHandle *module,
+    size_t index
+);
+
 size_t SwordModuleParseReferenceCount(
     SwordModuleHandle *module,
     const char *reference

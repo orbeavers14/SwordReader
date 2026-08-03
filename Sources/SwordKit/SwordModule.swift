@@ -379,7 +379,10 @@ public final class SwordModule: Hashable {
                 ),
                 lemma: SwordLibrary.string(
                     from: SwordModuleWordAttributeLemma(handle, $0)
-                )
+                ),
+                morphology: SwordLibrary.string(
+                    from: SwordModuleWordAttributeMorphology(handle, $0)
+                ).nilIfEmpty
             )
         }
         
@@ -526,6 +529,12 @@ private let reportSearchProgress:
 
         handler.callback(Int(percentage))
     }
+
+private extension String {
+    var nilIfEmpty: String? {
+        isEmpty ? nil : self
+    }
+}
 
 public extension SwordModule {
     /// A broad classification of a SWORD module's contents.

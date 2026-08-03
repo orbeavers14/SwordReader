@@ -124,7 +124,8 @@ public struct SwordVerseComparison: Hashable, Sendable {
 
                 return SwordWordToken(
                     text: tokenText,
-                    lemma: attribute?.lemma
+                    lemma: attribute?.lemma,
+                    morphology: attribute?.morphology
                 )
             }
 
@@ -152,6 +153,7 @@ public struct SwordVerseComparison: Hashable, Sendable {
 public struct SwordWordToken: Hashable, Sendable {
     public let text: String
     public let lemma: String?
+    public let morphology: String?
 
     public var strongsNumber: String? {
         lemma.map { SwordLexicalAttribute(text: text, lemma: $0) }
@@ -166,8 +168,13 @@ public struct SwordWordToken: Hashable, Sendable {
         ).precomposedStringWithCanonicalMapping
     }
 
-    public init(text: String, lemma: String? = nil) {
+    public init(
+        text: String,
+        lemma: String? = nil,
+        morphology: String? = nil
+    ) {
         self.text = text
         self.lemma = lemma
+        self.morphology = morphology
     }
 }

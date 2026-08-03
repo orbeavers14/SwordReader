@@ -73,6 +73,7 @@ struct SwordModuleHandle {
     std::string renderedText;
     std::vector<std::string> wordAttributeTexts;
     std::vector<std::string> wordAttributeLemmas;
+    std::vector<std::string> wordAttributeMorphologies;
     
     std::vector<std::string> parsedReferences;
     std::string parsedReferenceBuffer;
@@ -515,6 +516,7 @@ const char *SwordModuleRenderText(
     try {
         module->wordAttributeTexts.clear();
         module->wordAttributeLemmas.clear();
+        module->wordAttributeMorphologies.clear();
         module->module->setProcessEntryAttributes(true);
         module->renderedText =
         module->module->renderText().c_str();
@@ -538,6 +540,15 @@ const char *SwordModuleRenderText(
                     }
 
                     const auto lemma = word.second.find(lemmaKey.c_str());
+                    std::string morphologyKey = "Morph";
+
+                    if (partCount > 1) {
+                        morphologyKey += "." + std::to_string(part + 1);
+                    }
+
+                    const auto morphology = word.second.find(
+                        morphologyKey.c_str()
+                    );
 
                     if (lemma == word.second.end()) {
                         continue;
@@ -548,6 +559,11 @@ const char *SwordModuleRenderText(
                     );
                     module->wordAttributeLemmas.emplace_back(
                         lemma->second.c_str()
+                    );
+                    module->wordAttributeMorphologies.emplace_back(
+                        morphology == word.second.end()
+                            ? ""
+                            : morphology->second.c_str()
                     );
                 }
             }
@@ -586,6 +602,20 @@ const char *SwordModuleWordAttributeLemma(
     }
 
     return module->wordAttributeLemmas[index].c_str();
+}
+
+const char *SwordModuleWordAttributeMorphology(
+    const SwordModuleHandle *module,
+    size_t index
+) {
+    if (
+        module == nullptr
+        || index >= module->wordAttributeMorphologies.size()
+    ) {
+        return "";
+    }
+
+    return module->wordAttributeMorphologies[index].c_str();
 }
 
 void SwordModuleIncrement(

@@ -30,6 +30,7 @@ public struct SwordVerse: Hashable, Sendable {
 public struct SwordLexicalAttribute: Hashable, Sendable {
     public let text: String
     public let lemma: String
+    public let morphology: String?
 
     /// A normalized Strong's identifier when the lemma contains one.
     public var strongsNumber: String? {
@@ -48,8 +49,13 @@ public struct SwordLexicalAttribute: Hashable, Sendable {
             }
     }
 
-    public init(text: String, lemma: String) {
+    public init(
+        text: String,
+        lemma: String,
+        morphology: String? = nil
+    ) {
         self.text = text
         self.lemma = lemma
+        self.morphology = morphology
     }
 }

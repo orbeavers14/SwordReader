@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Morphology-Aware Source Comparison
+## Source-to-Translation Word Links
 
 Goal:
 
@@ -112,11 +112,11 @@ let passage = try library.parallelPassage(
     modules: ["KJV", "ASV"]
 )
 
-let morphology = comparison.tokensByModule["Greek"]?.map(\.morphology)
+let links = comparison.wordLinks
 ```
 
-The next milestone will carry SWORD morphology attributes alongside lemmas so
-Greek and Hebrew words can be compared by grammatical form.
+The next milestone will represent explicit links between source-language and
+translated tokens without assuming a one-to-one word relationship.
 
 ---
 
@@ -151,7 +151,7 @@ Long-term direction:
 - [x] Unicode-aware tokenization for Greek, Hebrew, and translated text
 - [x] Normalized word comparison without losing original display text
 - [x] Strong's-number and lemma alignment
-- [ ] Morphology-aware Greek and Hebrew comparison
+- [x] Morphology-aware Greek and Hebrew comparison
 - [ ] Source-to-translation word links
 - [ ] One-to-many and missing-word alignment
 

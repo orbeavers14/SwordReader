@@ -479,6 +479,28 @@ func comparisonTokensCarryMatchingLexicalAttributes() throws {
 }
 
 @Test
+func comparisonTokensCarryMorphology() throws {
+    let comparison = SwordVerseComparison(
+        reference: try SwordReference("John 1:1"),
+        textByModule: ["Greek": "ἦν"],
+        lexicalAttributesByModule: [
+            "Greek": [
+                SwordLexicalAttribute(
+                    text: "ἦν",
+                    lemma: "strong:G1510",
+                    morphology: "robinson:V-IAI-3S"
+                )
+            ]
+        ]
+    )
+
+    #expect(
+        comparison.tokensByModule["Greek"]?.first?.morphology
+            == "robinson:V-IAI-3S"
+    )
+}
+
+@Test
 func chapterReferenceParsesBookAndChapter() throws {
     let reference = try SwordChapterReference("John 3")
 
