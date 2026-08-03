@@ -15,8 +15,9 @@ platform integration tests all cover that destination.
 | watchOS | watchOS 10 | Companion-first values and reading features; full native engine subject to validation |
 
 These baselines align the first cross-platform release around the same generation
-of Foundation, Swift concurrency, and attributed-string APIs. They remain planned
-minimums until declared in `Package.swift` and verified in continuous integration.
+of Foundation, Swift concurrency, and attributed-string APIs. macOS, iOS/iPadOS,
+tvOS, and visionOS are declared in `Package.swift`; continuous-integration and
+runtime validation still gate their first supported release.
 
 ## Portable today
 

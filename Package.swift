@@ -5,7 +5,10 @@ import PackageDescription
 let package = Package(
     name: "SwordKit",
     platforms: [
-        .macOS(.v14)
+        .macOS(.v14),
+        .iOS(.v17),
+        .tvOS(.v17),
+        .visionOS(.v1)
     ],
     products: [
         .library(

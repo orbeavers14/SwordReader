@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Declare Mobile Apple Platforms
+## Validate watchOS Native-Engine Feasibility
 
 Goal:
 
-Declare the validated deployment baselines in Swift Package Manager and compile
-the public bridge for iOS, iPadOS, tvOS, and visionOS.
+Measure the full native engine on watchOS and decide whether SwordKit should ship
+it directly or expose a companion-first subset backed by the paired iPhone.
 
 ---
 
@@ -118,9 +118,9 @@ the public bridge for iOS, iPadOS, tvOS, and visionOS.
 - [x] Define platform support and delivery matrix
 - [x] Build multi-SDK SWORD artifacts
 - [x] Integrate platform-aware native artifacts with SwiftPM
-- [ ] Declare iOS and iPadOS support
-- [ ] Declare tvOS support
-- [ ] Declare visionOS support
+- [x] Declare iOS and iPadOS support
+- [x] Declare tvOS support
+- [x] Declare visionOS support
 - [ ] Validate watchOS native-engine feasibility
 - [ ] Add sandbox-aware module locations
 - [ ] Add platform compile and integration CI
