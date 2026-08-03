@@ -69,5 +69,8 @@ public enum SwordError: Error, Equatable, Sendable {
 
     /// Note content was empty after trimming whitespace.
     case invalidNoteContent
+
+    /// A verse collection had an empty title, no references, or duplicates.
+    case invalidVerseCollection(String)
     
 }

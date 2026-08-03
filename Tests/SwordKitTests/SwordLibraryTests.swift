@@ -424,6 +424,31 @@ func savedSearchRejectsBlankQuery() {
 }
 
 @Test
+func verseCollectionStoresUniquePortableReferences() throws {
+    let john = try SwordReference("John 3:16")
+    let romans = try SwordReference("Romans 8:1")
+    let collection = try SwordVerseCollection(
+        title: "  Promises  ",
+        references: [john, romans]
+    )
+
+    #expect(collection.title == "Promises")
+    #expect(collection.references == [john, romans])
+}
+
+@Test
+func verseCollectionRejectsDuplicateReferences() throws {
+    let reference = try SwordReference("John 3:16")
+
+    #expect(throws: SwordError.invalidVerseCollection("Promises")) {
+        try SwordVerseCollection(
+            title: "Promises",
+            references: [reference, reference]
+        )
+    }
+}
+
+@Test
 func knownSwordCategoriesAreMapped() {
     #expect(
         SwordModule.Category(swordType: "Biblical Texts") == .bible

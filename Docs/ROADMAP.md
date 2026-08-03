@@ -102,19 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Verse Collections
+## Finalize Public API Naming and Ownership
 
 Goal:
 
-```swift
-let collection = try SwordVerseCollection(
-    title: "Promises",
-    references: [try SwordReference("John 3:16")]
-)
-```
-
-The next milestone will add immutable named collections of portable verse
-references.
+Review the complete public surface for consistent Swift naming, clear ownership,
+and minimal exposure of the underlying C++ implementation.
 
 ---
 
@@ -191,7 +184,7 @@ Long-term direction:
 - [x] Notes
 - [x] Reading history
 - [x] Saved searches
-- [ ] Verse collections
+- [x] Verse collections
 
 ---
 
