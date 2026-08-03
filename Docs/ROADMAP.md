@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Establish Concurrency Guarantees
+## Add Complete Integration Tests
 
 Goal:
 
-Define and test the isolation rules for library and module access, then make safe
-cross-task behavior explicit in the public API documentation.
+Exercise complete library workflows against fixture modules, including discovery,
+retrieval, searching, comparison, and module installation boundaries.
 
 ---
 
@@ -192,7 +192,7 @@ Long-term direction:
 
 - [x] Finalize public naming and ownership semantics
 - [x] Document every public declaration
-- [ ] Establish concurrency guarantees
+- [x] Establish concurrency guarantees
 - [ ] Add complete integration tests
 - [ ] Add continuous integration
 - [ ] Publish migration and compatibility policies

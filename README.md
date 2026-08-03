@@ -24,6 +24,9 @@ It provides an idiomatic Swift API while hiding the underlying SWORD C++ impleme
 
 See [Docs/ROADMAP.md](Docs/ROADMAP.md) for planned milestones.
 
+See [Docs/CONCURRENCY.md](Docs/CONCURRENCY.md) for task and actor isolation
+guarantees.
+
 ## Requirements
 
 - macOS 14 or later

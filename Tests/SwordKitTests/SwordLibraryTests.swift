@@ -1571,6 +1571,29 @@ func asynchronousSearchCanBeCancelled() async throws {
     }
 }
 
+@Test
+func portablePublicValuesAreSendable() {
+    requireSendable(SwordReference.self)
+    requireSendable(SwordReferenceList.self)
+    requireSendable(SwordPassageRange.self)
+    requireSendable(SwordVerse.self)
+    requireSendable(SwordChapter.self)
+    requireSendable(SwordPassage.self)
+    requireSendable(SwordSearchResult.self)
+    requireSendable(SwordParallelPassage.self)
+    requireSendable(SwordVerseComparison.self)
+    requireSendable(SwordReadingPlan.self)
+    requireSendable(SwordFavorite.self)
+    requireSendable(SwordBookmark.self)
+    requireSendable(SwordHighlight.self)
+    requireSendable(SwordNote.self)
+    requireSendable(SwordReadingHistoryEntry.self)
+    requireSendable(SwordSavedSearch.self)
+    requireSendable(SwordVerseCollection.self)
+}
+
+private func requireSendable<Value: Sendable>(_: Value.Type) {}
+
 private final class SearchProgressRecorder: @unchecked Sendable {
     private let lock = NSLock()
     private var recordedPercentages: [Int] = []
