@@ -313,6 +313,24 @@ func favoriteStoresPortableVerseIdentity() throws {
 }
 
 @Test
+func bookmarkStoresOptionalUserLabel() throws {
+    let bookmark = SwordBookmark(
+        reference: try SwordReference("Romans 8:28"),
+        moduleName: "KJV",
+        label: "  Encouragement  "
+    )
+    let unlabeled = SwordBookmark(
+        reference: try SwordReference("Romans 8:29"),
+        label: "   "
+    )
+
+    #expect(bookmark.label == "Encouragement")
+    #expect(bookmark.reference.value == "Romans 8:28")
+    #expect(bookmark.moduleName == "KJV")
+    #expect(unlabeled.label == nil)
+}
+
+@Test
 func knownSwordCategoriesAreMapped() {
     #expect(
         SwordModule.Category(swordType: "Biblical Texts") == .bible
