@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Multi-Platform Native SWORD Build
+## Platform-Aware SwiftPM Integration
 
 Goal:
 
-Produce reproducible device and simulator SWORD artifacts for macOS, iOS, tvOS,
-and visionOS, with an experimental watchOS slice for feasibility testing.
+Package the native SWORD slices for Swift Package Manager and replace the
+macOS-only linker configuration with platform-aware integration.
 
 ---
 
@@ -116,7 +116,7 @@ and visionOS, with an experimental watchOS slice for feasibility testing.
 ## Apple Platform Support
 
 - [x] Define platform support and delivery matrix
-- [ ] Build multi-SDK SWORD artifacts
+- [x] Build multi-SDK SWORD artifacts
 - [ ] Integrate platform-aware native artifacts with SwiftPM
 - [ ] Declare iOS and iPadOS support
 - [ ] Declare tvOS support

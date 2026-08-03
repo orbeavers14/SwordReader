@@ -49,3 +49,13 @@ Build the vendored SWORD library:
 
 ```bash
 ./Scripts/build-libsword.sh
+```
+
+Build a platform-specific native slice under `.build/sword-apple`:
+
+```bash
+./Scripts/build-libsword-apple.sh ios-simulator
+```
+
+Use `all` to build every planned Apple destination. The watchOS destinations
+remain feasibility outputs until their resource and storage behavior is validated.

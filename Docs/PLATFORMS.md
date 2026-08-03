@@ -34,9 +34,10 @@ SWORD integration code.
 
 ## Native build requirement
 
-The current `libsword.a` is built for macOS only. Apple-family support requires
-reproducible static SWORD slices for device and simulator SDKs, packaged as an
-XCFramework or an equivalent Swift Package Manager artifact.
+`Scripts/build-libsword-apple.sh` now produces reproducible static SWORD slices
+for device and simulator SDKs. These slices still need to be packaged as an
+XCFramework or an equivalent Swift Package Manager artifact before applications
+can consume them across platforms.
 
 The native build must cover:
 
@@ -49,6 +50,10 @@ The native build must cover:
 Each slice must use the same vendored SWORD revision and compatible feature
 flags. The C bridge must compile against every supported SDK without importing UI
 frameworks.
+
+The iOS, tvOS, visionOS, and watchOS simulator builds have been validated. The
+watchOS result establishes build feasibility only; runtime, storage, memory, and
+package-size validation still determine whether the complete engine ships there.
 
 ## Storage and installation
 
