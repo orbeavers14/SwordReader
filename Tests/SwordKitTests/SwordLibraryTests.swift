@@ -1098,8 +1098,9 @@ func moduleCanRetrieveChapter() throws {
     }
 
     let chapter = try bible.chapter("John 3")
+    let expectedReference = try SwordChapterReference("John 3")
 
-    #expect(chapter.reference == "John 3")
+    #expect(chapter.reference == expectedReference)
     #expect(!chapter.verses.isEmpty)
     #expect(chapter.verses.first?.reference.value == "John 3:1")
     #expect(chapter.verses.last?.reference.value == "John 3:36")

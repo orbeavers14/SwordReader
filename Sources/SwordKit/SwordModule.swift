@@ -335,7 +335,7 @@ public final class SwordModule: Hashable {
         }
 
         return SwordChapter(
-            reference: reference.value,
+            reference: reference,
             moduleName: name,
             verses: verses
         )

@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Finalize Public API Naming and Ownership
+## Document Every Public Declaration
 
 Goal:
 
-Review the complete public surface for consistent Swift naming, clear ownership,
-and minimal exposure of the underlying C++ implementation.
+Add concise DocC documentation for every public type, property, initializer, and
+method, including parameters, return values, and thrown errors where useful.
 
 ---
 
@@ -190,7 +190,7 @@ Long-term direction:
 
 ## Maintenance
 
-- [ ] Finalize public naming and ownership semantics
+- [x] Finalize public naming and ownership semantics
 - [ ] Document every public declaration
 - [ ] Establish concurrency guarantees
 - [ ] Add complete integration tests

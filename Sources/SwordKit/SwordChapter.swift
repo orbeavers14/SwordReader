@@ -1,7 +1,7 @@
 /// A complete chapter retrieved from a SWORD Bible module.
 public struct SwordChapter: Hashable, Sendable {
     /// The normalized chapter reference, such as `"John 3"`.
-    public let reference: String
+    public let reference: SwordChapterReference
 
     /// The module used to retrieve the chapter.
     public let moduleName: String
@@ -10,7 +10,7 @@ public struct SwordChapter: Hashable, Sendable {
     public let verses: [SwordVerse]
 
     public init(
-        reference: String,
+        reference: SwordChapterReference,
         moduleName: String,
         verses: [SwordVerse]
     ) {
