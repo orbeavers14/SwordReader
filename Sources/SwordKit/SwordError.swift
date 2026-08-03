@@ -36,5 +36,14 @@ public enum SwordError: Error, Equatable, Sendable {
 
     /// No installed module matched the requested name.
     case moduleNotFound(String)
+
+    /// An installer destination was not a local file URL.
+    case invalidInstallDestination(String)
+
+    /// Installer-private storage was not a local file URL.
+    case invalidInstallerDirectory(String)
+
+    /// A module repository omitted a required identity or host value.
+    case invalidModuleRepository(String)
     
 }

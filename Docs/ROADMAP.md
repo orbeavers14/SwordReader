@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Module Installation
+## Local Module Catalog Inspection
 
 Goal:
 
@@ -115,8 +115,8 @@ let passage = try library.parallelPassage(
 let text = try bible.attributedString("John 3:16")
 ```
 
-The next milestone will wrap SWORD's installer APIs with explicit source and
-destination configuration.
+The next milestone will inspect modules in a local SWORD repository without
+network access or filesystem mutation.
 
 ---
 
@@ -174,6 +174,7 @@ Long-term direction:
 
 - [x] Open by module name
 - [x] Filter modules
+- [x] Installer configuration
 - [ ] Install modules
 - [ ] Remove modules
 - [ ] Refresh library

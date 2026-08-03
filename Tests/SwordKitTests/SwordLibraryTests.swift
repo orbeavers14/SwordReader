@@ -88,6 +88,51 @@ func libraryFiltersModulesByCategoryAndLanguage() {
 }
 
 @Test
+func installerConfigurationStoresExplicitDirectoriesAndRepositories() throws {
+    let repository = try SwordModuleRepository(
+        identifier: "crosswire",
+        name: "CrossWire",
+        transport: .https,
+        host: "www.crosswire.org",
+        directory: "/ftpmirror/pub/sword/raw"
+    )
+    let configuration = try SwordInstallerConfiguration(
+        destinationDirectory: URL(fileURLWithPath: "/tmp/sword-library"),
+        privateDirectory: URL(fileURLWithPath: "/tmp/sword-installer"),
+        repositories: [repository]
+    )
+
+    #expect(configuration.repositories == [repository])
+    #expect(configuration.destinationDirectory.isFileURL)
+    #expect(configuration.privateDirectory.isFileURL)
+}
+
+@Test
+func installerConfigurationRejectsRemoteDestination() throws {
+    let remoteURL = try #require(URL(string: "https://example.com/modules"))
+
+    #expect(throws: SwordError.invalidInstallDestination(remoteURL.absoluteString)) {
+        try SwordInstallerConfiguration(
+            destinationDirectory: remoteURL,
+            privateDirectory: URL(fileURLWithPath: "/tmp/sword-installer")
+        )
+    }
+}
+
+@Test
+func moduleRepositoryRejectsBlankHost() {
+    #expect(throws: SwordError.invalidModuleRepository("crosswire")) {
+        try SwordModuleRepository(
+            identifier: "crosswire",
+            name: "CrossWire",
+            transport: .http,
+            host: "  ",
+            directory: "/modules"
+        )
+    }
+}
+
+@Test
 func knownSwordCategoriesAreMapped() {
     #expect(
         SwordModule.Category(swordType: "Biblical Texts") == .bible
