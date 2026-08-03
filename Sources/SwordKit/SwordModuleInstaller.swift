@@ -59,4 +59,32 @@ public struct SwordModuleInstaller: Sendable {
             )
         }
     }
+
+    /// Removes one module from the configured destination.
+    public func remove(moduleNamed moduleName: String) throws {
+        let catalog = try SwordModuleCatalog(
+            directory: configuration.destinationDirectory
+        )
+
+        guard catalog.modules.contains(where: { $0.name == moduleName }) else {
+            throw SwordError.moduleNotFound(moduleName)
+        }
+
+        let status = configuration.privateDirectory.path.withCString {
+            privatePath in
+            configuration.destinationDirectory.path.withCString {
+                destinationPath in
+                moduleName.withCString { name in
+                    SwordRemoveModule(privatePath, destinationPath, name)
+                }
+            }
+        }
+
+        guard status == 0 else {
+            throw SwordError.moduleRemovalFailed(
+                module: moduleName,
+                status: status
+            )
+        }
+    }
 }

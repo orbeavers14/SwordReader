@@ -48,6 +48,12 @@ int SwordInstallLocalModule(
     const char *moduleName
 );
 
+int SwordRemoveModule(
+    const char *privatePath,
+    const char *destinationPath,
+    const char *moduleName
+);
+
 size_t SwordManagerModuleCount(const SwordManager *manager);
 
 SwordModuleHandle *SwordManagerOpenModule(

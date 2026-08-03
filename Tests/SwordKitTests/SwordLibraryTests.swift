@@ -244,6 +244,11 @@ func installerCopiesModuleFromLocalCatalog() throws {
 
     let installedCatalog = try SwordModuleCatalog(directory: destination)
     #expect(installedCatalog.modules.map(\.name) == ["TestBible"])
+
+    try installer.remove(moduleNamed: "TestBible")
+
+    let catalogAfterRemoval = try SwordModuleCatalog(directory: destination)
+    #expect(catalogAfterRemoval.modules.isEmpty)
 }
 
 @Test

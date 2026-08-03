@@ -51,5 +51,8 @@ public enum SwordError: Error, Equatable, Sendable {
 
     /// SWORD could not install a selected module.
     case moduleInstallationFailed(module: String, status: Int32)
+
+    /// SWORD could not remove a selected module.
+    case moduleRemovalFailed(module: String, status: Int32)
     
 }

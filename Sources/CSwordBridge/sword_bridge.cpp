@@ -193,6 +193,29 @@ int SwordInstallLocalModule(
     }
 }
 
+int SwordRemoveModule(
+    const char *privatePath,
+    const char *destinationPath,
+    const char *moduleName
+) {
+    if (
+        privatePath == nullptr
+        || destinationPath == nullptr
+        || moduleName == nullptr
+        || moduleName[0] == '\0'
+    ) {
+        return -1;
+    }
+
+    try {
+        sword::InstallMgr installer(privatePath);
+        sword::SWMgr destination(destinationPath);
+        return installer.removeModule(&destination, moduleName);
+    } catch (...) {
+        return -1;
+    }
+}
+
 size_t SwordModuleParseReferenceCount(
     SwordModuleHandle *module,
     const char *reference

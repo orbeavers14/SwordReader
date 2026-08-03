@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Module Removal
+## Library Refresh
 
 Goal:
 
@@ -115,8 +115,8 @@ let passage = try library.parallelPassage(
 let text = try bible.attributedString("John 3:16")
 ```
 
-The next milestone will explicitly remove a selected module from the configured
-destination using SWORD's installer.
+The next milestone will refresh a library snapshot after installation or
+removal without requiring application restart.
 
 ---
 
@@ -177,7 +177,7 @@ Long-term direction:
 - [x] Installer configuration
 - [x] Local catalog inspection
 - [x] Install modules
-- [ ] Remove modules
+- [x] Remove modules
 - [ ] Refresh library
 - [ ] Inspect module metadata
 - [ ] Version information
