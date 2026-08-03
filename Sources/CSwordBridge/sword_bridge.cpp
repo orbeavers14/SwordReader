@@ -22,6 +22,22 @@ constexpr int searchAttributeNone = 0;
 constexpr int searchAttributeStrongs = 1;
 constexpr int searchAttributeMorphology = 2;
 
+struct SearchProgressContext {
+    SwordSearchProgressCallback callback;
+    void *userData;
+};
+
+void reportSearchProgress(char percentage, void *userData) {
+    auto *context = static_cast<SearchProgressContext *>(userData);
+
+    if (context != nullptr && context->callback != nullptr) {
+        context->callback(
+            static_cast<unsigned char>(percentage),
+            context->userData
+        );
+    }
+}
+
 } // namespace
 
 struct SwordManager {
@@ -167,7 +183,9 @@ size_t SwordModuleSearchCount(
     const char *scope,
     int searchType,
     int attributeType,
-    int caseSensitive
+    int caseSensitive,
+    SwordSearchProgressCallback progress,
+    void *progressUserData
 ) {
     const bool isAttributeSearch =
         searchType == sword::SWModule::SEARCHTYPE_ENTRYATTR;
@@ -233,11 +251,19 @@ size_t SwordModuleSearchCount(
             searchScope = &scopeKeys;
         }
 
+        SearchProgressContext progressContext {
+            progress,
+            progressUserData
+        };
+
         sword::ListKey results = module->module->search(
             searchQuery.c_str(),
             searchType,
             caseSensitive ? 0 : REG_ICASE,
-            searchScope
+            searchScope,
+            nullptr,
+            &reportSearchProgress,
+            &progressContext
         );
 
         const int count = results.getCount();

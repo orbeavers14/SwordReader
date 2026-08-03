@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import SwordKit
 
@@ -694,6 +695,29 @@ func bibleModuleCanSearchAsynchronously() async throws {
 }
 
 @Test
+func asynchronousSearchReportsProgress() async throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let progress = SearchProgressRecorder()
+
+    _ = try await bible.searchAsync(
+        "Jesus wept",
+        scope: "John 11",
+        progress: { percentage in
+            progress.record(percentage)
+        }
+    )
+
+    let percentages = progress.percentages
+    #expect(!percentages.isEmpty)
+    #expect(percentages.allSatisfy { (0...100).contains($0) })
+}
+
+@Test
 func asynchronousSearchCanBeCancelled() async throws {
     let library = SwordLibrary()
 
@@ -715,5 +739,20 @@ func asynchronousSearchCanBeCancelled() async throws {
         Issue.record("Expected the search to be cancelled")
     } catch is CancellationError {
         // Expected.
+    }
+}
+
+private final class SearchProgressRecorder: @unchecked Sendable {
+    private let lock = NSLock()
+    private var recordedPercentages: [Int] = []
+
+    var percentages: [Int] {
+        lock.withLock { recordedPercentages }
+    }
+
+    func record(_ percentage: Int) {
+        lock.withLock {
+            recordedPercentages.append(percentage)
+        }
     }
 }

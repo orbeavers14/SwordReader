@@ -86,6 +86,7 @@ try bible.references(
 - [x] Morphology search
 - [x] Scoped search
 - [x] Cancellable asynchronous search
+- [x] Search progress reporting
 - [x] Swift-native `SwordSearchType`
 - [x] Immutable `SwordSearchResult` values
 - [x] SWORD relevance scores
@@ -100,21 +101,17 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Search Progress Reporting
+## Search Result Ranking
 
 Goal:
 
 ```swift
-let results = try await bible.searchAsync(
-    "faith",
-    progress: { percentage in
-        print(percentage)
-    }
-)
+let results = try bible.search("faith").rankedByRelevance()
 ```
 
-The next search milestone will expose SWORD's progress callback through a
-Swift-native reporting closure.
+The next search milestone will provide a Swift-native way to order results by
+their SWORD relevance scores while preserving the engine's original order by
+default.
 
 ---
 
@@ -135,7 +132,6 @@ let results = try bible.search(
 
 Planned:
 
-- [ ] Progress reporting
 - [ ] Search result ranking
 
 ---

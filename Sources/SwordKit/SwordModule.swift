@@ -135,12 +135,14 @@ public final class SwordModule: Hashable {
     ///   - type: The matching strategy. The default is exact phrase search.
     ///   - caseSensitive: Whether letter case must match. The default is `true`.
     ///   - scope: An optional Scripture reference expression to search within.
+    ///   - progress: An optional callback receiving search completion percentages.
     /// - Returns: Matching verses in the order returned by SWORD.
     public func search(
         _ query: String,
         type: SwordSearchType = .phrase,
         caseSensitive: Bool = true,
-        scope: String? = nil
+        scope: String? = nil,
+        progress: (@Sendable (Int) -> Void)? = nil
     ) throws -> [SwordSearchResult] {
         guard category == .bible else {
             throw SwordError.unsupportedModuleType
@@ -178,6 +180,20 @@ public final class SwordModule: Hashable {
             SwordModuleClearSearchResults(handle)
         }
 
+        let progressContext = progress.map {
+            Unmanaged.passRetained(
+                SearchProgressHandler($0)
+            ).toOpaque()
+        }
+
+        defer {
+            if let progressContext {
+                Unmanaged<SearchProgressHandler>
+                    .fromOpaque(progressContext)
+                    .release()
+            }
+        }
+
         let count = normalizedQuery.withCString { queryPointer in
             normalizedScope.withCString { scopePointer in
                 SwordModuleSearchCount(
@@ -186,7 +202,9 @@ public final class SwordModule: Hashable {
                     scopePointer,
                     type.bridgeValue,
                     type.bridgeAttributeType,
-                    caseSensitive ? 1 : 0
+                    caseSensitive ? 1 : 0,
+                    progress == nil ? nil : reportSearchProgress,
+                    progressContext
                 )
             }
         }
@@ -232,11 +250,13 @@ public final class SwordModule: Hashable {
     ///
     /// Cancelling the calling task signals SWORD to terminate its active
     /// search and causes this method to throw ``CancellationError``.
+    /// The optional progress callback receives SWORD's completion percentage.
     public func searchAsync(
         _ query: String,
         type: SwordSearchType = .phrase,
         caseSensitive: Bool = true,
-        scope: String? = nil
+        scope: String? = nil,
+        progress: (@Sendable (Int) -> Void)? = nil
     ) async throws -> [SwordSearchResult] {
         let nativeHandle = SendableSwordModuleHandle(
             value: handle
@@ -249,7 +269,8 @@ public final class SwordModule: Hashable {
                 query,
                 type: type,
                 caseSensitive: caseSensitive,
-                scope: scope
+                scope: scope,
+                progress: progress
             )
 
             try Task.checkCancellation()
@@ -470,6 +491,29 @@ public final class SwordModule: Hashable {
 private struct SendableSwordModuleHandle: @unchecked Sendable {
     let value: OpaquePointer
 }
+
+private final class SearchProgressHandler: @unchecked Sendable {
+    let callback: @Sendable (Int) -> Void
+
+    init(_ callback: @escaping @Sendable (Int) -> Void) {
+        self.callback = callback
+    }
+}
+
+private let reportSearchProgress:
+    @convention(c) (Int32, UnsafeMutableRawPointer?) -> Void = {
+        percentage,
+        userData in
+        guard let userData else {
+            return
+        }
+
+        let handler = Unmanaged<SearchProgressHandler>
+            .fromOpaque(userData)
+            .takeUnretainedValue()
+
+        handler.callback(Int(percentage))
+    }
 
 public extension SwordModule {
     /// A broad classification of a SWORD module's contents.

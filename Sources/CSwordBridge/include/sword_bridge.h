@@ -12,6 +12,10 @@ const char *SwordEngineVersion(void);
 
 typedef struct SwordManager SwordManager;
 typedef struct SwordModuleHandle SwordModuleHandle;
+typedef void (*SwordSearchProgressCallback)(
+    int percentage,
+    void *userData
+);
 
 SwordManager *SwordManagerCreate(void);
 void SwordManagerDestroy(SwordManager *manager);
@@ -82,7 +86,9 @@ size_t SwordModuleSearchCount(
     const char *scope,
     int searchType,
     int attributeType,
-    int caseSensitive
+    int caseSensitive,
+    SwordSearchProgressCallback progress,
+    void *progressUserData
 );
 
 const char *SwordModuleSearchResultReference(
