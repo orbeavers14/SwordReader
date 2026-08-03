@@ -19,6 +19,7 @@ typedef void (*SwordSearchProgressCallback)(
 );
 
 SwordManager *SwordManagerCreate(void);
+SwordManager *SwordManagerCreateAtPath(const char *path);
 void SwordManagerDestroy(SwordManager *manager);
 
 SwordModuleCatalogHandle *SwordModuleCatalogCreate(const char *path);

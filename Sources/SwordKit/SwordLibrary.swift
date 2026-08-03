@@ -14,14 +14,37 @@ public final class SwordLibrary {
     )
 
     /// The modules available through this SWORD installation.
-    public let modules: [SwordModule]
+    public private(set) var modules: [SwordModule]
 
-    private let storage: SwordManagerStorage?
+    private var storage: SwordManagerStorage?
+    private let directory: URL?
 
     /// Creates a library using the modules installed in the standard
     /// SWORD module locations.
     public init() {
-        guard let storage = SwordManagerStorage() else {
+        self.directory = nil
+        self.storage = nil
+        self.modules = []
+        refresh()
+    }
+
+    /// Creates a library rooted at an explicit local SWORD directory.
+    public init(directory: URL) throws {
+        guard directory.isFileURL else {
+            throw SwordError.moduleCatalogNotFound(directory.absoluteString)
+        }
+
+        self.directory = directory.standardizedFileURL
+        self.storage = nil
+        self.modules = []
+        refresh()
+    }
+
+    /// Reloads installed modules into a new library snapshot.
+    public func refresh() {
+        let storage = SwordManagerStorage(directory: directory?.path)
+
+        guard let storage else {
             self.storage = nil
             self.modules = []
             return
@@ -31,7 +54,7 @@ public final class SwordLibrary {
 
         let count = SwordManagerModuleCount(storage.handle)
 
-        self.modules = (0..<count).compactMap { index in
+        modules = (0..<count).compactMap { index in
             guard let handle = SwordManagerOpenModule(
                 storage.handle,
                 index

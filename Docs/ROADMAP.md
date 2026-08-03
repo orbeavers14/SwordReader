@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Library Refresh
+## Expanded Module Metadata
 
 Goal:
 
@@ -115,8 +115,8 @@ let passage = try library.parallelPassage(
 let text = try bible.attributedString("John 3:16")
 ```
 
-The next milestone will refresh a library snapshot after installation or
-removal without requiring application restart.
+The next milestone will expose additional SWORD configuration metadata for
+installed and catalog modules.
 
 ---
 
@@ -178,7 +178,7 @@ Long-term direction:
 - [x] Local catalog inspection
 - [x] Install modules
 - [x] Remove modules
-- [ ] Refresh library
+- [x] Refresh library
 - [ ] Inspect module metadata
 - [ ] Version information
 

@@ -50,6 +50,20 @@ struct SwordManager {
 
     SwordManager()
         : htmlManager(new sword::MarkupFilterMgr(sword::FMT_XHTML)) {
+        loadModules();
+    }
+
+    explicit SwordManager(const char *path)
+        : manager(path),
+          htmlManager(
+              path,
+              true,
+              new sword::MarkupFilterMgr(sword::FMT_XHTML)
+          ) {
+        loadModules();
+    }
+
+    void loadModules() {
         const auto &installedModules = manager.getModules();
 
         modules.reserve(installedModules.size());
@@ -509,6 +523,18 @@ const char *SwordEngineVersion(void) {
 SwordManager *SwordManagerCreate(void) {
     try {
         return new SwordManager();
+    } catch (...) {
+        return nullptr;
+    }
+}
+
+SwordManager *SwordManagerCreateAtPath(const char *path) {
+    if (path == nullptr || path[0] == '\0') {
+        return nullptr;
+    }
+
+    try {
+        return new SwordManager(path);
     } catch (...) {
         return nullptr;
     }
