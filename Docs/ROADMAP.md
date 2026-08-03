@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Highlights
+## Notes
 
 Goal:
 
@@ -115,8 +115,8 @@ let passage = try library.parallelPassage(
 let text = try bible.attributedString("John 3:16")
 ```
 
-The next milestone will add immutable verse highlights with portable style
-identifiers and optional text ranges.
+The next milestone will add immutable verse notes with normalized nonempty
+content and optional module context.
 
 ---
 
@@ -189,7 +189,7 @@ Long-term direction:
 - [x] Reading plans
 - [x] Favorites
 - [x] Bookmarks
-- [ ] Highlights
+- [x] Highlights
 - [ ] Notes
 - [ ] Reading history
 - [ ] Saved searches

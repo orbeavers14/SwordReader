@@ -331,6 +331,29 @@ func bookmarkStoresOptionalUserLabel() throws {
 }
 
 @Test
+func highlightStoresPortableStyleAndTextRange() throws {
+    let range = try SwordTextRange(location: 4, length: 12)
+    let highlight = try SwordHighlight(
+        reference: SwordReference("Psalm 23:1"),
+        moduleName: "KJV",
+        styleIdentifier: "  yellow  ",
+        range: range
+    )
+
+    #expect(highlight.styleIdentifier == "yellow")
+    #expect(highlight.range == range)
+    #expect(highlight.range?.location == 4)
+    #expect(highlight.range?.length == 12)
+}
+
+@Test
+func textRangeRejectsZeroLength() {
+    #expect(throws: SwordError.invalidTextRange(location: 0, length: 0)) {
+        try SwordTextRange(location: 0, length: 0)
+    }
+}
+
+@Test
 func knownSwordCategoriesAreMapped() {
     #expect(
         SwordModule.Category(swordType: "Biblical Texts") == .bible

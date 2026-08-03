@@ -60,5 +60,11 @@ public enum SwordError: Error, Equatable, Sendable {
 
     /// A reading-plan day had an invalid identifier or reading expression.
     case invalidReadingPlanDay(Int)
+
+    /// A serializable text range had an invalid location or length.
+    case invalidTextRange(location: Int, length: Int)
+
+    /// A highlight style identifier was empty.
+    case invalidHighlightStyle(String)
     
 }
