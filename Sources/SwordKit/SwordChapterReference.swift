@@ -16,6 +16,7 @@ public struct SwordChapterReference: Hashable, Sendable {
         }
     }
 
+    /// Parses and validates a chapter reference.
     public init(_ value: String) throws {
         let trimmed = value.trimmingCharacters(
             in: .whitespacesAndNewlines

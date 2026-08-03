@@ -45,6 +45,7 @@ public struct SwordParallelPassage: Hashable, Sendable {
         }
     }
 
+    /// Creates a parallel passage from an expected range and module passages.
     public init(
         reference: SwordPassageRange,
         passages: [SwordPassage]
@@ -75,7 +76,9 @@ public struct SwordParallelPassage: Hashable, Sendable {
 
 /// Verses from multiple modules aligned to one Scripture reference.
 public struct SwordAlignedVerse: Hashable, Sendable {
+    /// The Scripture reference shared by the aligned row.
     public let reference: SwordReference
+    /// Available verses keyed by module name.
     public let versesByModule: [String: SwordVerse]
 
     /// A verse-level comparison of rendered text across the aligned modules.
@@ -89,6 +92,7 @@ public struct SwordAlignedVerse: Hashable, Sendable {
         )
     }
 
+    /// Creates an aligned verse row.
     public init(
         reference: SwordReference,
         versesByModule: [String: SwordVerse]
@@ -100,8 +104,11 @@ public struct SwordAlignedVerse: Hashable, Sendable {
 
 /// Rendered verse text grouped by module for comparison.
 public struct SwordVerseComparison: Hashable, Sendable {
+    /// The Scripture reference being compared.
     public let reference: SwordReference
+    /// Rendered verse text keyed by module name.
     public let textByModule: [String: String]
+    /// Lexical metadata keyed by module name.
     public let lexicalAttributesByModule: [String: [SwordLexicalAttribute]]
 
     /// Unicode-aware word tokens grouped by module.
@@ -216,6 +223,7 @@ public struct SwordVerseComparison: Hashable, Sendable {
         }
     }
 
+    /// Creates a comparison from rendered text and optional lexical metadata.
     public init(
         reference: SwordReference,
         textByModule: [String: String],
@@ -229,10 +237,14 @@ public struct SwordVerseComparison: Hashable, Sendable {
 
 /// A token's position within one module's rendered verse.
 public struct SwordWordLocation: Hashable, Sendable {
+    /// The module containing the token.
     public let moduleName: String
+    /// The zero-based token offset within the module's verse text.
     public let tokenIndex: Int
+    /// The token at the specified offset.
     public let token: SwordWordToken
 
+    /// Creates a token location within a module.
     public init(
         moduleName: String,
         tokenIndex: Int,
@@ -246,9 +258,12 @@ public struct SwordWordLocation: Hashable, Sendable {
 
 /// Tokens across modules linked by a shared Strong's identifier.
 public struct SwordWordLink: Hashable, Sendable {
+    /// The normalized Strong's identifier shared by the linked tokens.
     public let strongsNumber: String
+    /// Token locations participating in the cross-module link.
     public let locations: [SwordWordLocation]
 
+    /// Creates a cross-module Strong's-number link.
     public init(
         strongsNumber: String,
         locations: [SwordWordLocation]
@@ -260,10 +275,14 @@ public struct SwordWordLink: Hashable, Sendable {
 
 /// A word token retaining the exact text supplied by its module.
 public struct SwordWordToken: Hashable, Sendable {
+    /// The exact word text supplied by the module.
     public let text: String
+    /// The source lemma metadata, when available.
     public let lemma: String?
+    /// The morphology code, when available.
     public let morphology: String?
 
+    /// The normalized Strong's identifier parsed from the lemma.
     public var strongsNumber: String? {
         lemma.map { SwordLexicalAttribute(text: text, lemma: $0) }
             .flatMap(\.strongsNumber)
@@ -277,6 +296,7 @@ public struct SwordWordToken: Hashable, Sendable {
         ).precomposedStringWithCanonicalMapping
     }
 
+    /// Creates a word token with optional lexical metadata.
     public init(
         text: String,
         lemma: String? = nil,

@@ -14,18 +14,20 @@ public enum SwordError: Error, Equatable, Sendable {
 
     /// SWORD returned no rendered content for the requested reference.
     case emptyRenderedText(reference: String)
-    
+
+    /// A sequential passage requested a nonpositive number of verses.
     case invalidVerseCount(Int)
-    
+
     /// The supplied passage range could not be interpreted.
     case invalidPassageRange(String)
 
     /// The ending verse precedes the starting verse.
     case reversedPassageRange(String)
-    
+
     /// The supplied chapter reference could not be interpreted.
     case invalidChapterReference(String)
-    
+
+    /// A reference-list expression was empty or could not be parsed.
     case invalidReferenceList(String)
 
     /// A search query contained no non-whitespace characters.
@@ -72,5 +74,4 @@ public enum SwordError: Error, Equatable, Sendable {
 
     /// A verse collection had an empty title, no references, or duplicates.
     case invalidVerseCollection(String)
-    
 }

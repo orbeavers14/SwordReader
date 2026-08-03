@@ -9,6 +9,7 @@ public struct SwordPassage: Hashable, Sendable {
     /// The verses contained in the passage.
     public let verses: [SwordVerse]
 
+    /// Creates a retrieved sequential passage value.
     public init(
         reference: SwordReference,
         moduleName: String,

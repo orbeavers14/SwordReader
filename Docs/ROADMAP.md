@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Document Every Public Declaration
+## Establish Concurrency Guarantees
 
 Goal:
 
-Add concise DocC documentation for every public type, property, initializer, and
-method, including parameters, return values, and thrown errors where useful.
+Define and test the isolation rules for library and module access, then make safe
+cross-task behavior explicit in the public API documentation.
 
 ---
 
@@ -191,7 +191,7 @@ Long-term direction:
 ## Maintenance
 
 - [x] Finalize public naming and ownership semantics
-- [ ] Document every public declaration
+- [x] Document every public declaration
 - [ ] Establish concurrency guarantees
 - [ ] Add complete integration tests
 - [ ] Add continuous integration

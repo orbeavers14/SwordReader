@@ -2,11 +2,16 @@ import Foundation
 
 /// An immutable named collection of portable Scripture references.
 public struct SwordVerseCollection: Hashable, Sendable, Identifiable {
+    /// A stable identifier suitable for persistence.
     public let id: UUID
+    /// The nonempty display title.
     public let title: String
+    /// The unique Scripture references in collection order.
     public let references: [SwordReference]
+    /// The date the collection was created.
     public let createdAt: Date
 
+    /// Creates a nonempty collection with a unique set of references.
     public init(
         id: UUID = UUID(),
         title: String,

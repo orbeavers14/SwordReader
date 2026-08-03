@@ -536,6 +536,7 @@ public final class SwordModule: Hashable {
         SwordModuleDestroy(handle)
     }
     
+    /// Returns whether two values represent the same live module instance.
     public static func == (
         lhs: SwordModule,
         rhs: SwordModule
@@ -543,6 +544,7 @@ public final class SwordModule: Hashable {
         lhs === rhs
     }
     
+    /// Hashes the module's object identity.
     public func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(self))
     }

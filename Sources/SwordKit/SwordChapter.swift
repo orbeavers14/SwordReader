@@ -9,6 +9,7 @@ public struct SwordChapter: Hashable, Sendable {
     /// The verses contained in the chapter.
     public let verses: [SwordVerse]
 
+    /// Creates a retrieved chapter value.
     public init(
         reference: SwordChapterReference,
         moduleName: String,

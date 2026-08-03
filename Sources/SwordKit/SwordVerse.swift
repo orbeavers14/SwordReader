@@ -11,8 +11,11 @@ public struct SwordVerse: Hashable, Sendable {
 
     /// Lexical annotations supplied by the SWORD module for this entry.
     public let lexicalAttributes: [SwordLexicalAttribute]
+    /// Footnotes attached to the entry.
     public let footnotes: [SwordFootnote]
+    /// Parsed Scripture cross references attached to the entry.
     public let crossReferences: [SwordCrossReference]
+    /// Headings associated with the entry.
     public let headings: [SwordHeading]
 
     /// Creates a retrieved verse value.
@@ -37,16 +40,24 @@ public struct SwordVerse: Hashable, Sendable {
 
 /// A heading associated with a SWORD entry.
 public struct SwordHeading: Hashable, Sendable {
+    /// The heading's position relative to verse content.
     public enum Position: Hashable, Sendable {
+        /// The heading precedes the verse.
         case preVerse
+        /// The heading occurs within the verse stream.
         case interVerse
+        /// A module-specific position value.
         case other(String)
     }
 
+    /// The module-provided heading identifier.
     public let identifier: String
+    /// The rendered heading content.
     public let body: String
+    /// The heading's position relative to the verse.
     public let position: Position
 
+    /// Creates heading metadata.
     public init(identifier: String, body: String, position: Position) {
         self.identifier = identifier
         self.body = body
@@ -56,9 +67,12 @@ public struct SwordHeading: Hashable, Sendable {
 
 /// Scripture references associated with a cross-reference footnote.
 public struct SwordCrossReference: Hashable, Sendable {
+    /// The identifier of the source footnote.
     public let footnoteIdentifier: String
+    /// Scripture references parsed from the footnote.
     public let references: [SwordReference]
 
+    /// Creates parsed cross-reference metadata.
     public init(
         footnoteIdentifier: String,
         references: [SwordReference]
@@ -70,11 +84,16 @@ public struct SwordCrossReference: Hashable, Sendable {
 
 /// Footnote metadata attached to a SWORD entry.
 public struct SwordFootnote: Hashable, Sendable {
+    /// The module-provided footnote identifier.
     public let identifier: String
+    /// The rendered footnote content.
     public let body: String
+    /// The module-provided footnote type, when available.
     public let type: String?
+    /// The unparsed reference expression, when provided.
     public let referenceList: String?
 
+    /// Creates footnote metadata.
     public init(
         identifier: String,
         body: String,
@@ -90,8 +109,11 @@ public struct SwordFootnote: Hashable, Sendable {
 
 /// Per-word lexical metadata emitted by a SWORD module.
 public struct SwordLexicalAttribute: Hashable, Sendable {
+    /// The exact text annotated by the module.
     public let text: String
+    /// The module-provided lemma metadata.
     public let lemma: String
+    /// The module-provided morphology code, when available.
     public let morphology: String?
 
     /// A normalized Strong's identifier when the lemma contains one.
@@ -111,6 +133,7 @@ public struct SwordLexicalAttribute: Hashable, Sendable {
             }
     }
 
+    /// Creates lexical metadata for rendered text.
     public init(
         text: String,
         lemma: String,

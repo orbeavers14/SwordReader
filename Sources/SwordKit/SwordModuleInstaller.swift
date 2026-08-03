@@ -3,8 +3,10 @@ import Foundation
 
 /// Performs explicit SWORD module installation operations.
 public struct SwordModuleInstaller: Sendable {
+    /// The destinations and repositories used by this installer.
     public let configuration: SwordInstallerConfiguration
 
+    /// Creates an installer with explicit configuration.
     public init(configuration: SwordInstallerConfiguration) {
         self.configuration = configuration
     }
