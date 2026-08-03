@@ -1592,6 +1592,40 @@ func portablePublicValuesAreSendable() {
     requireSendable(SwordVerseCollection.self)
 }
 
+@Test
+func installedBibleSupportsCompleteReadingWorkflow() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.modules.first(
+        where: { $0.category == .bible }
+    ) else {
+        return
+    }
+
+    let verse = try bible.verse("John 3:16")
+    let chapter = try bible.chapter("John 3")
+    let passage = try bible.passage("John 3:16-18")
+    let results = try bible.search(
+        "God",
+        caseSensitive: false,
+        scope: "John 3"
+    )
+    let parallel = try library.parallelPassage(
+        "John 3:16-18",
+        modules: [bible.name]
+    )
+
+    #expect(verse.moduleName == bible.name)
+    #expect(chapter.verses.contains(verse))
+    #expect(passage.verses.first == verse)
+    #expect(results.contains { $0.reference == verse.reference })
+    #expect(parallel.passages == [passage])
+    #expect(
+        parallel.alignedVerses.first?
+            .comparison.tokensByModule[bible.name]?.isEmpty == false
+    )
+}
+
 private func requireSendable<Value: Sendable>(_: Value.Type) {}
 
 private final class SearchProgressRecorder: @unchecked Sendable {

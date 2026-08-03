@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Add Complete Integration Tests
+## Add Continuous Integration
 
 Goal:
 
-Exercise complete library workflows against fixture modules, including discovery,
-retrieval, searching, comparison, and module installation boundaries.
+Run the supported build and test workflow automatically for every proposed
+change, with reproducible native SWORD dependencies.
 
 ---
 
@@ -193,7 +193,7 @@ Long-term direction:
 - [x] Finalize public naming and ownership semantics
 - [x] Document every public declaration
 - [x] Establish concurrency guarantees
-- [ ] Add complete integration tests
+- [x] Add complete integration tests
 - [ ] Add continuous integration
 - [ ] Publish migration and compatibility policies
 
