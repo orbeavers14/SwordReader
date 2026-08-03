@@ -70,6 +70,9 @@ install_manifest.txt
 *.exp
 *.pdb
 
+# The packaged native dependency is intentionally versioned.
+!Artifacts/Sword.xcframework/**/*.a
+
 # ----------------------------------------------------------
 # Logs
 # ----------------------------------------------------------

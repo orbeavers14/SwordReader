@@ -59,3 +59,9 @@ Build a platform-specific native slice under `.build/sword-apple`:
 
 Use `all` to build every planned Apple destination. The watchOS destinations
 remain feasibility outputs until their resource and storage behavior is validated.
+
+Package completed slices into an XCFramework:
+
+```bash
+./Scripts/package-libsword-xcframework.sh
+```

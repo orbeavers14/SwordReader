@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Platform-Aware SwiftPM Integration
+## Declare Mobile Apple Platforms
 
 Goal:
 
-Package the native SWORD slices for Swift Package Manager and replace the
-macOS-only linker configuration with platform-aware integration.
+Declare the validated deployment baselines in Swift Package Manager and compile
+the public bridge for iOS, iPadOS, tvOS, and visionOS.
 
 ---
 
@@ -117,7 +117,7 @@ macOS-only linker configuration with platform-aware integration.
 
 - [x] Define platform support and delivery matrix
 - [x] Build multi-SDK SWORD artifacts
-- [ ] Integrate platform-aware native artifacts with SwiftPM
+- [x] Integrate platform-aware native artifacts with SwiftPM
 - [ ] Declare iOS and iPadOS support
 - [ ] Declare tvOS support
 - [ ] Declare visionOS support

@@ -16,21 +16,22 @@ let package = Package(
     targets: [
         .target(
             name: "CSwordBridge",
+            dependencies: ["SwordNative"],
             path: "Sources/CSwordBridge",
             publicHeadersPath: "include",
             cxxSettings: [
                 .headerSearchPath("../../Vendor/libsword/include")
             ],
             linkerSettings: [
-                .unsafeFlags([
-                    "-LVendor/libsword/build",
-                    "-lsword"
-                ]),
                 .linkedLibrary("z"),
                 .linkedLibrary("bz2"),
-                .linkedLibrary("lzma"),
-                .linkedLibrary("curl")
+                .linkedLibrary("lzma", .when(platforms: [.macOS])),
+                .linkedLibrary("curl", .when(platforms: [.macOS]))
             ]
+        ),
+        .binaryTarget(
+            name: "SwordNative",
+            path: "Artifacts/Sword.xcframework"
         ),
         .target(
             name: "SwordKit",

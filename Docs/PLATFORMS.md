@@ -34,10 +34,10 @@ SWORD integration code.
 
 ## Native build requirement
 
-`Scripts/build-libsword-apple.sh` now produces reproducible static SWORD slices
-for device and simulator SDKs. These slices still need to be packaged as an
-XCFramework or an equivalent Swift Package Manager artifact before applications
-can consume them across platforms.
+`Scripts/build-libsword-apple.sh` produces reproducible static SWORD slices for
+device and simulator SDKs. `Scripts/package-libsword-xcframework.sh` packages
+those slices into the versioned `Artifacts/Sword.xcframework`, which Swift
+Package Manager links through the `SwordNative` binary target.
 
 The native build must cover:
 
