@@ -61,6 +61,29 @@ public final class SwordLibrary {
         module(named: name)
     }
 
+    /// Retrieves the same Scripture range from multiple Bible modules.
+    ///
+    /// Passages are returned in the same order as the supplied module names.
+    public func parallelPassage(
+        _ reference: String,
+        modules moduleNames: [String]
+    ) throws -> SwordParallelPassage {
+        let range = try SwordPassageRange(reference)
+
+        let passages = try moduleNames.map { moduleName in
+            guard let module = module(named: moduleName) else {
+                throw SwordError.moduleNotFound(moduleName)
+            }
+
+            return try module.passage(range.value)
+        }
+
+        return SwordParallelPassage(
+            reference: range,
+            passages: passages
+        )
+    }
+
     internal static func string(
         from pointer: UnsafePointer<CChar>?
     ) -> String {

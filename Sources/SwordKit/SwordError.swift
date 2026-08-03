@@ -33,5 +33,8 @@ public enum SwordError: Error, Equatable, Sendable {
 
     /// A Strong's number was not a `G` or `H` followed by digits.
     case invalidStrongsNumber(String)
+
+    /// No installed module matched the requested name.
+    case moduleNotFound(String)
     
 }

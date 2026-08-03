@@ -284,6 +284,41 @@ func moduleCanRetrievePassageRange() throws {
 }
 
 @Test
+func libraryCanRetrievePassageFromMultipleBibles() throws {
+    let library = SwordLibrary()
+    let bibles = Array(
+        library.modules
+            .filter { $0.category == .bible }
+            .prefix(2)
+    )
+
+    guard bibles.count == 2 else {
+        return
+    }
+
+    let result = try library.parallelPassage(
+        "John 3:16-18",
+        modules: bibles.map(\.name)
+    )
+
+    #expect(result.reference.value == "John 3:16-18")
+    #expect(result.passages.map(\.moduleName) == bibles.map(\.name))
+    #expect(result.passages.allSatisfy { $0.verses.count == 3 })
+}
+
+@Test
+func parallelPassageRejectsUnknownModule() {
+    let library = SwordLibrary()
+
+    #expect(throws: SwordError.moduleNotFound("NotInstalled")) {
+        try library.parallelPassage(
+            "John 3:16-18",
+            modules: ["NotInstalled"]
+        )
+    }
+}
+
+@Test
 func chapterReferenceParsesBookAndChapter() throws {
     let reference = try SwordChapterReference("John 3")
 
