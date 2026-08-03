@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Expanded Module Metadata
+## Reading Plans
 
 Goal:
 
@@ -115,8 +115,8 @@ let passage = try library.parallelPassage(
 let text = try bible.attributedString("John 3:16")
 ```
 
-The next milestone will expose additional SWORD configuration metadata for
-installed and catalog modules.
+The next milestone will introduce immutable reading-plan values and progress
+tracking independent of any application UI or persistence layer.
 
 ---
 
@@ -179,8 +179,8 @@ Long-term direction:
 - [x] Install modules
 - [x] Remove modules
 - [x] Refresh library
-- [ ] Inspect module metadata
-- [ ] Version information
+- [x] Inspect module metadata
+- [x] Version information
 
 ---
 

@@ -41,6 +41,14 @@ const char *SwordModuleCatalogType(
     const SwordModuleCatalogHandle *catalog,
     size_t index
 );
+const char *SwordModuleCatalogVersion(
+    const SwordModuleCatalogHandle *catalog,
+    size_t index
+);
+const char *SwordModuleCatalogCopyright(
+    const SwordModuleCatalogHandle *catalog,
+    size_t index
+);
 
 int SwordInstallLocalModule(
     const char *privatePath,
@@ -87,6 +95,8 @@ const char *SwordModuleLanguage(
 const char *SwordModuleType(
     const SwordModuleHandle *module
 );
+const char *SwordModuleVersion(const SwordModuleHandle *module);
+const char *SwordModuleCopyright(const SwordModuleHandle *module);
 
 int SwordModuleSetKey(
     SwordModuleHandle *module,

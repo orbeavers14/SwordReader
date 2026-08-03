@@ -7,6 +7,8 @@ public struct SwordModuleCatalogEntry: Hashable, Sendable {
     public let title: String
     public let language: String
     public let category: SwordModule.Category
+    public let version: String?
+    public let copyright: String?
 }
 
 /// A read-only snapshot of a local SWORD repository catalog.
@@ -54,8 +56,18 @@ public struct SwordModuleCatalog: Hashable, Sendable {
                 language: SwordLibrary.string(
                     from: SwordModuleCatalogLanguage(handle, index)
                 ),
-                category: SwordModule.Category(swordType: type)
+                category: SwordModule.Category(swordType: type),
+                version: SwordLibrary.string(
+                    from: SwordModuleCatalogVersion(handle, index)
+                ).emptyToNil,
+                copyright: SwordLibrary.string(
+                    from: SwordModuleCatalogCopyright(handle, index)
+                ).emptyToNil
             )
         }
     }
+}
+
+private extension String {
+    var emptyToNil: String? { isEmpty ? nil : self }
 }

@@ -19,6 +19,12 @@ public final class SwordModule: Hashable {
     
     /// The module's language code.
     public let language: String
+
+    /// The module version supplied by its SWORD configuration.
+    public let version: String?
+
+    /// Copyright information supplied by the module publisher.
+    public let copyright: String?
     
     /// The general type of content contained in the module.
     public let category: Category
@@ -44,6 +50,14 @@ public final class SwordModule: Hashable {
         self.language = SwordLibrary.string(
             from: SwordModuleLanguage(handle)
         )
+
+        self.version = SwordLibrary.string(
+            from: SwordModuleVersion(handle)
+        ).nilIfEmpty
+
+        self.copyright = SwordLibrary.string(
+            from: SwordModuleCopyright(handle)
+        ).nilIfEmpty
         
         let type = SwordLibrary.string(
             from: SwordModuleType(handle)

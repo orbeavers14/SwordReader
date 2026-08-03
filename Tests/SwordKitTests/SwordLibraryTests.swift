@@ -155,6 +155,8 @@ func localModuleCatalogReadsSwordConfiguration() throws {
     ModDrv=RawText
     Description=Test Bible
     Lang=en
+    Version=2.1
+    Copyright=Public Domain
     """
     try configuration.write(
         to: configurationDirectory.appending(path: "testbible.conf"),
@@ -169,6 +171,8 @@ func localModuleCatalogReadsSwordConfiguration() throws {
     #expect(module.title == "Test Bible")
     #expect(module.language == "en")
     #expect(module.category == .bible)
+    #expect(module.version == "2.1")
+    #expect(module.copyright == "Public Domain")
 }
 
 @Test

@@ -175,6 +175,14 @@ SWORD_CATALOG_GETTER(SwordModuleCatalogName, getName())
 SWORD_CATALOG_GETTER(SwordModuleCatalogDescription, getDescription())
 SWORD_CATALOG_GETTER(SwordModuleCatalogLanguage, getLanguage())
 SWORD_CATALOG_GETTER(SwordModuleCatalogType, getType())
+SWORD_CATALOG_GETTER(
+    SwordModuleCatalogVersion,
+    getConfigEntry("Version")
+)
+SWORD_CATALOG_GETTER(
+    SwordModuleCatalogCopyright,
+    getConfigEntry("Copyright")
+)
 
 #undef SWORD_CATALOG_GETTER
 
@@ -615,6 +623,18 @@ const char *SwordModuleType(
     }
 
     return safeCString(module->module->getType());
+}
+
+const char *SwordModuleVersion(const SwordModuleHandle *module) {
+    return module == nullptr || module->module == nullptr
+        ? ""
+        : safeCString(module->module->getConfigEntry("Version"));
+}
+
+const char *SwordModuleCopyright(const SwordModuleHandle *module) {
+    return module == nullptr || module->module == nullptr
+        ? ""
+        : safeCString(module->module->getConfigEntry("Copyright"));
 }
 
 int SwordModuleSetKey(
