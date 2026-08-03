@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Sandbox-Aware Module Locations
+## Apple Platform Compile and Integration CI
 
 Goal:
 
-Provide safe default module directories for each Apple platform while preserving
-explicit host-app control over storage and restoration policies.
+Compile the package for every declared Apple destination in automation and add
+platform integration coverage for native artifact selection and module storage.
 
 ---
 
@@ -122,7 +122,7 @@ explicit host-app control over storage and restoration policies.
 - [x] Declare tvOS support
 - [x] Declare visionOS support
 - [x] Validate watchOS native-engine feasibility
-- [ ] Add sandbox-aware module locations
+- [x] Add sandbox-aware module locations
 - [ ] Add platform compile and integration CI
 
 ---

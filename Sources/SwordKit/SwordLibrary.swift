@@ -40,6 +40,11 @@ public final class SwordLibrary {
         refresh()
     }
 
+    /// Creates a library using an app-owned module location.
+    public convenience init(location: SwordModuleLocation) throws {
+        try self.init(directory: location.modulesDirectory)
+    }
+
     /// Reloads installed modules into a new library snapshot.
     public func refresh() {
         let storage = SwordManagerStorage(directory: directory?.path)

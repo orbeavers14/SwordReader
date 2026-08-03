@@ -45,6 +45,12 @@ public enum SwordError: Error, Equatable, Sendable {
     /// Installer-private storage was not a local file URL.
     case invalidInstallerDirectory(String)
 
+    /// An Application Support directory could not be resolved.
+    case applicationSupportDirectoryUnavailable
+
+    /// An app storage identifier was empty or contained path separators.
+    case invalidStorageIdentifier(String)
+
     /// A module repository omitted a required identity or host value.
     case invalidModuleRepository(String)
 

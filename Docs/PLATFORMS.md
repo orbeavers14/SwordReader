@@ -70,6 +70,12 @@ sets compact and prefer paired-iPhone delivery over direct remote installation.
 SWORD module discovery cannot assume traditional desktop paths outside macOS.
 Sandboxed apps must supply an app-owned module directory.
 
+`SwordModuleLocation.applicationSupport()` resolves sandbox-safe module and
+installer directories using the host app's bundle identifier. Apps can instead
+construct `SwordModuleLocation` with explicit file URLs when they need an app
+group, shared container, purgeable cache, or another storage policy. The same
+location can initialize both `SwordLibrary` and `SwordInstallerConfiguration`.
+
 - iOS, iPadOS, and visionOS should use Application Support for durable modules.
 - tvOS must tolerate system-purgeable local storage and support restoration.
 - watchOS should normally receive compact, app-selected content from its paired

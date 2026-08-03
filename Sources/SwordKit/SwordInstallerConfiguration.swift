@@ -33,6 +33,16 @@ public struct SwordInstallerConfiguration: Hashable, Sendable {
         self.privateDirectory = privateDirectory.standardizedFileURL
         self.repositories = repositories
     }
+
+    /// Creates configuration using a shared app-owned module location.
+    public init(
+        location: SwordModuleLocation,
+        repositories: [SwordModuleRepository] = []
+    ) {
+        self.destinationDirectory = location.modulesDirectory
+        self.privateDirectory = location.installerDirectory
+        self.repositories = repositories
+    }
 }
 
 /// A remote SWORD module repository.

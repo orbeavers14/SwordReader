@@ -63,3 +63,16 @@ Package completed slices into an XCFramework:
 ```bash
 ./Scripts/package-libsword-xcframework.sh
 ```
+
+## App-owned module storage
+
+Use the sandbox-aware Application Support location for ordinary applications:
+
+```swift
+let location = try SwordModuleLocation.applicationSupport()
+let library = try SwordLibrary(location: location)
+let installerConfiguration = SwordInstallerConfiguration(location: location)
+```
+
+Apps with shared containers or platform-specific restoration policies can create
+`SwordModuleLocation` from explicit module and installer directory URLs instead.

@@ -108,6 +108,80 @@ func installerConfigurationStoresExplicitDirectoriesAndRepositories() throws {
 }
 
 @Test
+func moduleLocationBuildsAppOwnedApplicationSupportDirectories() throws {
+    let applicationSupport = URL(
+        fileURLWithPath: "/tmp/Application Support",
+        isDirectory: true
+    )
+    let location = try SwordModuleLocation(
+        applicationSupportDirectory: applicationSupport,
+        applicationIdentifier: "com.example.reader"
+    )
+
+    #expect(
+        location.modulesDirectory.path
+            == "/tmp/Application Support/com.example.reader/Sword"
+    )
+    #expect(
+        location.installerDirectory.path
+            == "/tmp/Application Support/com.example.reader/SwordInstaller"
+    )
+}
+
+@Test
+func moduleLocationRejectsUnsafeApplicationIdentifier() {
+    let applicationSupport = URL(fileURLWithPath: "/tmp")
+
+    #expect(throws: SwordError.invalidStorageIdentifier("../shared")) {
+        try SwordModuleLocation(
+            applicationSupportDirectory: applicationSupport,
+            applicationIdentifier: "../shared"
+        )
+    }
+}
+
+@Test
+func moduleLocationResolvesUserApplicationSupportDirectory() throws {
+    let location = try SwordModuleLocation.applicationSupport(
+        applicationIdentifier: "com.example.reader"
+    )
+
+    #expect(location.modulesDirectory.isFileURL)
+    #expect(
+        location.modulesDirectory.path.hasSuffix(
+            "/com.example.reader/Sword"
+        )
+    )
+}
+
+@Test
+func installerConfigurationUsesModuleLocationDirectories() throws {
+    let location = try SwordModuleLocation(
+        modulesDirectory: URL(fileURLWithPath: "/tmp/sword-modules"),
+        installerDirectory: URL(fileURLWithPath: "/tmp/sword-installer")
+    )
+    let configuration = SwordInstallerConfiguration(location: location)
+
+    #expect(configuration.destinationDirectory == location.modulesDirectory)
+    #expect(configuration.privateDirectory == location.installerDirectory)
+}
+
+@Test
+func libraryAcceptsModuleLocation() throws {
+    let location = try SwordModuleLocation(
+        modulesDirectory: FileManager.default.temporaryDirectory.appending(
+            path: "SwordKit-Modules-\(UUID().uuidString)"
+        ),
+        installerDirectory: FileManager.default.temporaryDirectory.appending(
+            path: "SwordKit-Installer-\(UUID().uuidString)"
+        )
+    )
+    let library = try SwordLibrary(location: location)
+
+    #expect(library.modules.isEmpty)
+}
+
+@Test
 func installerConfigurationRejectsRemoteDestination() throws {
     let remoteURL = try #require(URL(string: "https://example.com/modules"))
 
