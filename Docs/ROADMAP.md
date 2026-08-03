@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Verse Alignment
+## Translation Comparison
 
 Goal:
 
@@ -115,8 +115,8 @@ let passage = try library.parallelPassage(
 let rows = passage.alignedVerses
 ```
 
-The next milestone will turn parallel passages and their detected gaps into
-reference-keyed rows suitable for side-by-side presentation.
+The next milestone will add Swift-native comparison helpers for aligned verse
+text across translations.
 
 ---
 
@@ -141,7 +141,7 @@ Planned:
 
 - [x] Side-by-side verses
 - [x] Missing verse detection
-- [ ] Verse alignment
+- [x] Verse alignment
 - [ ] Translation comparison
 
 ---

@@ -22,6 +22,27 @@ public struct SwordParallelPassage: Hashable, Sendable {
         )
     }
 
+    /// Reference-keyed rows for side-by-side presentation.
+    public var alignedVerses: [SwordAlignedVerse] {
+        expectedReferences.map { expected in
+            SwordAlignedVerse(
+                reference: expected,
+                versesByModule: Dictionary(
+                    passages.compactMap { passage in
+                        guard let verse = passage.verses.first(
+                            where: { $0.reference == expected }
+                        ) else {
+                            return nil
+                        }
+
+                        return (passage.moduleName, verse)
+                    },
+                    uniquingKeysWith: { _, latest in latest }
+                )
+            )
+        }
+    }
+
     public init(
         reference: SwordPassageRange,
         passages: [SwordPassage]
@@ -47,5 +68,19 @@ public struct SwordParallelPassage: Hashable, Sendable {
         return (startingVerse...reference.endingVerse).compactMap {
             try? SwordReference("\(prefix)\($0)")
         }
+    }
+}
+
+/// Verses from multiple modules aligned to one Scripture reference.
+public struct SwordAlignedVerse: Hashable, Sendable {
+    public let reference: SwordReference
+    public let versesByModule: [String: SwordVerse]
+
+    public init(
+        reference: SwordReference,
+        versesByModule: [String: SwordVerse]
+    ) {
+        self.reference = reference
+        self.versesByModule = versesByModule
     }
 }

@@ -350,6 +350,30 @@ func parallelPassageReportsMissingReferencesByModule() throws {
 }
 
 @Test
+func parallelPassageAlignsVersesByReference() throws {
+    let range = try SwordPassageRange("John 3:16-17")
+    let verse = SwordVerse(
+        reference: try SwordReference("John 3:16"),
+        moduleName: "KJV",
+        text: "Text"
+    )
+    let passage = SwordParallelPassage(
+        reference: range,
+        passages: [
+            SwordPassage(
+                reference: verse.reference,
+                moduleName: "KJV",
+                verses: [verse]
+            )
+        ]
+    )
+
+    #expect(passage.alignedVerses.map(\.reference.value) == ["John 3:16", "John 3:17"])
+    #expect(passage.alignedVerses[0].versesByModule["KJV"] == verse)
+    #expect(passage.alignedVerses[1].versesByModule["KJV"] == nil)
+}
+
+@Test
 func chapterReferenceParsesBookAndChapter() throws {
     let reference = try SwordChapterReference("John 3")
 
