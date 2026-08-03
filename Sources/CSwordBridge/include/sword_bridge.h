@@ -41,6 +41,13 @@ const char *SwordModuleCatalogType(
     size_t index
 );
 
+int SwordInstallLocalModule(
+    const char *privatePath,
+    const char *destinationPath,
+    const char *sourcePath,
+    const char *moduleName
+);
+
 size_t SwordManagerModuleCount(const SwordManager *manager);
 
 SwordModuleHandle *SwordManagerOpenModule(

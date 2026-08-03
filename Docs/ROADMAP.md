@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Local Module Installation
+## Module Removal
 
 Goal:
 
@@ -115,8 +115,8 @@ let passage = try library.parallelPassage(
 let text = try bible.attributedString("John 3:16")
 ```
 
-The next milestone will explicitly copy a selected module from a local catalog
-into a configured destination using SWORD's installer.
+The next milestone will explicitly remove a selected module from the configured
+destination using SWORD's installer.
 
 ---
 
@@ -176,7 +176,7 @@ Long-term direction:
 - [x] Filter modules
 - [x] Installer configuration
 - [x] Local catalog inspection
-- [ ] Install modules
+- [x] Install modules
 - [ ] Remove modules
 - [ ] Refresh library
 - [ ] Inspect module metadata

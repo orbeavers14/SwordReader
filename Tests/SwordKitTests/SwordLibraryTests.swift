@@ -183,6 +183,70 @@ func localModuleCatalogRejectsMissingDirectory() {
 }
 
 @Test
+func installerCopiesModuleFromLocalCatalog() throws {
+    let workspace = FileManager.default.temporaryDirectory.appending(
+        path: "SwordKitInstall-\(UUID().uuidString)",
+        directoryHint: .isDirectory
+    )
+    let source = workspace.appending(path: "source", directoryHint: .isDirectory)
+    let data = source.appending(
+        path: "modules/texts/rawtext/testbible",
+        directoryHint: .isDirectory
+    )
+    let configurationDirectory = source.appending(
+        path: "mods.d",
+        directoryHint: .isDirectory
+    )
+    let destination = workspace.appending(
+        path: "destination",
+        directoryHint: .isDirectory
+    )
+    let privateDirectory = workspace.appending(
+        path: "installer",
+        directoryHint: .isDirectory
+    )
+
+    try FileManager.default.createDirectory(
+        at: configurationDirectory,
+        withIntermediateDirectories: true
+    )
+    try FileManager.default.createDirectory(
+        at: data,
+        withIntermediateDirectories: true
+    )
+    defer { try? FileManager.default.removeItem(at: workspace) }
+
+    try "module-data".write(
+        to: data.appending(path: "placeholder"),
+        atomically: true,
+        encoding: .utf8
+    )
+    try """
+    [TestBible]
+    DataPath=./modules/texts/rawtext/testbible/
+    ModDrv=RawText
+    Description=Test Bible
+    Lang=en
+    """.write(
+        to: configurationDirectory.appending(path: "testbible.conf"),
+        atomically: true,
+        encoding: .utf8
+    )
+
+    let catalog = try SwordModuleCatalog(directory: source)
+    let configuration = try SwordInstallerConfiguration(
+        destinationDirectory: destination,
+        privateDirectory: privateDirectory
+    )
+    let installer = SwordModuleInstaller(configuration: configuration)
+
+    try installer.install(moduleNamed: "TestBible", from: catalog)
+
+    let installedCatalog = try SwordModuleCatalog(directory: destination)
+    #expect(installedCatalog.modules.map(\.name) == ["TestBible"])
+}
+
+@Test
 func knownSwordCategoriesAreMapped() {
     #expect(
         SwordModule.Category(swordType: "Biblical Texts") == .bible

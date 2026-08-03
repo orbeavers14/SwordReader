@@ -11,6 +11,7 @@
 #include <swversion.h>
 
 #include <listkey.h>
+#include <installmgr.h>
 #include <markupfiltmgr.h>
 #include <versekey.h>
 
@@ -162,6 +163,35 @@ SWORD_CATALOG_GETTER(SwordModuleCatalogLanguage, getLanguage())
 SWORD_CATALOG_GETTER(SwordModuleCatalogType, getType())
 
 #undef SWORD_CATALOG_GETTER
+
+int SwordInstallLocalModule(
+    const char *privatePath,
+    const char *destinationPath,
+    const char *sourcePath,
+    const char *moduleName
+) {
+    if (
+        privatePath == nullptr
+        || destinationPath == nullptr
+        || sourcePath == nullptr
+        || moduleName == nullptr
+        || moduleName[0] == '\0'
+    ) {
+        return -1;
+    }
+
+    try {
+        sword::InstallMgr installer(privatePath);
+        sword::SWMgr destination(destinationPath);
+        return installer.installModule(
+            &destination,
+            sourcePath,
+            moduleName
+        );
+    } catch (...) {
+        return -1;
+    }
+}
 
 size_t SwordModuleParseReferenceCount(
     SwordModuleHandle *module,

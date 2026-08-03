@@ -48,5 +48,8 @@ public enum SwordError: Error, Equatable, Sendable {
 
     /// No local SWORD repository existed at the supplied directory.
     case moduleCatalogNotFound(String)
+
+    /// SWORD could not install a selected module.
+    case moduleInstallationFailed(module: String, status: Int32)
     
 }
