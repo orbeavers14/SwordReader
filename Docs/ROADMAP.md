@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Morphology Rich-Text Annotations
+## Footnote Metadata
 
 Goal:
 
@@ -115,8 +115,8 @@ let passage = try library.parallelPassage(
 let text = try bible.attributedString("John 3:16")
 ```
 
-The next milestone will attach morphology codes beside Strong's identifiers on
-the same attributed word ranges.
+The next milestone will expose SWORD footnote entry attributes as immutable
+Swift values associated with a verse.
 
 ---
 
@@ -162,7 +162,7 @@ Long-term direction:
 - [x] HTML rendering
 - [x] AttributedString rendering
 - [x] Strong's numbers
-- [ ] Morphology
+- [x] Morphology
 - [ ] Footnotes
 - [ ] Cross references
 - [ ] Headings

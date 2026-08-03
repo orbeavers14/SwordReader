@@ -598,14 +598,20 @@ private extension AttributedString {
 
         for attribute in attributes {
             guard
-                let strongsNumber = attribute.strongsNumber,
                 !attribute.text.isEmpty,
                 let range = result[searchStart...].range(of: attribute.text)
             else {
                 continue
             }
 
-            result[range][SwordStrongsNumberAttribute.self] = strongsNumber
+            if let strongsNumber = attribute.strongsNumber {
+                result[range][SwordStrongsNumberAttribute.self] = strongsNumber
+            }
+
+            if let morphology = attribute.morphology {
+                result[range][SwordMorphologyAttribute.self] = morphology
+            }
+
             searchStart = range.upperBound
         }
 

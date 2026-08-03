@@ -202,6 +202,22 @@ func attributedStringIncludesStrongsAnnotations() throws {
 }
 
 @Test
+func attributedStringIncludesMorphologyAnnotations() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let attributedText = try bible.attributedString("John 3:16")
+    let morphology = attributedText.runs.compactMap {
+        $0[SwordMorphologyAttribute.self]
+    }
+
+    #expect(!morphology.isEmpty)
+}
+
+@Test
 func verseLookupRejectsNonBibleModule() {
     let library = SwordLibrary()
 
