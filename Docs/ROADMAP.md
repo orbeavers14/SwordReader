@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Add Continuous Integration
+## Publish Migration and Compatibility Policies
 
 Goal:
 
-Run the supported build and test workflow automatically for every proposed
-change, with reproducible native SWORD dependencies.
+Define semantic-versioning expectations, supported platform and toolchain ranges,
+deprecation practices, and migration guidance for API changes.
 
 ---
 
@@ -194,7 +194,7 @@ Long-term direction:
 - [x] Document every public declaration
 - [x] Establish concurrency guarantees
 - [x] Add complete integration tests
-- [ ] Add continuous integration
+- [x] Add continuous integration
 - [ ] Publish migration and compatibility policies
 
 ---

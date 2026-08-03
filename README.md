@@ -1,5 +1,7 @@
 # SwordKit
 
+[![CI](https://github.com/orbeavers14/SwordKit/actions/workflows/ci.yml/badge.svg)](https://github.com/orbeavers14/SwordKit/actions/workflows/ci.yml)
+
 SwordKit is an experimental Swift interface to the CrossWire SWORD engine.
 
 It provides an idiomatic Swift API while hiding the underlying SWORD C++ implementation behind a small C-compatible bridge.
