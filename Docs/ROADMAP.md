@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Heading Metadata
+## Red-Letter Text
 
 Goal:
 
@@ -115,8 +115,8 @@ let passage = try library.parallelPassage(
 let text = try bible.attributedString("John 3:16")
 ```
 
-The next milestone will expose SWORD pre-verse and inter-verse headings as
-immutable values associated with retrieved verses.
+The next milestone will preserve words-of-Christ styling in HTML and
+`AttributedString` rendering.
 
 ---
 
@@ -165,7 +165,7 @@ Long-term direction:
 - [x] Morphology
 - [x] Footnotes
 - [x] Cross references
-- [ ] Headings
+- [x] Headings
 - [ ] Red-letter text
 
 ---

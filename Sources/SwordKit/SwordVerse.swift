@@ -13,6 +13,7 @@ public struct SwordVerse: Hashable, Sendable {
     public let lexicalAttributes: [SwordLexicalAttribute]
     public let footnotes: [SwordFootnote]
     public let crossReferences: [SwordCrossReference]
+    public let headings: [SwordHeading]
 
     /// Creates a retrieved verse value.
     public init(
@@ -21,7 +22,8 @@ public struct SwordVerse: Hashable, Sendable {
         text: String,
         lexicalAttributes: [SwordLexicalAttribute] = [],
         footnotes: [SwordFootnote] = [],
-        crossReferences: [SwordCrossReference] = []
+        crossReferences: [SwordCrossReference] = [],
+        headings: [SwordHeading] = []
     ) {
         self.reference = reference
         self.moduleName = moduleName
@@ -29,6 +31,26 @@ public struct SwordVerse: Hashable, Sendable {
         self.lexicalAttributes = lexicalAttributes
         self.footnotes = footnotes
         self.crossReferences = crossReferences
+        self.headings = headings
+    }
+}
+
+/// A heading associated with a SWORD entry.
+public struct SwordHeading: Hashable, Sendable {
+    public enum Position: Hashable, Sendable {
+        case preVerse
+        case interVerse
+        case other(String)
+    }
+
+    public let identifier: String
+    public let body: String
+    public let position: Position
+
+    public init(identifier: String, body: String, position: Position) {
+        self.identifier = identifier
+        self.body = body
+        self.position = position
     }
 }
 

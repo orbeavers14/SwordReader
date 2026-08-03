@@ -107,6 +107,20 @@ const char *SwordModuleFootnoteReferenceList(
     size_t index
 );
 
+size_t SwordModuleHeadingCount(const SwordModuleHandle *module);
+const char *SwordModuleHeadingPosition(
+    const SwordModuleHandle *module,
+    size_t index
+);
+const char *SwordModuleHeadingIdentifier(
+    const SwordModuleHandle *module,
+    size_t index
+);
+const char *SwordModuleHeadingBody(
+    const SwordModuleHandle *module,
+    size_t index
+);
+
 size_t SwordModuleParseReferenceCount(
     SwordModuleHandle *module,
     const char *reference

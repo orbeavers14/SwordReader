@@ -425,6 +425,26 @@ public final class SwordModule: Hashable {
                 references: parsedReferences.references
             )
         }
+        let headings = (0..<SwordModuleHeadingCount(handle)).map { index in
+            let position = SwordLibrary.string(
+                from: SwordModuleHeadingPosition(handle, index)
+            )
+            let headingPosition: SwordHeading.Position = switch position {
+            case "Preverse": .preVerse
+            case "Interverse": .interVerse
+            default: .other(position)
+            }
+
+            return SwordHeading(
+                identifier: SwordLibrary.string(
+                    from: SwordModuleHeadingIdentifier(handle, index)
+                ),
+                body: SwordLibrary.string(
+                    from: SwordModuleHeadingBody(handle, index)
+                ),
+                position: headingPosition
+            )
+        }
         
         return SwordVerse(
             reference: resolvedReference,
@@ -432,7 +452,8 @@ public final class SwordModule: Hashable {
             text: text,
             lexicalAttributes: lexicalAttributes,
             footnotes: footnotes,
-            crossReferences: crossReferences
+            crossReferences: crossReferences,
+            headings: headings
         )
     }
     

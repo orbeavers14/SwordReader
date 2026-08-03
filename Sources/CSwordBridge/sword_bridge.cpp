@@ -83,6 +83,9 @@ struct SwordModuleHandle {
     std::vector<std::string> footnoteBodies;
     std::vector<std::string> footnoteTypes;
     std::vector<std::string> footnoteReferenceLists;
+    std::vector<std::string> headingPositions;
+    std::vector<std::string> headingIdentifiers;
+    std::vector<std::string> headingBodies;
     
     std::vector<std::string> parsedReferences;
     std::string parsedReferenceBuffer;
@@ -538,6 +541,9 @@ const char *SwordModuleRenderText(
         module->footnoteBodies.clear();
         module->footnoteTypes.clear();
         module->footnoteReferenceLists.clear();
+        module->headingPositions.clear();
+        module->headingIdentifiers.clear();
+        module->headingBodies.clear();
         module->module->setProcessEntryAttributes(true);
         module->renderedText =
         module->module->renderText().c_str();
@@ -616,6 +622,24 @@ const char *SwordModuleRenderText(
                         ? ""
                         : references->second.c_str()
                 );
+            }
+        }
+
+        const auto headings = attributes.find("Heading");
+
+        if (headings != attributes.end()) {
+            for (const auto &position : headings->second) {
+                for (const auto &heading : position.second) {
+                    module->headingPositions.emplace_back(
+                        position.first.c_str()
+                    );
+                    module->headingIdentifiers.emplace_back(
+                        heading.first.c_str()
+                    );
+                    module->headingBodies.emplace_back(
+                        heading.second.c_str()
+                    );
+                }
             }
         }
         
@@ -707,6 +731,22 @@ SWORD_FOOTNOTE_GETTER(
 )
 
 #undef SWORD_FOOTNOTE_GETTER
+
+size_t SwordModuleHeadingCount(const SwordModuleHandle *module) {
+    return module == nullptr ? 0 : module->headingIdentifiers.size();
+}
+
+#define SWORD_HEADING_GETTER(functionName, field) \
+const char *functionName(const SwordModuleHandle *module, size_t index) { \
+    if (module == nullptr || index >= module->field.size()) return ""; \
+    return module->field[index].c_str(); \
+}
+
+SWORD_HEADING_GETTER(SwordModuleHeadingPosition, headingPositions)
+SWORD_HEADING_GETTER(SwordModuleHeadingIdentifier, headingIdentifiers)
+SWORD_HEADING_GETTER(SwordModuleHeadingBody, headingBodies)
+
+#undef SWORD_HEADING_GETTER
 
 void SwordModuleIncrement(
     SwordModuleHandle *module

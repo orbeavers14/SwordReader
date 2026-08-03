@@ -173,6 +173,19 @@ func crossReferenceStoresTypedReferences() throws {
 }
 
 @Test
+func headingStoresPositionAndBody() {
+    let heading = SwordHeading(
+        identifier: "1",
+        body: "The Word Became Flesh",
+        position: .preVerse
+    )
+
+    #expect(heading.identifier == "1")
+    #expect(heading.body == "The Word Became Flesh")
+    #expect(heading.position == .preVerse)
+}
+
+@Test
 func bibleModuleCanRetrieveVerse() throws {
     let library = SwordLibrary()
 
