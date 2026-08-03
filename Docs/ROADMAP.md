@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Red-Letter Text
+## Module Filtering
 
 Goal:
 
@@ -115,8 +115,8 @@ let passage = try library.parallelPassage(
 let text = try bible.attributedString("John 3:16")
 ```
 
-The next milestone will preserve words-of-Christ styling in HTML and
-`AttributedString` rendering.
+The next milestone will add Swift-native filtering by module category and
+language.
 
 ---
 
@@ -166,13 +166,13 @@ Long-term direction:
 - [x] Footnotes
 - [x] Cross references
 - [x] Headings
-- [ ] Red-letter text
+- [x] Red-letter text
 
 ---
 
 ## Module Management
 
-- [ ] Open by module name
+- [x] Open by module name
 - [ ] Filter modules
 - [ ] Install modules
 - [ ] Remove modules

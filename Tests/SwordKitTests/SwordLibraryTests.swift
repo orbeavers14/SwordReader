@@ -231,6 +231,20 @@ func bibleModuleCanRenderAttributedString() throws {
 }
 
 @Test
+func htmlRenderingPreservesRedLetterStyling() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let html = try bible.html("Matthew 5:3")
+
+    #expect(html.contains(".wordsOfJesus { color: red; }"))
+    #expect(html.contains("class=\"wordsOfJesus\""))
+}
+
+@Test
 func attributedStringIncludesStrongsAnnotations() throws {
     let library = SwordLibrary()
 

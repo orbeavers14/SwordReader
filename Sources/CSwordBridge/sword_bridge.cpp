@@ -659,7 +659,12 @@ const char *SwordModuleRenderHTML(
 
     try {
         module->htmlModule->setKey(module->module->getKeyText());
-        module->renderedHTML = module->htmlModule->renderText().c_str();
+        module->renderedHTML = "<style>";
+        module->renderedHTML += safeCString(
+            module->htmlModule->getRenderHeader()
+        );
+        module->renderedHTML += "</style>";
+        module->renderedHTML += module->htmlModule->renderText().c_str();
         return module->renderedHTML.c_str();
     } catch (...) {
         module->renderedHTML.clear();
