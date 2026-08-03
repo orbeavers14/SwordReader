@@ -11,6 +11,7 @@
 #include <swversion.h>
 
 #include <listkey.h>
+#include <markupfiltmgr.h>
 #include <versekey.h>
 
 namespace {
@@ -43,9 +44,11 @@ void reportSearchProgress(char percentage, void *userData) {
 
 struct SwordManager {
     sword::SWMgr manager;
+    sword::SWMgr htmlManager;
     std::vector<sword::SWModule *> modules;
 
-    SwordManager() {
+    SwordManager()
+        : htmlManager(new sword::MarkupFilterMgr(sword::FMT_XHTML)) {
         const auto &installedModules = manager.getModules();
 
         modules.reserve(installedModules.size());
@@ -69,8 +72,10 @@ struct SwordManager {
 
 struct SwordModuleHandle {
     sword::SWModule *module;
+    sword::SWModule *htmlModule;
     std::string currentKey;
     std::string renderedText;
+    std::string renderedHTML;
     std::vector<std::string> wordAttributeTexts;
     std::vector<std::string> wordAttributeLemmas;
     std::vector<std::string> wordAttributeMorphologies;
@@ -82,8 +87,10 @@ struct SwordModuleHandle {
     std::vector<long> searchResultScores;
     std::string searchResultReferenceBuffer;
 
-    explicit SwordModuleHandle(sword::SWModule *module)
-        : module(module) {}
+    SwordModuleHandle(
+        sword::SWModule *module,
+        sword::SWModule *htmlModule
+    ) : module(module), htmlModule(htmlModule) {}
 };
 
 extern "C" {
@@ -407,7 +414,13 @@ SwordModuleHandle *SwordManagerOpenModule(
     }
 
     try {
-        return new SwordModuleHandle(manager->modules[index]);
+        sword::SWModule *module = manager->modules[index];
+        return new SwordModuleHandle(
+            module,
+            const_cast<sword::SWModule *>(
+                manager->htmlManager.getModule(module->getName())
+            )
+        );
     } catch (...) {
         return nullptr;
     }
@@ -572,6 +585,23 @@ const char *SwordModuleRenderText(
         return module->renderedText.c_str();
     } catch (...) {
         module->renderedText.clear();
+        return "";
+    }
+}
+
+const char *SwordModuleRenderHTML(
+    SwordModuleHandle *module
+) {
+    if (module == nullptr || module->htmlModule == nullptr) {
+        return "";
+    }
+
+    try {
+        module->htmlModule->setKey(module->module->getKeyText());
+        module->renderedHTML = module->htmlModule->renderText().c_str();
+        return module->renderedHTML.c_str();
+    } catch (...) {
+        module->renderedHTML.clear();
         return "";
     }
 }

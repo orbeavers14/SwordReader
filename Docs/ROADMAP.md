@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## HTML Rendering
+## AttributedString Rendering
 
 Goal:
 
@@ -112,11 +112,11 @@ let passage = try library.parallelPassage(
     modules: ["KJV", "ASV"]
 )
 
-let html = try bible.html("John 3:16")
+let text = try bible.attributedString("John 3:16")
 ```
 
-The next milestone will expose module-rendered HTML while keeping plain-text
-verse retrieval unchanged.
+The next milestone will convert SWORD-rendered XHTML into a Swift-native
+`AttributedString` while retaining the HTML API for web-based presentation.
 
 ---
 
@@ -159,7 +159,7 @@ Long-term direction:
 
 ## Rich Text
 
-- [ ] HTML rendering
+- [x] HTML rendering
 - [ ] AttributedString rendering
 - [ ] Strong's numbers
 - [ ] Morphology

@@ -159,6 +159,20 @@ func bibleModuleCanRetrieveVerse() throws {
 }
 
 @Test
+func bibleModuleCanRenderHTML() throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let html = try bible.html("John 3:16")
+
+    #expect(html.contains("God"))
+    #expect(html.contains("<"))
+}
+
+@Test
 func verseLookupRejectsNonBibleModule() {
     let library = SwordLibrary()
 

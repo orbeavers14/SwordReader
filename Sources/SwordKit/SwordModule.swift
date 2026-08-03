@@ -407,6 +407,21 @@ public final class SwordModule: Hashable {
     ) throws -> SwordVerse {
         try verse(SwordReference(reference))
     }
+
+    /// Renders a Bible entry as SWORD-generated XHTML.
+    public func html(_ reference: String) throws -> String {
+        _ = try verse(reference)
+
+        let html = SwordLibrary.string(
+            from: SwordModuleRenderHTML(handle)
+        )
+
+        guard !html.isEmpty else {
+            throw SwordError.emptyRenderedText(reference: reference)
+        }
+
+        return html
+    }
     
     deinit {
         SwordModuleDestroy(handle)

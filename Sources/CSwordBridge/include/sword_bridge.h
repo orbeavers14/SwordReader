@@ -66,6 +66,10 @@ const char *SwordModuleRenderText(
     SwordModuleHandle *module
 );
 
+const char *SwordModuleRenderHTML(
+    SwordModuleHandle *module
+);
+
 size_t SwordModuleWordAttributeCount(
     const SwordModuleHandle *module
 );
