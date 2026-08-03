@@ -45,5 +45,8 @@ public enum SwordError: Error, Equatable, Sendable {
 
     /// A module repository omitted a required identity or host value.
     case invalidModuleRepository(String)
+
+    /// No local SWORD repository existed at the supplied directory.
+    case moduleCatalogNotFound(String)
     
 }

@@ -100,7 +100,68 @@ struct SwordModuleHandle {
     ) : module(module), htmlModule(htmlModule) {}
 };
 
+struct SwordModuleCatalogHandle {
+    sword::SWMgr manager;
+    std::vector<sword::SWModule *> modules;
+
+    explicit SwordModuleCatalogHandle(const char *path)
+        : manager(path) {
+        for (const auto &entry : manager.getModules()) {
+            if (entry.second != nullptr) {
+                modules.push_back(entry.second);
+            }
+        }
+    }
+};
+
 extern "C" {
+
+SwordModuleCatalogHandle *SwordModuleCatalogCreate(const char *path) {
+    if (path == nullptr || path[0] == '\0') {
+        return nullptr;
+    }
+
+    try {
+        return new SwordModuleCatalogHandle(path);
+    } catch (...) {
+        return nullptr;
+    }
+}
+
+void SwordModuleCatalogDestroy(SwordModuleCatalogHandle *catalog) {
+    delete catalog;
+}
+
+size_t SwordModuleCatalogCount(const SwordModuleCatalogHandle *catalog) {
+    return catalog == nullptr ? 0 : catalog->modules.size();
+}
+
+const sword::SWModule *catalogModule(
+    const SwordModuleCatalogHandle *catalog,
+    size_t index
+) {
+    if (catalog == nullptr || index >= catalog->modules.size()) {
+        return nullptr;
+    }
+
+    return catalog->modules[index];
+}
+
+#define SWORD_CATALOG_GETTER(functionName, expression) \
+const char *functionName( \
+    const SwordModuleCatalogHandle *catalog, \
+    size_t index \
+) { \
+    const auto *module = catalogModule(catalog, index); \
+    return module == nullptr ? "" : safeCString(module->expression); \
+}
+
+SWORD_CATALOG_GETTER(SwordModuleCatalogName, getName())
+SWORD_CATALOG_GETTER(SwordModuleCatalogDescription, getDescription())
+SWORD_CATALOG_GETTER(SwordModuleCatalogLanguage, getLanguage())
+SWORD_CATALOG_GETTER(SwordModuleCatalogType, getType())
+
+#undef SWORD_CATALOG_GETTER
 
 size_t SwordModuleParseReferenceCount(
     SwordModuleHandle *module,

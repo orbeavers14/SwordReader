@@ -12,6 +12,7 @@ const char *SwordEngineVersion(void);
 
 typedef struct SwordManager SwordManager;
 typedef struct SwordModuleHandle SwordModuleHandle;
+typedef struct SwordModuleCatalogHandle SwordModuleCatalogHandle;
 typedef void (*SwordSearchProgressCallback)(
     int percentage,
     void *userData
@@ -19,6 +20,26 @@ typedef void (*SwordSearchProgressCallback)(
 
 SwordManager *SwordManagerCreate(void);
 void SwordManagerDestroy(SwordManager *manager);
+
+SwordModuleCatalogHandle *SwordModuleCatalogCreate(const char *path);
+void SwordModuleCatalogDestroy(SwordModuleCatalogHandle *catalog);
+size_t SwordModuleCatalogCount(const SwordModuleCatalogHandle *catalog);
+const char *SwordModuleCatalogName(
+    const SwordModuleCatalogHandle *catalog,
+    size_t index
+);
+const char *SwordModuleCatalogDescription(
+    const SwordModuleCatalogHandle *catalog,
+    size_t index
+);
+const char *SwordModuleCatalogLanguage(
+    const SwordModuleCatalogHandle *catalog,
+    size_t index
+);
+const char *SwordModuleCatalogType(
+    const SwordModuleCatalogHandle *catalog,
+    size_t index
+);
 
 size_t SwordManagerModuleCount(const SwordManager *manager);
 

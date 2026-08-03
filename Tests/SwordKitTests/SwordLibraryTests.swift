@@ -133,6 +133,56 @@ func moduleRepositoryRejectsBlankHost() {
 }
 
 @Test
+func localModuleCatalogReadsSwordConfiguration() throws {
+    let root = FileManager.default.temporaryDirectory.appending(
+        path: "SwordKitCatalog-\(UUID().uuidString)",
+        directoryHint: .isDirectory
+    )
+    let configurationDirectory = root.appending(
+        path: "mods.d",
+        directoryHint: .isDirectory
+    )
+
+    try FileManager.default.createDirectory(
+        at: configurationDirectory,
+        withIntermediateDirectories: true
+    )
+    defer { try? FileManager.default.removeItem(at: root) }
+
+    let configuration = """
+    [TestBible]
+    DataPath=./modules/texts/rawtext/testbible/
+    ModDrv=RawText
+    Description=Test Bible
+    Lang=en
+    """
+    try configuration.write(
+        to: configurationDirectory.appending(path: "testbible.conf"),
+        atomically: true,
+        encoding: .utf8
+    )
+
+    let catalog = try SwordModuleCatalog(directory: root)
+    let module = try #require(catalog.modules.first)
+
+    #expect(module.name == "TestBible")
+    #expect(module.title == "Test Bible")
+    #expect(module.language == "en")
+    #expect(module.category == .bible)
+}
+
+@Test
+func localModuleCatalogRejectsMissingDirectory() {
+    let directory = FileManager.default.temporaryDirectory.appending(
+        path: "SwordKit-Missing-\(UUID().uuidString)"
+    )
+
+    #expect(throws: SwordError.moduleCatalogNotFound(directory.absoluteString)) {
+        try SwordModuleCatalog(directory: directory)
+    }
+}
+
+@Test
 func knownSwordCategoriesAreMapped() {
     #expect(
         SwordModule.Category(swordType: "Biblical Texts") == .bible
