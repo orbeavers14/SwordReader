@@ -354,6 +354,38 @@ func textRangeRejectsZeroLength() {
 }
 
 @Test
+func noteUpdatesWithoutMutatingOriginalValue() throws {
+    let createdAt = Date(timeIntervalSince1970: 1_700_000_000)
+    let updatedAt = createdAt.addingTimeInterval(60)
+    let note = try SwordNote(
+        reference: SwordReference("John 1:1"),
+        moduleName: "KJV",
+        content: "  Opening of the Gospel  ",
+        createdAt: createdAt
+    )
+    let updated = try note.updating(
+        content: "The Word",
+        at: updatedAt
+    )
+
+    #expect(note.content == "Opening of the Gospel")
+    #expect(updated.content == "The Word")
+    #expect(updated.id == note.id)
+    #expect(updated.createdAt == createdAt)
+    #expect(updated.updatedAt == updatedAt)
+}
+
+@Test
+func noteRejectsBlankContent() throws {
+    #expect(throws: SwordError.invalidNoteContent) {
+        try SwordNote(
+            reference: SwordReference("John 1:1"),
+            content: "   "
+        )
+    }
+}
+
+@Test
 func knownSwordCategoriesAreMapped() {
     #expect(
         SwordModule.Category(swordType: "Biblical Texts") == .bible

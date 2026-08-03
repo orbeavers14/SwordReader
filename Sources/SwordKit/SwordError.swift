@@ -66,5 +66,8 @@ public enum SwordError: Error, Equatable, Sendable {
 
     /// A highlight style identifier was empty.
     case invalidHighlightStyle(String)
+
+    /// Note content was empty after trimming whitespace.
+    case invalidNoteContent
     
 }
