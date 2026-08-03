@@ -125,6 +125,37 @@ public final class SwordLibrary {
         )
     }
 
+    /// Retrieves a parallel passage cooperatively in caller-supplied order.
+    ///
+    /// The operation runs on the library's owning executor and checks for task
+    /// cancellation between modules. It does not make live modules safe for
+    /// concurrent access.
+    public func parallelPassageAsync(
+        _ reference: String,
+        modules moduleNames: [String]
+    ) async throws -> SwordParallelPassage {
+        let range = try SwordPassageRange(reference)
+        var passages: [SwordPassage] = []
+        passages.reserveCapacity(moduleNames.count)
+
+        for moduleName in moduleNames {
+            try Task.checkCancellation()
+
+            guard let module = module(named: moduleName) else {
+                throw SwordError.moduleNotFound(moduleName)
+            }
+
+            passages.append(try module.passage(range.value))
+            await Task<Never, Never>.yield()
+        }
+
+        try Task.checkCancellation()
+        return SwordParallelPassage(
+            reference: range,
+            passages: passages
+        )
+    }
+
     internal static func string(
         from pointer: UnsafePointer<CChar>?
     ) -> String {

@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Expand Async APIs
+## Thread-Safe Module Access
 
 Goal:
 
-Add asynchronous entry points for longer-running retrieval and module-management
-operations while preserving the documented native-object isolation model.
+Serialize access to mutable native module state so live modules can safely support
+well-defined cross-task workflows without exposing raw SWORD handles.
 
 ---
 
@@ -201,7 +201,7 @@ Long-term direction:
 
 ## Concurrency
 
-- [ ] Async APIs
+- [x] Async APIs
 - [ ] Thread-safe module access
 - [ ] Background searching
 - [ ] AsyncSequence support

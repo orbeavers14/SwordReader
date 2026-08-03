@@ -1524,6 +1524,60 @@ func bibleModuleCanSearchAsynchronously() async throws {
 }
 
 @Test
+func bibleModuleCanRetrieveVersesAsynchronously() async throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let verses = try await bible.versesAsync(
+        in: "John 3:16-18"
+    )
+
+    #expect(verses.map(\.reference.value) == [
+        "John 3:16",
+        "John 3:17",
+        "John 3:18"
+    ])
+}
+
+@Test
+func libraryCanRetrieveParallelPassageAsynchronously() async throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let passage = try await library.parallelPassageAsync(
+        "John 3:16-18",
+        modules: [bible.name]
+    )
+
+    #expect(passage.passages.map(\.moduleName) == [bible.name])
+    #expect(passage.alignedVerses.count == 3)
+}
+
+@Test
+func asynchronousVerseRetrievalHonorsCancellation() async throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let task = Task {
+        try await bible.versesAsync(in: "Genesis 1-50")
+    }
+    task.cancel()
+
+    await #expect(throws: CancellationError.self) {
+        try await task.value
+    }
+}
+
+@Test
 func asynchronousSearchReportsProgress() async throws {
     let library = SwordLibrary()
 

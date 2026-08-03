@@ -32,6 +32,14 @@ Cancellation may signal the native search from Swift's cancellation handler.
 Callers should handle `CancellationError` in the same way as other cancellable
 Swift APIs.
 
+## Asynchronous retrieval
+
+`SwordModule.versesAsync(in:)` and
+`SwordLibrary.parallelPassageAsync(_:modules:)` preserve input order and check
+for cancellation between native retrieval operations. Like asynchronous search,
+they run on the live object's owning executor and do not permit concurrent use
+of the same module.
+
 ## Future thread-safe access
 
 Thread-safe shared module access is a separate roadmap feature. Until that work

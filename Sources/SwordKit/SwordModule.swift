@@ -148,6 +148,36 @@ public final class SwordModule: Hashable {
         )
     }
 
+    /// Retrieves verses cooperatively, preserving reference order.
+    ///
+    /// The operation runs on the module's owning executor and checks for task
+    /// cancellation between entries. It does not make the module safe for
+    /// concurrent access.
+    public func versesAsync(
+        in references: SwordReferenceList
+    ) async throws -> [SwordVerse] {
+        var verses: [SwordVerse] = []
+        verses.reserveCapacity(references.count)
+
+        for reference in references {
+            try Task.checkCancellation()
+            verses.append(try verse(reference))
+            await Task<Never, Never>.yield()
+        }
+
+        try Task.checkCancellation()
+        return verses
+    }
+
+    /// Parses a Scripture expression and retrieves its verses cooperatively.
+    public func versesAsync(
+        in expression: String
+    ) async throws -> [SwordVerse] {
+        try Task.checkCancellation()
+        let references = try references(in: expression)
+        return try await versesAsync(in: references)
+    }
+
     /// Searches a Bible module for matching entries.
     ///
     /// - Parameters:
