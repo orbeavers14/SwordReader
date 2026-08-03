@@ -102,7 +102,7 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Translation Comparison
+## Unicode-Aware Word Tokenization
 
 Goal:
 
@@ -112,11 +112,11 @@ let passage = try library.parallelPassage(
     modules: ["KJV", "ASV"]
 )
 
-let rows = passage.alignedVerses
+let words = comparison.tokensByModule
 ```
 
-The next milestone will add Swift-native comparison helpers for aligned verse
-text across translations.
+The next milestone will preserve original Greek, Hebrew, and translated word
+forms while producing normalized tokens suitable for later linguistic links.
 
 ---
 
@@ -142,7 +142,18 @@ Planned:
 - [x] Side-by-side verses
 - [x] Missing verse detection
 - [x] Verse alignment
-- [ ] Translation comparison
+- [x] Verse-level translation comparison
+
+## Word-Level Language Comparison
+
+Long-term direction:
+
+- [ ] Unicode-aware tokenization for Greek, Hebrew, and translated text
+- [ ] Normalized word comparison without losing original display text
+- [ ] Strong's-number and lemma alignment
+- [ ] Morphology-aware Greek and Hebrew comparison
+- [ ] Source-to-translation word links
+- [ ] One-to-many and missing-word alignment
 
 ---
 

@@ -76,11 +76,38 @@ public struct SwordAlignedVerse: Hashable, Sendable {
     public let reference: SwordReference
     public let versesByModule: [String: SwordVerse]
 
+    /// A verse-level comparison of rendered text across the aligned modules.
+    public var comparison: SwordVerseComparison {
+        SwordVerseComparison(
+            reference: reference,
+            textByModule: versesByModule.mapValues(\.text)
+        )
+    }
+
     public init(
         reference: SwordReference,
         versesByModule: [String: SwordVerse]
     ) {
         self.reference = reference
         self.versesByModule = versesByModule
+    }
+}
+
+/// Rendered verse text grouped by module for comparison.
+public struct SwordVerseComparison: Hashable, Sendable {
+    public let reference: SwordReference
+    public let textByModule: [String: String]
+
+    /// Whether the available modules contain more than one distinct text.
+    public var hasTextDifferences: Bool {
+        Set(textByModule.values).count > 1
+    }
+
+    public init(
+        reference: SwordReference,
+        textByModule: [String: String]
+    ) {
+        self.reference = reference
+        self.textByModule = textByModule
     }
 }

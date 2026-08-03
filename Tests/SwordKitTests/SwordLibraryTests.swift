@@ -374,6 +374,34 @@ func parallelPassageAlignsVersesByReference() throws {
 }
 
 @Test
+func alignedVerseComparesRenderedTextByModule() throws {
+    let reference = try SwordReference("John 3:16")
+    let comparison = SwordAlignedVerse(
+        reference: reference,
+        versesByModule: [
+            "KJV": SwordVerse(
+                reference: reference,
+                moduleName: "KJV",
+                text: "For God so loved the world"
+            ),
+            "ASV": SwordVerse(
+                reference: reference,
+                moduleName: "ASV",
+                text: "For God so loved the world"
+            ),
+            "WEB": SwordVerse(
+                reference: reference,
+                moduleName: "WEB",
+                text: "For God so loved the world,"
+            )
+        ]
+    ).comparison
+
+    #expect(comparison.textByModule["KJV"] == "For God so loved the world")
+    #expect(comparison.hasTextDifferences)
+}
+
+@Test
 func chapterReferenceParsesBookAndChapter() throws {
     let reference = try SwordChapterReference("John 3")
 
