@@ -31,6 +31,9 @@ jobs:
       - name: Run tests
         run: ./Scripts/test.sh
 
+      - name: Build external consumer package
+        run: ./Scripts/test-consumer-package.sh
+
       - name: Build documentation
         run: |
           xcodebuild docbuild \

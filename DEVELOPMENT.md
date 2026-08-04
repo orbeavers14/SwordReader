@@ -60,6 +60,16 @@ The script builds and runs the suite serially. Live `SwordLibrary` and
 execution also prevents independent integration tests from competing over shared
 module fixtures.
 
+Validate the package from an isolated consumer manifest:
+
+```bash
+./Scripts/test-consumer-package.sh
+```
+
+This check imports the public product from a temporary executable package and
+calls the native bridge and SWORD version APIs, proving that SwiftPM resolves the
+package and links the bundled XCFramework.
+
 ## Building documentation
 
 ```bash

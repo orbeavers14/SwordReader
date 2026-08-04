@@ -28,6 +28,7 @@ Run the required Swift suite:
 
 ```bash
 ./Scripts/test.sh
+./Scripts/test-consumer-package.sh
 ```
 
 Build the documentation and treat unresolved links or content warnings as
