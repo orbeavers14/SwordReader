@@ -25,11 +25,48 @@ jobs:
 
       - name: Report toolchain
         run: |
+          xcodebuild -version
           swift --version
-          cmake --version
-
-      - name: Build SWORD
-        run: ./Scripts/build-libsword.sh
 
       - name: Run tests
         run: ./Scripts/test.sh
+
+  platform-build:
+    name: Build for ${{ matrix.name }}
+    runs-on: macos-26
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: iOS and iPadOS
+            destination: generic/platform=iOS Simulator
+            derived-data: ios
+          - name: tvOS
+            destination: generic/platform=tvOS Simulator
+            derived-data: tvos
+          - name: visionOS
+            destination: generic/platform=visionOS Simulator
+            derived-data: visionos
+          - name: watchOS
+            destination: generic/platform=watchOS Simulator
+            derived-data: watchos
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Report toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Compile package and tests
+        run: |
+          xcodebuild \
+            -scheme SwordKit \
+            -destination '${{ matrix.destination }}' \
+            -derivedDataPath '.build/xcode-${{ matrix.derived-data }}' \
+            CODE_SIGNING_ALLOWED=NO \
+            build-for-testing

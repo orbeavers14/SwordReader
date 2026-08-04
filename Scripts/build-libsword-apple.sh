@@ -71,7 +71,7 @@ configure_destination() {
         tvos-simulator)
             SDK_NAME="appletvsimulator"
             SYSTEM_NAME="tvOS"
-            DEFAULT_ARCHITECTURES="arm64"
+            DEFAULT_ARCHITECTURES="arm64;x86_64"
             DEFAULT_DEPLOYMENT_TARGET="17.0"
             ;;
         visionos)
@@ -83,7 +83,7 @@ configure_destination() {
         visionos-simulator)
             SDK_NAME="xrsimulator"
             SYSTEM_NAME="visionOS"
-            DEFAULT_ARCHITECTURES="arm64"
+            DEFAULT_ARCHITECTURES="arm64;x86_64"
             DEFAULT_DEPLOYMENT_TARGET="1.0"
             ;;
         watchos)
@@ -95,7 +95,7 @@ configure_destination() {
         watchos-simulator)
             SDK_NAME="watchsimulator"
             SYSTEM_NAME="watchOS"
-            DEFAULT_ARCHITECTURES="arm64"
+            DEFAULT_ARCHITECTURES="arm64;x86_64"
             DEFAULT_DEPLOYMENT_TARGET="10.0"
             ;;
         *)

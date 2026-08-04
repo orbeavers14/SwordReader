@@ -16,8 +16,9 @@ platform integration tests all cover that destination.
 
 These baselines align the first cross-platform release around the same generation
 of Foundation, Swift concurrency, and attributed-string APIs. All listed
-platforms are declared in `Package.swift`; continuous-integration and runtime
-validation still gate their first supported release.
+platforms are declared in `Package.swift`. Continuous integration compiles the
+package and its tests for every platform; device runtime validation still gates
+their first supported release.
 
 ## Portable today
 
@@ -91,7 +92,6 @@ portable values directly whenever possible.
 
 ## Delivery sequence
 
-1. Add compile and integration jobs for device and simulator SDKs.
-2. Validate sandbox storage and module restoration on each platform.
-3. Measure watchOS runtime memory and storage with representative modules.
-4. Publish support only after all required checks pass.
+1. Validate module restoration on physical devices for each platform.
+2. Measure watchOS runtime memory and storage with representative modules.
+3. Publish support only after all required checks pass.
