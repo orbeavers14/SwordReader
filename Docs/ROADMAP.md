@@ -110,7 +110,7 @@ pre-1.0 release reproducible and safe for external package consumers.
 - [x] Define the release checklist and changelog
 - [x] Refresh contributor documentation
 - [ ] Verify package consumption from a clean external project
-- [ ] Decide and publish the project license
+- [x] Decide and publish the project license
 - [ ] Establish the first pre-1.0 version and tag
 
 ---

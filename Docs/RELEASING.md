@@ -4,12 +4,12 @@ SwordKit releases are Git tags that identify a tested Swift package revision.
 Use Semantic Versioning and the compatibility rules in
 [COMPATIBILITY.md](COMPATIBILITY.md).
 
-## Before the first public release
+## Licensing gate
 
-SwordKit does not yet have a project-level license. The repository owner must
-choose and add one before publishing a release. The vendored SWORD source keeps
-its own upstream license files; those files do not establish the license for
-SwordKit's original Swift and bridge code.
+SwordKit is GPL-2.0-only. Confirm that release notes identify the license, retain
+SWORD's upstream notices, and explain that Bible modules have independent terms.
+Anyone distributing a linked application is responsible for the corresponding
+source and redistribution obligations of the combined GPL work.
 
 ## Prepare the release
 

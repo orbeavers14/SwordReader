@@ -3,6 +3,17 @@
 SwordKit is currently an experimental pre-1.0 package. This policy describes
 how releases communicate compatibility while the public API matures.
 
+## License compatibility
+
+SwordKit is licensed under GPL-2.0-only and statically links the GPL-2.0 SWORD
+engine. Distributors are responsible for satisfying the GPL for the complete
+combined work and for preserving the independent licenses of Bible and study
+modules. SwordKit does not grant permission to redistribute module content.
+
+Changing the license of SwordKit's original code would not change SWORD's terms.
+Any future linking exception or alternate distribution license must come from
+the relevant copyright holders and be documented before use.
+
 ## Versioning
 
 SwordKit follows Semantic Versioning.

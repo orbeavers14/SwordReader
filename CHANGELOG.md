@@ -7,6 +7,8 @@ Versioning and is currently preparing its first pre-1.0 release.
 
 ### Added
 
+- GPL-2.0-only licensing for SwordKit and explicit downstream distribution
+  guidance.
 - Swift-native access to installed SWORD modules, scripture content, rendering,
   navigation, reference parsing, and search.
 - Cancellable asynchronous search with progress and `AsyncSequence` support.

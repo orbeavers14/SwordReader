@@ -1,6 +1,7 @@
 # SwordKit
 
 [![CI](https://github.com/orbeavers14/SwordKit/actions/workflows/ci.yml/badge.svg)](https://github.com/orbeavers14/SwordKit/actions/workflows/ci.yml)
+[![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](LICENSE)
 
 SwordKit is an experimental Swift interface to the CrossWire SWORD engine for
 the Apple platform family.
@@ -41,6 +42,16 @@ See [CHANGELOG.md](CHANGELOG.md) for notable changes and
 
 Open the SwordKit product documentation in Xcode for DocC guides covering setup,
 Apple-platform storage, search, translation comparison, and migration.
+
+## License
+
+SwordKit is licensed under GPL-2.0-only and statically links the GPL-2.0 SWORD
+engine. Applications distributed with SwordKit ordinarily need to comply with
+the GPL for the combined work, including corresponding-source and redistribution
+requirements. Bible modules retain their own licenses and distribution terms.
+
+See [LICENSE](LICENSE) and obtain appropriate legal advice before distributing
+through a platform whose terms may add restrictions to recipients.
 
 ## Requirements
 

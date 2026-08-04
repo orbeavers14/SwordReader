@@ -1,0 +1,19 @@
+SwordKit is free software licensed under the GNU General Public License,
+version 2 only (GPL-2.0-only).
+
+Copyright (C) 2026 SwordKit contributors
+
+You may redistribute and/or modify SwordKit under the terms of version 2 of
+the GNU General Public License as published by the Free Software Foundation.
+
+SwordKit is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+The complete, unmodified GNU General Public License version 2 text is included
+at Vendor/libsword/LICENSE and is part of this distribution. It is also
+available from https://www.gnu.org/licenses/old-licenses/gpl-2.0.html.
+
+The CrossWire SWORD source and binary artifact included with SwordKit retain
+their upstream copyright and license notices. Bible and study-text modules are
+separate works with their own distribution terms.
