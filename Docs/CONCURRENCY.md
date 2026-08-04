@@ -28,6 +28,11 @@ search-result state.
 `@Sendable` progress callback. Other operations targeting the same module wait
 until the active search releases its serialized native access.
 
+Because it is a non-actor-isolated async method, `searchAsync` performs native
+search work on Swift's generic executor instead of blocking the caller's actor.
+It preserves structured cancellation rather than creating an unstructured
+detached task.
+
 Cancellation may signal the native search from Swift's cancellation handler.
 Callers should handle `CancellationError` in the same way as other cancellable
 Swift APIs.

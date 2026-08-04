@@ -328,6 +328,8 @@ public final class SwordModule: Hashable, @unchecked Sendable {
     /// Cancelling the calling task signals SWORD to terminate its active
     /// search and causes this method to throw ``CancellationError``.
     /// The optional progress callback receives SWORD's completion percentage.
+    /// As a nonisolated async method, native search runs on Swift's generic
+    /// executor rather than the caller's actor executor.
     public func searchAsync(
         _ query: String,
         type: SwordSearchType = .phrase,

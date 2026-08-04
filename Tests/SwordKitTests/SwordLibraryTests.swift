@@ -1674,6 +1674,31 @@ func asynchronousSearchReportsProgress() async throws {
     #expect(percentages.allSatisfy { (0...100).contains($0) })
 }
 
+@MainActor
+@Test
+func asynchronousSearchRunsProgressOffMainThread() async throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let progress = SearchProgressRecorder()
+
+    _ = try await bible.searchAsync(
+        "Jesus wept",
+        scope: "John 11",
+        progress: { percentage in
+            progress.record(
+                percentage,
+                isMainThread: Thread.isMainThread
+            )
+        }
+    )
+
+    #expect(progress.observedBackgroundThread)
+}
+
 @Test
 func asynchronousSearchCanBeCancelled() async throws {
     let library = SwordLibrary()
@@ -1814,14 +1839,25 @@ private func requireSendable<Value: Sendable>(_: Value.Type) {}
 private final class SearchProgressRecorder: @unchecked Sendable {
     private let lock = NSLock()
     private var recordedPercentages: [Int] = []
+    private var recordedMainThreadValues: [Bool] = []
 
     var percentages: [Int] {
         lock.withLock { recordedPercentages }
     }
 
-    func record(_ percentage: Int) {
+    var observedBackgroundThread: Bool {
+        lock.withLock {
+            recordedMainThreadValues.contains(false)
+        }
+    }
+
+    func record(
+        _ percentage: Int,
+        isMainThread: Bool = Thread.isMainThread
+    ) {
         lock.withLock {
             recordedPercentages.append(percentage)
+            recordedMainThreadValues.append(isMainThread)
         }
     }
 }

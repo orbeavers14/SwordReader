@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Background Searching
+## AsyncSequence Search Results
 
 Goal:
 
-Run SWORD searches away from the caller's executor while preserving serialized
-module access, cancellation, progress reporting, and result ordering.
+Stream ordered search results through a cancellable Swift `AsyncSequence` while
+preserving the existing array-returning search APIs.
 
 ---
 
@@ -217,7 +217,7 @@ Long-term direction:
 
 - [x] Async APIs
 - [x] Thread-safe module access
-- [ ] Background searching
+- [x] Background searching
 - [ ] AsyncSequence support
 
 Example:
