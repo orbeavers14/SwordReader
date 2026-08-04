@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Tutorials
+## Sample Applications
 
 Goal:
 
-Add task-oriented tutorials that take developers from an empty Apple app through
-module setup, Scripture reading, search, and translation comparison.
+Provide small reference applications that compile against SwordKit and
+demonstrate reader, search, storage, and comparison integration.
 
 ---
 
@@ -235,7 +235,7 @@ for try await result in bible.search(
 ## Documentation
 
 - [x] DocC
-- [ ] Tutorials
+- [x] Tutorials
 - [ ] Sample applications
 - [ ] API guides
 - [ ] Migration guides

@@ -20,6 +20,8 @@ immutable `Sendable` snapshots.
     - <doc:SearchingScripture>
     - <doc:ComparingTranslations>
     - <doc:ApplePlatformStorage>
+    - <doc:BuildingAScriptureReader>
+    - <doc:BuildingATranslationComparison>
 }
 
 ## Topics
@@ -30,6 +32,11 @@ immutable `Sendable` snapshots.
 - ``SwordLibrary``
 - ``SwordModule``
 - ``SwordModuleLocation``
+
+### Tutorials
+
+- <doc:BuildingAScriptureReader>
+- <doc:BuildingATranslationComparison>
 
 ### Scripture references and content
 
