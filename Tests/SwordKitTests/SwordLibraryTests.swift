@@ -9,7 +9,7 @@ func bridgeVersionIsAvailable() {
 
 @Test
 func engineVersionIsAvailable() {
-    #expect(!SwordLibrary.engineVersion.isEmpty)
+    #expect(SwordLibrary.engineVersion.hasPrefix("1.9.0"))
 }
 
 @Test

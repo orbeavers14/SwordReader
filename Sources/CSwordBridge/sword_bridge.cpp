@@ -524,8 +524,7 @@ const char *SwordBridgeVersion(void) {
 }
 
 const char *SwordEngineVersion(void) {
-    static sword::SWVersion version;
-    return version.getText();
+    return sword::SWVersion::currentVersion.getText();
 }
 
 SwordManager *SwordManagerCreate(void) {
