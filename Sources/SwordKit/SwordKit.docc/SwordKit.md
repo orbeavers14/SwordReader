@@ -22,6 +22,8 @@ immutable `Sendable` snapshots.
     - <doc:ApplePlatformStorage>
     - <doc:BuildingAScriptureReader>
     - <doc:BuildingATranslationComparison>
+    - <doc:ManagingModuleLifecycle>
+    - <doc:UsingSwordKitWithConcurrency>
 }
 
 ## Topics
@@ -37,6 +39,14 @@ immutable `Sendable` snapshots.
 
 - <doc:BuildingAScriptureReader>
 - <doc:BuildingATranslationComparison>
+
+### API guides
+
+- <doc:ManagingModuleLifecycle>
+- <doc:HandlingSwordKitErrors>
+- <doc:UsingSwordKitWithConcurrency>
+- <doc:RenderingScriptureContent>
+- <doc:PersistingStudyData>
 
 ### Scripture references and content
 
@@ -67,6 +77,7 @@ immutable `Sendable` snapshots.
 ### Module management
 
 - <doc:ApplePlatformStorage>
+- <doc:ManagingModuleLifecycle>
 - ``SwordModuleCatalog``
 - ``SwordModuleCatalogEntry``
 - ``SwordInstallerConfiguration``
@@ -75,6 +86,7 @@ immutable `Sendable` snapshots.
 
 ### Study values
 
+- <doc:PersistingStudyData>
 - ``SwordFavorite``
 - ``SwordBookmark``
 - ``SwordHighlight``
@@ -86,4 +98,5 @@ immutable `Sendable` snapshots.
 
 ### Errors
 
+- <doc:HandlingSwordKitErrors>
 - ``SwordError``

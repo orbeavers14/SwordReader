@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## API Guides
+## Migration Guides
 
 Goal:
 
-Document the framework's major API families, behavioral guarantees, error
-handling, and integration choices in focused reference guides.
+Provide a repeatable migration-guide structure and document the changes required
+when adopting the current multi-platform, thread-safe, XCFramework-backed API.
 
 ---
 
@@ -237,7 +237,7 @@ for try await result in bible.searchStream(
 - [x] DocC
 - [x] Tutorials
 - [ ] Sample applications (deferred)
-- [ ] API guides
+- [x] API guides
 - [ ] Migration guides
 
 Sample applications will resume when a product app can define useful reusable
