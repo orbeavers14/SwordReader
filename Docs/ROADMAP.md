@@ -102,11 +102,16 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Core Roadmap Complete
+## Pre-Release Hardening
 
-The framework milestones are complete. Sample applications remain deferred until
-product work can identify reusable UI boundaries without coupling SwordKit to a
-specific app design.
+The framework milestones are complete. The current focus is making the first
+pre-1.0 release reproducible and safe for external package consumers.
+
+- [x] Define the release checklist and changelog
+- [ ] Refresh contributor documentation
+- [ ] Verify package consumption from a clean external project
+- [ ] Decide and publish the project license
+- [ ] Establish the first pre-1.0 version and tag
 
 ---
 

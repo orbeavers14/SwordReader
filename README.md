@@ -36,6 +36,9 @@ visionOS, and watchOS delivery strategy.
 See [Docs/NATIVE_DISTRIBUTION.md](Docs/NATIVE_DISTRIBUTION.md) for why SwordKit
 ships a native XCFramework and how it is maintained.
 
+See [CHANGELOG.md](CHANGELOG.md) for notable changes and
+[Docs/RELEASING.md](Docs/RELEASING.md) for the release process.
+
 Open the SwordKit product documentation in Xcode for DocC guides covering setup,
 Apple-platform storage, search, translation comparison, and migration.
 
