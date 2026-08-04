@@ -33,6 +33,9 @@ visionOS, and watchOS delivery strategy.
 See [Docs/NATIVE_DISTRIBUTION.md](Docs/NATIVE_DISTRIBUTION.md) for why SwordKit
 ships a native XCFramework and how it is maintained.
 
+Open the SwordKit product documentation in Xcode for DocC guides covering setup,
+Apple-platform storage, search, and translation comparison.
+
 ## Requirements
 
 - macOS 14, iOS/iPadOS 17, tvOS 17, visionOS 1, or watchOS 10

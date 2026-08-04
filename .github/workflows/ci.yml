@@ -31,6 +31,14 @@ jobs:
       - name: Run tests
         run: ./Scripts/test.sh
 
+      - name: Build documentation
+        run: |
+          xcodebuild docbuild \
+            -scheme SwordKit \
+            -destination 'generic/platform=macOS' \
+            -derivedDataPath .build/docc \
+            CODE_SIGNING_ALLOWED=NO
+
   platform-build:
     name: Build for ${{ matrix.name }}
     runs-on: macos-26

@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## DocC Documentation
+## Tutorials
 
 Goal:
 
-Publish generated API documentation with framework concepts, platform guidance,
-and runnable examples for the primary reading, search, and comparison workflows.
+Add task-oriented tutorials that take developers from an empty Apple app through
+module setup, Scripture reading, search, and translation comparison.
 
 ---
 
@@ -234,7 +234,7 @@ for try await result in bible.search(
 
 ## Documentation
 
-- [ ] DocC
+- [x] DocC
 - [ ] Tutorials
 - [ ] Sample applications
 - [ ] API guides
