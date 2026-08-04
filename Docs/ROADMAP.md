@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Sample Applications
+## API Guides
 
 Goal:
 
-Provide small reference applications that compile against SwordKit and
-demonstrate reader, search, storage, and comparison integration.
+Document the framework's major API families, behavioral guarantees, error
+handling, and integration choices in focused reference guides.
 
 ---
 
@@ -223,7 +223,7 @@ Long-term direction:
 Example:
 
 ```swift
-for try await result in bible.search(
+for try await result in bible.searchStream(
     "grace"
 ) {
     print(result.reference)
@@ -236,9 +236,12 @@ for try await result in bible.search(
 
 - [x] DocC
 - [x] Tutorials
-- [ ] Sample applications
+- [ ] Sample applications (deferred)
 - [ ] API guides
 - [ ] Migration guides
+
+Sample applications will resume when a product app can define useful reusable
+UI boundaries without expanding the core framework.
 
 ---
 
