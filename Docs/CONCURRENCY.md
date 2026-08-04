@@ -13,20 +13,20 @@ This includes values such as `SwordVerse`, `SwordPassage`,
 
 ## Live engine objects
 
-`SwordLibrary` and `SwordModule` do not conform to `Sendable`. They own mutable
-native SWORD manager and module handles, including cursor and search state. Keep
-each library and its modules within the task or actor that owns them. Do not pass
-these objects between actors or invoke the same module concurrently.
+`SwordLibrary` and `SwordModule` conform to `Sendable` using internal recursive
+locks around their mutable native SWORD manager, cursor, parsing, rendering, and
+search state. A library or module may be shared between tasks and actors. Calls
+on the same live module are serialized; separate modules can continue working
+independently.
 
-Create a separate `SwordLibrary` inside another actor when that actor needs live
-SWORD access. Pass the resulting immutable SwordKit values back across the actor
-boundary.
+Returned values remain immutable snapshots and do not retain mutable cursor or
+search-result state.
 
 ## Asynchronous search
 
 `SwordModule.searchAsync` supports Swift task cancellation and accepts an
-`@Sendable` progress callback. It remains an operation on the module's owning
-executor; it does not make the live module safe for concurrent use.
+`@Sendable` progress callback. Other operations targeting the same module wait
+until the active search releases its serialized native access.
 
 Cancellation may signal the native search from Swift's cancellation handler.
 Callers should handle `CancellationError` in the same way as other cancellable
@@ -36,12 +36,5 @@ Swift APIs.
 
 `SwordModule.versesAsync(in:)` and
 `SwordLibrary.parallelPassageAsync(_:modules:)` preserve input order and check
-for cancellation between native retrieval operations. Like asynchronous search,
-they run on the live object's owning executor and do not permit concurrent use
-of the same module.
-
-## Future thread-safe access
-
-Thread-safe shared module access is a separate roadmap feature. Until that work
-is complete, SwordKit will not use `@unchecked Sendable` to imply safety for live
-native objects.
+for cancellation between native retrieval operations. They may be called from
+any concurrency domain; operations sharing a module are serialized internally.

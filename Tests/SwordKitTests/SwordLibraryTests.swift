@@ -1700,6 +1700,59 @@ func asynchronousSearchCanBeCancelled() async throws {
 }
 
 @Test
+func sharedBibleSerializesConcurrentVerseAccess() async throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let references = ["John 3:16", "Romans 8:28", "Psalm 23:1"]
+    let retrieved = try await withThrowingTaskGroup(
+        of: SwordVerse.self,
+        returning: [SwordVerse].self
+    ) { group in
+        for index in 0..<30 {
+            group.addTask {
+                try bible.verse(references[index % references.count])
+            }
+        }
+
+        var verses: [SwordVerse] = []
+        for try await verse in group {
+            verses.append(verse)
+        }
+        return verses
+    }
+
+    #expect(retrieved.count == 30)
+    #expect(
+        retrieved.allSatisfy {
+            references.contains($0.reference.value) && !$0.text.isEmpty
+        }
+    )
+}
+
+@Test
+func sharedLibrarySerializesRefreshAndModuleSnapshots() async {
+    let library = SwordLibrary()
+
+    await withTaskGroup(of: Void.self) { group in
+        for index in 0..<20 {
+            group.addTask {
+                if index.isMultiple(of: 2) {
+                    library.refresh()
+                } else {
+                    _ = library.modules.map(\.name)
+                }
+            }
+        }
+    }
+
+    #expect(library.modules.map(\.name) == library.modules.map(\.name).sorted())
+}
+
+@Test
 func portablePublicValuesAreSendable() {
     requireSendable(SwordReference.self)
     requireSendable(SwordReferenceList.self)
@@ -1718,6 +1771,8 @@ func portablePublicValuesAreSendable() {
     requireSendable(SwordReadingHistoryEntry.self)
     requireSendable(SwordSavedSearch.self)
     requireSendable(SwordVerseCollection.self)
+    requireSendable(SwordLibrary.self)
+    requireSendable(SwordModule.self)
 }
 
 @Test

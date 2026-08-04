@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Thread-Safe Module Access
+## Background Searching
 
 Goal:
 
-Serialize access to live SWORD module handles so applications can safely share
-library and module services across Swift concurrency domains.
+Run SWORD searches away from the caller's executor while preserving serialized
+module access, cancellation, progress reporting, and result ordering.
 
 ---
 
@@ -216,7 +216,7 @@ Long-term direction:
 ## Concurrency
 
 - [x] Async APIs
-- [ ] Thread-safe module access
+- [x] Thread-safe module access
 - [ ] Background searching
 - [ ] AsyncSequence support
 

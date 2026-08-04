@@ -1,4 +1,5 @@
 import CSwordBridge
+import Foundation
 
 #if canImport(AppKit)
 import AppKit
@@ -10,7 +11,7 @@ import UIKit
 ///
 /// A module may represent a Bible, commentary, dictionary, lexicon,
 /// or general book.
-public final class SwordModule: Hashable {
+public final class SwordModule: Hashable, @unchecked Sendable {
     /// The module's internal SWORD identifier.
     public let name: String
     
@@ -30,6 +31,7 @@ public final class SwordModule: Hashable {
     public let category: Category
     
     private let storage: SwordManagerStorage
+    private let accessLock = NSRecursiveLock()
     internal let handle: OpaquePointer
     
     internal init(
@@ -69,6 +71,14 @@ public final class SwordModule: Hashable {
     /// Parses a Scripture reference expression using the module's
     /// native SWORD versification.
     public func references(
+        in expression: String
+    ) throws -> SwordReferenceList {
+        try accessLock.withLock {
+            try referencesWithoutLock(in: expression)
+        }
+    }
+
+    private func referencesWithoutLock(
         in expression: String
     ) throws -> SwordReferenceList {
         guard category == .bible else {
@@ -150,9 +160,8 @@ public final class SwordModule: Hashable {
 
     /// Retrieves verses cooperatively, preserving reference order.
     ///
-    /// The operation runs on the module's owning executor and checks for task
-    /// cancellation between entries. It does not make the module safe for
-    /// concurrent access.
+    /// The operation checks for task cancellation between entries. Native
+    /// access is serialized with other operations on this module.
     public func versesAsync(
         in references: SwordReferenceList
     ) async throws -> [SwordVerse] {
@@ -193,6 +202,24 @@ public final class SwordModule: Hashable {
         caseSensitive: Bool = true,
         scope: String? = nil,
         progress: (@Sendable (Int) -> Void)? = nil
+    ) throws -> [SwordSearchResult] {
+        try accessLock.withLock {
+            try searchWithoutLock(
+                query,
+                type: type,
+                caseSensitive: caseSensitive,
+                scope: scope,
+                progress: progress
+            )
+        }
+    }
+
+    private func searchWithoutLock(
+        _ query: String,
+        type: SwordSearchType,
+        caseSensitive: Bool,
+        scope: String?,
+        progress: (@Sendable (Int) -> Void)?
     ) throws -> [SwordSearchResult] {
         guard category == .bible else {
             throw SwordError.unsupportedModuleType
@@ -334,6 +361,14 @@ public final class SwordModule: Hashable {
     public func chapter(
         _ reference: SwordChapterReference
     ) throws -> SwordChapter {
+        try accessLock.withLock {
+            try chapterWithoutLock(reference)
+        }
+    }
+
+    private func chapterWithoutLock(
+        _ reference: SwordChapterReference
+    ) throws -> SwordChapter {
         guard category == .bible else {
             throw SwordError.unsupportedModuleType
         }
@@ -388,6 +423,14 @@ public final class SwordModule: Hashable {
     /// - Throws: A ``SwordError`` when the reference is invalid,
     ///   unavailable, or incompatible with the module.
     public func verse(
+        _ reference: SwordReference
+    ) throws -> SwordVerse {
+        try accessLock.withLock {
+            try verseWithoutLock(reference)
+        }
+    }
+
+    private func verseWithoutLock(
         _ reference: SwordReference
     ) throws -> SwordVerse {
         guard category == .bible else {
@@ -517,6 +560,12 @@ public final class SwordModule: Hashable {
 
     /// Renders a Bible entry as SWORD-generated XHTML.
     public func html(_ reference: String) throws -> String {
+        try accessLock.withLock {
+            try htmlWithoutLock(reference)
+        }
+    }
+
+    private func htmlWithoutLock(_ reference: String) throws -> String {
         _ = try verse(reference)
 
         let html = SwordLibrary.string(
@@ -532,6 +581,14 @@ public final class SwordModule: Hashable {
 
     /// Renders a Bible entry as a Swift-native attributed string.
     public func attributedString(
+        _ reference: String
+    ) throws -> AttributedString {
+        try accessLock.withLock {
+            try attributedStringWithoutLock(reference)
+        }
+    }
+
+    private func attributedStringWithoutLock(
         _ reference: String
     ) throws -> AttributedString {
         let verse = try verse(reference)
@@ -587,6 +644,18 @@ public final class SwordModule: Hashable {
     /// - Returns: A sequential collection of verses.
     /// - Throws: A ``SwordError`` when the request cannot be completed.
     public func passage(
+        startingAt reference: SwordReference,
+        verseCount: Int
+    ) throws -> SwordPassage {
+        try accessLock.withLock {
+            try passageWithoutLock(
+                startingAt: reference,
+                verseCount: verseCount
+            )
+        }
+    }
+
+    private func passageWithoutLock(
         startingAt reference: SwordReference,
         verseCount: Int
     ) throws -> SwordPassage {
@@ -763,42 +832,52 @@ public extension SwordModule {
 
 extension SwordModule {
     internal func advance() {
-        SwordModuleIncrement(handle)
+        accessLock.withLock {
+            SwordModuleIncrement(handle)
+        }
     }
 
     internal func retreat() {
-        SwordModuleDecrement(handle)
+        accessLock.withLock {
+            SwordModuleDecrement(handle)
+        }
     }
 
     internal var currentReference: SwordReference? {
-        let text = SwordLibrary.string(
-            from: SwordModuleCurrentKey(handle)
-        )
+        accessLock.withLock {
+            let text = SwordLibrary.string(
+                from: SwordModuleCurrentKey(handle)
+            )
 
-        return try? SwordReference(text)
+            return try? SwordReference(text)
+        }
     }
 
     internal var currentText: String {
-        SwordLibrary.string(
-            from: SwordModuleRenderText(handle)
-        )
+        accessLock.withLock {
+            SwordLibrary.string(
+                from: SwordModuleRenderText(handle)
+            )
+        }
     }
     
     internal var currentVerse: SwordVerse? {
-        guard let reference = currentReference else {
-            return nil
+        accessLock.withLock {
+            guard let reference = currentReference else {
+                return nil
+            }
+
+            let text = currentText
+
+            guard !text.isEmpty else {
+                return nil
+            }
+
+            return SwordVerse(
+                reference: reference,
+                moduleName: name,
+                text: text
+            )
         }
-
-        let text = currentText
-
-        guard !text.isEmpty else {
-            return nil
-        }
-
-        return SwordVerse(
-            reference: reference,
-            moduleName: name,
-            text: text
-        )
     }
 }

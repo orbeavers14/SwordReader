@@ -2,7 +2,7 @@ import CSwordBridge
 import Foundation
 
 /// Provides access to the SWORD engine and its installed modules.
-public final class SwordLibrary {
+public final class SwordLibrary: @unchecked Sendable {
     /// The version of the SwordKit native bridge.
     public static let bridgeVersion = string(
         from: SwordBridgeVersion()
@@ -14,8 +14,12 @@ public final class SwordLibrary {
     )
 
     /// The modules available through this SWORD installation.
-    public private(set) var modules: [SwordModule]
+    public var modules: [SwordModule] {
+        accessLock.withLock { storedModules }
+    }
 
+    private let accessLock = NSRecursiveLock()
+    private var storedModules: [SwordModule]
     private var storage: SwordManagerStorage?
     private let directory: URL?
 
@@ -24,7 +28,7 @@ public final class SwordLibrary {
     public init() {
         self.directory = nil
         self.storage = nil
-        self.modules = []
+        self.storedModules = []
         refresh()
     }
 
@@ -36,7 +40,7 @@ public final class SwordLibrary {
 
         self.directory = directory.standardizedFileURL
         self.storage = nil
-        self.modules = []
+        self.storedModules = []
         refresh()
     }
 
@@ -47,30 +51,32 @@ public final class SwordLibrary {
 
     /// Reloads installed modules into a new library snapshot.
     public func refresh() {
-        let storage = SwordManagerStorage(directory: directory?.path)
+        accessLock.withLock {
+            let storage = SwordManagerStorage(directory: directory?.path)
 
-        guard let storage else {
-            self.storage = nil
-            self.modules = []
-            return
-        }
-
-        self.storage = storage
-
-        let count = SwordManagerModuleCount(storage.handle)
-
-        modules = (0..<count).compactMap { index in
-            guard let handle = SwordManagerOpenModule(
-                storage.handle,
-                index
-            ) else {
-                return nil
+            guard let storage else {
+                self.storage = nil
+                self.storedModules = []
+                return
             }
 
-            return SwordModule(
-                storage: storage,
-                handle: handle
-            )
+            self.storage = storage
+
+            let count = SwordManagerModuleCount(storage.handle)
+
+            storedModules = (0..<count).compactMap { index in
+                guard let handle = SwordManagerOpenModule(
+                    storage.handle,
+                    index
+                ) else {
+                    return nil
+                }
+
+                return SwordModule(
+                    storage: storage,
+                    handle: handle
+                )
+            }
         }
     }
 
@@ -78,8 +84,10 @@ public final class SwordLibrary {
     ///
     /// Module-name matching is case-insensitive.
     public func module(named name: String) -> SwordModule? {
-        modules.first {
-            $0.name.lowercased() == name.lowercased()
+        accessLock.withLock {
+            storedModules.first {
+                $0.name.lowercased() == name.lowercased()
+            }
         }
     }
 
@@ -95,15 +103,17 @@ public final class SwordLibrary {
         category: SwordModule.Category? = nil,
         language: String? = nil
     ) -> [SwordModule] {
-        modules.filter { module in
-            let matchesCategory = category.map {
-                module.category == $0
-            } ?? true
-            let matchesLanguage = language.map {
-                module.language.caseInsensitiveCompare($0) == .orderedSame
-            } ?? true
+        accessLock.withLock {
+            storedModules.filter { module in
+                let matchesCategory = category.map {
+                    module.category == $0
+                } ?? true
+                let matchesLanguage = language.map {
+                    module.language.caseInsensitiveCompare($0) == .orderedSame
+                } ?? true
 
-            return matchesCategory && matchesLanguage
+                return matchesCategory && matchesLanguage
+            }
         }
     }
 
@@ -132,9 +142,8 @@ public final class SwordLibrary {
 
     /// Retrieves a parallel passage cooperatively in caller-supplied order.
     ///
-    /// The operation runs on the library's owning executor and checks for task
-    /// cancellation between modules. It does not make live modules safe for
-    /// concurrent access.
+    /// The operation checks for task cancellation between modules. Each live
+    /// module serializes its native SWORD access.
     public func parallelPassageAsync(
         _ reference: String,
         modules moduleNames: [String]
