@@ -102,12 +102,12 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## AsyncSequence Search Results
+## DocC Documentation
 
 Goal:
 
-Stream ordered search results through a cancellable Swift `AsyncSequence` while
-preserving the existing array-returning search APIs.
+Publish generated API documentation with framework concepts, platform guidance,
+and runnable examples for the primary reading, search, and comparison workflows.
 
 ---
 
@@ -218,7 +218,7 @@ Long-term direction:
 - [x] Async APIs
 - [x] Thread-safe module access
 - [x] Background searching
-- [ ] AsyncSequence support
+- [x] AsyncSequence support
 
 Example:
 

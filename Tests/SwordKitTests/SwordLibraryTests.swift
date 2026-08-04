@@ -1725,6 +1725,43 @@ func asynchronousSearchCanBeCancelled() async throws {
 }
 
 @Test
+func searchStreamYieldsOrderedResults() async throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    let expected = try await bible.searchAsync(
+        "Jesus wept",
+        scope: "John 11"
+    )
+    var streamed: [SwordSearchResult] = []
+
+    for try await result in bible.searchStream(
+        "Jesus wept",
+        scope: "John 11"
+    ) {
+        streamed.append(result)
+    }
+
+    #expect(streamed == expected)
+}
+
+@Test
+func searchStreamPropagatesValidationErrors() async throws {
+    let library = SwordLibrary()
+
+    guard let bible = library.module(named: "KJV") else {
+        return
+    }
+
+    await #expect(throws: SwordError.invalidSearchQuery("   ")) {
+        for try await _ in bible.searchStream("   ") {}
+    }
+}
+
+@Test
 func sharedBibleSerializesConcurrentVerseAccess() async throws {
     let library = SwordLibrary()
 

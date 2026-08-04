@@ -358,6 +358,47 @@ public final class SwordModule: Hashable, @unchecked Sendable {
             SwordModuleTerminateSearch(nativeHandle.value)
         }
     }
+
+    /// Streams search results in SWORD result order.
+    ///
+    /// Cancelling iteration cancels the producing task and signals an active
+    /// native search to terminate. SWORD produces its result list as a batch,
+    /// after which this sequence yields each immutable result cooperatively.
+    public func searchStream(
+        _ query: String,
+        type: SwordSearchType = .phrase,
+        caseSensitive: Bool = true,
+        scope: String? = nil,
+        progress: (@Sendable (Int) -> Void)? = nil
+    ) -> AsyncThrowingStream<SwordSearchResult, any Error> {
+        AsyncThrowingStream { continuation in
+            let producer = Task {
+                do {
+                    let results = try await searchAsync(
+                        query,
+                        type: type,
+                        caseSensitive: caseSensitive,
+                        scope: scope,
+                        progress: progress
+                    )
+
+                    for result in results {
+                        try Task.checkCancellation()
+                        continuation.yield(result)
+                        await Task<Never, Never>.yield()
+                    }
+
+                    continuation.finish()
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+            }
+
+            continuation.onTermination = { @Sendable _ in
+                producer.cancel()
+            }
+        }
+    }
     
     /// Retrieves a complete chapter from a Bible module.
     public func chapter(

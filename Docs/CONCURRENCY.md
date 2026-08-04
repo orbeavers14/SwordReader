@@ -43,3 +43,10 @@ Swift APIs.
 `SwordLibrary.parallelPassageAsync(_:modules:)` preserve input order and check
 for cancellation between native retrieval operations. They may be called from
 any concurrency domain; operations sharing a module are serialized internally.
+
+## Streaming search results
+
+`SwordModule.searchStream` returns an `AsyncThrowingStream` that preserves SWORD
+result order. SWORD first completes its native batch search, then the stream
+yields immutable results cooperatively. Ending or cancelling iteration cancels
+the producer and signals an active native search to terminate.

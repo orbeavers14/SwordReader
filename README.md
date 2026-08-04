@@ -76,3 +76,13 @@ let installerConfiguration = SwordInstallerConfiguration(location: location)
 
 Apps with shared containers or platform-specific restoration policies can create
 `SwordModuleLocation` from explicit module and installer directory URLs instead.
+
+## Streaming search
+
+Search results can also be consumed as a cancellable asynchronous sequence:
+
+```swift
+for try await result in bible.searchStream("grace") {
+    print(result.reference.value)
+}
+```
