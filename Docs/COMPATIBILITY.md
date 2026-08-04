@@ -83,3 +83,7 @@ schemas. Each guide should include:
 2. The replacement API or behavior.
 3. A minimal before-and-after example.
 4. Any data, threading, or deployment consequences.
+
+Use the [migration guide template](MIGRATION_GUIDE_TEMPLATE.md) for future
+breaking releases. Applications adopting the current architecture should start
+with [Migrating to the Current SwordKit Architecture](MIGRATING_TO_CURRENT.md).

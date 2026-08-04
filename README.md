@@ -27,6 +27,9 @@ guarantees.
 See [Docs/COMPATIBILITY.md](Docs/COMPATIBILITY.md) for supported environments,
 versioning, and migration policy.
 
+See [Docs/MIGRATING_TO_CURRENT.md](Docs/MIGRATING_TO_CURRENT.md) when updating an
+earlier macOS-oriented or manually linked integration.
+
 See [Docs/PLATFORMS.md](Docs/PLATFORMS.md) for the macOS, iOS, iPadOS, tvOS,
 visionOS, and watchOS delivery strategy.
 
@@ -34,7 +37,7 @@ See [Docs/NATIVE_DISTRIBUTION.md](Docs/NATIVE_DISTRIBUTION.md) for why SwordKit
 ships a native XCFramework and how it is maintained.
 
 Open the SwordKit product documentation in Xcode for DocC guides covering setup,
-Apple-platform storage, search, and translation comparison.
+Apple-platform storage, search, translation comparison, and migration.
 
 ## Requirements
 

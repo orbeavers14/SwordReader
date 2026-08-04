@@ -24,6 +24,7 @@ immutable `Sendable` snapshots.
     - <doc:BuildingATranslationComparison>
     - <doc:ManagingModuleLifecycle>
     - <doc:UsingSwordKitWithConcurrency>
+    - <doc:MigratingToCurrentSwordKit>
 }
 
 ## Topics
@@ -47,6 +48,7 @@ immutable `Sendable` snapshots.
 - <doc:UsingSwordKitWithConcurrency>
 - <doc:RenderingScriptureContent>
 - <doc:PersistingStudyData>
+- <doc:MigratingToCurrentSwordKit>
 
 ### Scripture references and content
 

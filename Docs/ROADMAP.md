@@ -102,12 +102,11 @@ let results = try bible.search("grace")
 
 # Next Milestone
 
-## Migration Guides
+## Core Roadmap Complete
 
-Goal:
-
-Provide a repeatable migration-guide structure and document the changes required
-when adopting the current multi-platform, thread-safe, XCFramework-backed API.
+The framework milestones are complete. Sample applications remain deferred until
+product work can identify reusable UI boundaries without coupling SwordKit to a
+specific app design.
 
 ---
 
@@ -238,7 +237,7 @@ for try await result in bible.searchStream(
 - [x] Tutorials
 - [ ] Sample applications (deferred)
 - [x] API guides
-- [ ] Migration guides
+- [x] Migration guides
 
 Sample applications will resume when a product app can define useful reusable
 UI boundaries without expanding the core framework.
@@ -304,13 +303,7 @@ Those remain internal implementation details hidden behind a clean Swift API.
 
 # Project Status
 
-Current completion estimate:
-
-Core Foundation
-███████████████████████░░░░░░░░░░░░ 55%
-
-Public Swift API
-██████████████████░░░░░░░░░░░░░░░░░ 45%
-
-Long-Term Vision
-██████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ 15%
+The core framework roadmap is complete. Future work can focus on release
+hardening, product-driven API feedback, and the explicitly deferred sample
+applications. The long-term vision remains open-ended and will evolve as apps
+exercise the framework across Apple platforms.
