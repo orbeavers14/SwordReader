@@ -5,6 +5,10 @@ Versioning and is currently preparing its first pre-1.0 release.
 
 ## Unreleased
 
+No changes yet.
+
+## 0.1.0 - 2026-08-03
+
 ### Added
 
 - GPL-2.0-only licensing for SwordKit and explicit downstream distribution

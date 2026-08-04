@@ -111,7 +111,7 @@ pre-1.0 release reproducible and safe for external package consumers.
 - [x] Refresh contributor documentation
 - [x] Verify package consumption from a clean external project
 - [x] Decide and publish the project license
-- [ ] Establish the first pre-1.0 version and tag
+- [x] Establish the first pre-1.0 version and tag
 
 ---
 

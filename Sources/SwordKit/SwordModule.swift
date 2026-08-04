@@ -326,7 +326,7 @@ public final class SwordModule: Hashable, @unchecked Sendable {
     /// Searches a Bible module with cooperative task cancellation.
     ///
     /// Cancelling the calling task signals SWORD to terminate its active
-    /// search and causes this method to throw ``CancellationError``.
+    /// search and causes this method to throw `CancellationError`.
     /// The optional progress callback receives SWORD's completion percentage.
     /// As a nonisolated async method, native search runs on Swift's generic
     /// executor rather than the caller's actor executor.
