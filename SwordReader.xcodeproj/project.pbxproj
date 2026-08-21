@@ -26,16 +26,19 @@
 		6A072D123975D86B1083E062 /* ReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F56BD8D43DB695CDBF6FA1 /* ReaderView.swift */; };
 		6A351D71793BE44657B5FA4A /* SwordReaderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F1353239778C7BDA6745BE /* SwordReaderApp.swift */; };
 		6B37C3BDCC3C7D7D57C0D95F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6469A607DD256F71E8190B92 /* OnboardingView.swift */; };
+		6FF718927442EFFE1CE9D83C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6CFB6AFF829370098E85374A /* PrivacyInfo.xcprivacy */; };
 		7188B75C2FE76BDD8F424BDE /* SwordReaderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F1353239778C7BDA6745BE /* SwordReaderApp.swift */; };
 		83EE1E8A576CC2D940596B8E /* ScriptureModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E1E8FB5D3F6DA959D2262C /* ScriptureModels.swift */; };
 		86E7749B2AB62AE5490BA88C /* SwordReaderCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDAEEF5A19F415E628AFC0F8 /* SwordReaderCommands.swift */; };
 		9A11462734D192571B619533 /* ReaderContinuityActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED025CDA228F5BF1BFC0211 /* ReaderContinuityActivity.swift */; };
 		9F9C8C85549F0BEB10525E5D /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6469A607DD256F71E8190B92 /* OnboardingView.swift */; };
 		A14388353CCED21CD2CC9DFF /* RemoteModuleBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD4F6E041939D1BDFAEA801 /* RemoteModuleBrowser.swift */; };
+		A43909D98CB5E98F7D7FAE86 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 33F43383FF3D4DDA7EBF9BB1 /* PrivacyInfo.xcprivacy */; };
 		AAB7033D031B86D14ACC2CE4 /* SwordKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1DF7AC1CF36D2CDF52E0FC47 /* SwordKit */; };
 		B57C1C554734A5FFAC2B4AE3 /* ScriptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1F04AA5EA5AB3CD6D26EF /* ScriptureService.swift */; };
 		B8A3B1A45FCFA16787DC569C /* SwordReaderWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = FFF9F7612224C5049A38F285 /* SwordReaderWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		BE1539567FA191395F00429E /* SwordReaderWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBDDD380A2DBC81DCD252FE /* SwordReaderWatchApp.swift */; };
+		C3207A64496F3151B78A3775 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 6CFB6AFF829370098E85374A /* PrivacyInfo.xcprivacy */; };
 		C3702C2A075B71841E477363 /* AppModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B339F32346BF8D819B510313 /* AppModelTests.swift */; };
 		D0476DEFEBF151A2A2324B14 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F770C383F38C009A1AD8849 /* RootView.swift */; };
 		D99C4EB13C43952B2533BC3D /* ScriptureModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E1E8FB5D3F6DA959D2262C /* ScriptureModels.swift */; };
@@ -89,12 +92,14 @@
 		27949FEDA7BA18A660F53B7B /* SwordReaderMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwordReaderMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F19A26B63B5D593D21B65DF /* WatchReaderModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchReaderModel.swift; sourceTree = "<group>"; };
 		3354BAF88C227A85054E11D8 /* SwordReader.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SwordReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		33F43383FF3D4DDA7EBF9BB1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		3AE97C20016F8E4AD4AD5DCF /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		4ED025CDA228F5BF1BFC0211 /* ReaderContinuityActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderContinuityActivity.swift; sourceTree = "<group>"; };
 		5868C39750F4174ED6485C38 /* SwordReaderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwordReaderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F770C383F38C009A1AD8849 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		623DCE1E666AA2B7B050E275 /* CompanionSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionSync.swift; sourceTree = "<group>"; };
 		6469A607DD256F71E8190B92 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		6CFB6AFF829370098E85374A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		7187879D676D30ECB4256EDC /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		779909E15D9A44634284F23A /* StudyStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyStore.swift; sourceTree = "<group>"; };
 		7FD4F6E041939D1BDFAEA801 /* RemoteModuleBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteModuleBrowser.swift; sourceTree = "<group>"; };
@@ -141,6 +146,7 @@
 		0D7007C207D54C18950E12BF /* SwordReaderWatch */ = {
 			isa = PBXGroup;
 			children = (
+				33F43383FF3D4DDA7EBF9BB1 /* PrivacyInfo.xcprivacy */,
 				BEBDDD380A2DBC81DCD252FE /* SwordReaderWatchApp.swift */,
 				2F19A26B63B5D593D21B65DF /* WatchReaderModel.swift */,
 				E44CFFBFC4CF764A0B1E8B34 /* WatchReaderView.swift */,
@@ -184,6 +190,7 @@
 		82FA916EA38CA6043226EBF8 /* SwordReader */ = {
 			isa = PBXGroup;
 			children = (
+				6CFB6AFF829370098E85374A /* PrivacyInfo.xcprivacy */,
 				F3CC7BF8F2443C947946422A /* App */,
 				F151B0D27F5B97939524068D /* Domain */,
 				F0019C899B5DF0D60CFF3852 /* Features */,
@@ -313,6 +320,7 @@
 			buildConfigurationList = E644396F2BF00BC1DC62F43C /* Build configuration list for PBXNativeTarget "SwordReader" */;
 			buildPhases = (
 				644E7A5F61AE7800BBBC084E /* Sources */,
+				3CF9EBEA42D168CD680DC3F7 /* Resources */,
 				73FF209B731A8F342C5BF634 /* Frameworks */,
 				40FFC498A67FEDFE0EA73EA8 /* Embed Watch Content */,
 			);
@@ -334,6 +342,7 @@
 			buildConfigurationList = 2A9772F3F65DE622C3E0DBF2 /* Build configuration list for PBXNativeTarget "SwordReaderWatch" */;
 			buildPhases = (
 				97956F40CB4398B11DBA5EEC /* Sources */,
+				0FF889044138312F9BC15710 /* Resources */,
 				19C64A53C31931D8B22594A3 /* Frameworks */,
 			);
 			buildRules = (
@@ -371,6 +380,7 @@
 			buildConfigurationList = 9E678FE016D49306A60D3E47 /* Build configuration list for PBXNativeTarget "SwordReaderMac" */;
 			buildPhases = (
 				D5AE0D9B00AF70F52DD4202D /* Sources */,
+				2F582484CD3BD16F75E7317A /* Resources */,
 				2EC9D2AC12BE6ADD028D6017 /* Frameworks */,
 			);
 			buildRules = (
@@ -429,6 +439,33 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0FF889044138312F9BC15710 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A43909D98CB5E98F7D7FAE86 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2F582484CD3BD16F75E7317A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C3207A64496F3151B78A3775 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3CF9EBEA42D168CD680DC3F7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6FF718927442EFFE1CE9D83C /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		5029B9A2F62556B39163B721 /* Sources */ = {

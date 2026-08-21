@@ -32,6 +32,11 @@ remove it after confirmation.
 - Platform-specific commands and toolbar placement stay in platform files.
 - App preferences and reading position use `UserDefaults`, which participates in
   normal encrypted device backups; SwordReader does not require an account or server.
+- SwordReader contains no advertising or analytics SDKs, does not track people,
+  and does not collect personal data. Network access occurs only when the user
+  chooses to browse or download modules from CrossWire; the app explains this
+  before the first request. App and Watch privacy manifests declare only their
+  local, app-scoped preferences access.
 - Reader appearance uses semantic Dynamic Type styles with persisted system,
   serif, or rounded design, text-size, spacing, and verse-number choices.
 - Publisher-supplied Scripture headings are rendered as accessible headings in
@@ -64,6 +69,16 @@ xcodebuild test \
 ```
 
 CI also builds the generic iOS destination to validate iPhone and iPad support.
+
+## App Store privacy summary
+
+- Data collection: None
+- Tracking: None
+- Required-reason API: app-scoped `UserDefaults` (`CA92.1`)
+- User-initiated network service: CrossWire Bible Society module catalog and downloads
+
+Recheck this summary and generate Xcode's privacy report before every release,
+especially after adding a dependency or network feature.
 
 ## Development policy
 
