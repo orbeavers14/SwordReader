@@ -76,22 +76,38 @@ actor SwordScriptureService: ScriptureServing {
         }
 
         let chapter = try module.chapter(reference)
+        let verses = chapter.verses.map { verse in
+            BibleVerse(
+                reference: verse.reference.value,
+                number: Self.verseNumber(from: verse.reference.value),
+                text: verse.text,
+                content: (try? module.attributedString(verse.reference.value))
+                    ?? AttributedString(verse.text),
+                headings: verse.headings.map {
+                    BibleHeading(
+                        identifier: $0.identifier,
+                        text: $0.body
+                    )
+                },
+                footnotes: verse.footnotes.map {
+                    BibleFootnote(
+                        id: $0.identifier,
+                        text: $0.body,
+                        type: $0.type
+                    )
+                },
+                crossReferences: verse.crossReferences.map {
+                    BibleCrossReference(
+                        id: $0.footnoteIdentifier,
+                        references: $0.references.map(\.value)
+                    )
+                }
+            )
+        }
         return BibleChapter(
             reference: chapter.reference.value,
             moduleID: chapter.moduleName,
-            verses: chapter.verses.map {
-                BibleVerse(
-                    reference: $0.reference.value,
-                    number: Self.verseNumber(from: $0.reference.value),
-                    text: $0.text,
-                    headings: $0.headings.map {
-                        BibleHeading(
-                            identifier: $0.identifier,
-                            text: $0.body
-                        )
-                    }
-                )
-            }
+            verses: verses
         )
     }
 

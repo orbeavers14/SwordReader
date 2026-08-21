@@ -126,6 +126,7 @@ struct ReaderView: View {
 private struct VerseView: View {
     @Environment(AppModel.self) private var model
     let verse: BibleVerse
+    @State private var isShowingAnnotations = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -140,6 +141,25 @@ private struct VerseView: View {
                 .font(.system(model.readerTextSize.textStyle, design: model.readerFont.design))
                 .lineSpacing(model.readerSpacing.lineSpacing)
                 .textSelection(.enabled)
+
+            if verse.annotationCount > 0 {
+                Button {
+                    isShowingAnnotations = true
+                } label: {
+                    Label(
+                        "\(verse.annotationCount) \(verse.annotationCount == 1 ? "note" : "notes")",
+                        systemImage: "text.bubble"
+                    )
+                    .font(.caption)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(.tint)
+                .accessibilityHint("Shows notes and Scripture references for \(verse.reference)")
+            }
+        }
+        .sheet(isPresented: $isShowingAnnotations) {
+            VerseAnnotationsView(verse: verse)
+                .environment(model)
         }
     }
 
@@ -148,10 +168,61 @@ private struct VerseView: View {
             Text(verse.number + " ")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
-            + Text(verse.text)
+            + Text(verse.content)
         } else {
-            Text(verse.text)
+            Text(verse.content)
         }
+    }
+}
+
+private struct VerseAnnotationsView: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.dismiss) private var dismiss
+    let verse: BibleVerse
+
+    var body: some View {
+        NavigationStack {
+            List {
+                if !verse.footnotes.isEmpty {
+                    Section("Notes") {
+                        ForEach(verse.footnotes) { note in
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(note.text)
+                                if let type = note.type, !type.isEmpty {
+                                    Text(type)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .textSelection(.enabled)
+                        }
+                    }
+                }
+
+                if !verse.crossReferences.isEmpty {
+                    Section("Cross-References") {
+                        ForEach(verse.crossReferences) { group in
+                            ForEach(group.references, id: \.self) { reference in
+                                Button {
+                                    dismiss()
+                                    model.open(reference: reference)
+                                } label: {
+                                    Label(reference, systemImage: "arrow.right.circle")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle(verse.reference)
+            .toolbarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
     }
 }
 

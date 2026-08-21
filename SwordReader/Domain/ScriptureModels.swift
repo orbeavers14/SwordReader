@@ -26,13 +26,31 @@ struct BibleVerse: Identifiable, Hashable, Sendable {
     let reference: String
     let number: String
     let text: String
+    let content: AttributedString
     let headings: [BibleHeading]
+    let footnotes: [BibleFootnote]
+    let crossReferences: [BibleCrossReference]
+
+    var annotationCount: Int {
+        footnotes.count + crossReferences.reduce(0) { $0 + $1.references.count }
+    }
 }
 
 struct BibleHeading: Identifiable, Hashable, Sendable {
     var id: String { identifier }
     let identifier: String
     let text: String
+}
+
+struct BibleFootnote: Identifiable, Hashable, Sendable {
+    let id: String
+    let text: String
+    let type: String?
+}
+
+struct BibleCrossReference: Identifiable, Hashable, Sendable {
+    let id: String
+    let references: [String]
 }
 
 struct BibleChapter: Hashable, Sendable {

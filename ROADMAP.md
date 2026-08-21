@@ -16,18 +16,18 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 - [x] First-launch onboarding and production module-library management
 - [x] HTTPS module discovery, licensing review, progress, and cancellation
 - [x] Accessible reader typography, spacing, verse-number controls, and headings
+- [x] Rich attributed Scripture content, footnotes, and cross references
 
 ## Ordered milestones
 
-1. Rich attributed Scripture content, footnotes, and cross references
-2. Advanced search modes, scope, progress, highlighting, and recent searches
-3. App-owned study-data persistence and schema migrations
-4. Parallel translation and original-language comparison
-5. Reading history, deep links, scene restoration, and multiple windows
-6. watchOS companion reading, continuity, and compact module delivery
-7. Reading plans and optional reminders
-8. Platform-specific interaction and accessibility refinement
-9. Privacy, licensing, performance, localization, and release preparation
+1. Advanced search modes, scope, progress, highlighting, and recent searches
+2. App-owned study-data persistence and schema migrations
+3. Parallel translation and original-language comparison
+4. Reading history, deep links, scene restoration, and multiple windows
+5. watchOS companion reading, continuity, and compact module delivery
+6. Reading plans and optional reminders
+7. Platform-specific interaction and accessibility refinement
+8. Privacy, licensing, performance, localization, and release preparation
 
 ## Platform direction
 
