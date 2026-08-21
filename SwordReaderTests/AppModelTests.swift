@@ -218,6 +218,7 @@ struct AppModelTests {
         first.setReaderTextSize(.large)
         first.setReaderSpacing(.relaxed)
         first.setShowsVerseNumbers(false)
+        first.setAppAppearance(.dark)
 
         let restored = AppModel(
             service: FakeScriptureService(),
@@ -227,6 +228,17 @@ struct AppModelTests {
         #expect(restored.readerTextSize == .large)
         #expect(restored.readerSpacing == .relaxed)
         #expect(!restored.showsVerseNumbers)
+        #expect(restored.appAppearance == .dark)
+    }
+
+    @Test func appAppearanceDefaultsToSystem() {
+        let suiteName = #function
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+
+        let model = AppModel(service: FakeScriptureService(), defaults: defaults)
+
+        #expect(model.appAppearance == .system)
     }
 
     @Test func builtInChronologicalPlanCoversOneYear() throws {

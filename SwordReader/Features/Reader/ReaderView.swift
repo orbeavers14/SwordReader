@@ -445,9 +445,15 @@ private struct ReaderAppearanceMenu: View {
                 }
             }
 
+            Picker("App Appearance", selection: appearanceBinding) {
+                ForEach(AppAppearance.allCases) { appearance in
+                    Text(appearance.title).tag(appearance)
+                }
+            }
+
             Toggle("Verse Numbers", isOn: verseNumberBinding)
         }
-        .accessibilityHint("Changes font, text size, spacing, and verse numbers")
+        .accessibilityHint("Changes font, text size, spacing, appearance, and verse numbers")
     }
 
     private var fontBinding: Binding<ReaderFont> {
@@ -475,6 +481,13 @@ private struct ReaderAppearanceMenu: View {
         Binding(
             get: { model.showsVerseNumbers },
             set: { model.setShowsVerseNumbers($0) }
+        )
+    }
+
+    private var appearanceBinding: Binding<AppAppearance> {
+        Binding(
+            get: { model.appAppearance },
+            set: { model.setAppAppearance($0) }
         )
     }
 }
@@ -599,8 +612,17 @@ private struct ChapterGridView: View {
                         model.select(bookID: book.id, chapter: chapter)
                         didSelect()
                     } label: {
-                        Text("\(chapter)")
-                            .font(.body.monospacedDigit())
+                        ZStack {
+                            Text("\(chapter)")
+                                .font(.body.monospacedDigit())
+                            if isSelected(chapter) {
+                                Image(systemName: "checkmark")
+                                    .font(.caption2.weight(.bold))
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                                    .padding(6)
+                                    .accessibilityHidden(true)
+                            }
+                        }
                             .frame(maxWidth: .infinity, minHeight: 44)
                             .background(
                                 isSelected(chapter)
@@ -615,6 +637,9 @@ private struct ChapterGridView: View {
                     .buttonStyle(.plain)
                     .accessibilityLabel(
                         "\(book.name) chapter \(chapter)"
+                    )
+                    .accessibilityAddTraits(
+                        isSelected(chapter) ? .isSelected : []
                     )
                 }
             }
