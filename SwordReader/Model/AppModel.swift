@@ -34,12 +34,14 @@ final class AppModel {
     private(set) var installingModuleID: String?
     private(set) var installProgress: ModuleTransferProgress?
     private(set) var removingModuleID: String?
+    private(set) var sendingModuleID: String?
     private(set) var isPresentingOnboarding = false
     var presentedError: PresentedError?
 
     private let service: any ScriptureServing
     private let defaults: UserDefaults
     private let studyStore: (any StudyDataServing)?
+    private let companionSync: (any CompanionSyncing)?
     private var chapterTask: Task<Void, Never>?
     private var searchTask: Task<Void, Never>?
     private var searchGeneration = UUID()
@@ -61,10 +63,12 @@ final class AppModel {
     init(
         service: any ScriptureServing,
         studyStore: (any StudyDataServing)? = nil,
+        companionSync: (any CompanionSyncing)? = nil,
         defaults: UserDefaults = .standard
     ) {
         self.service = service
         self.studyStore = studyStore
+        self.companionSync = companionSync
         self.defaults = defaults
         readerFont = ReaderFont(
             rawValue: defaults.string(forKey: Self.readerFontKey) ?? ""
@@ -96,7 +100,16 @@ final class AppModel {
         do {
             let service = try SwordScriptureService()
             let studyStore = try? StudyStore()
-            self.init(service: service, studyStore: studyStore)
+            #if canImport(WatchConnectivity) && !os(watchOS)
+            let companionSync: (any CompanionSyncing)? = WatchPassageSync()
+            #else
+            let companionSync: (any CompanionSyncing)? = nil
+            #endif
+            self.init(
+                service: service,
+                studyStore: studyStore,
+                companionSync: companionSync
+            )
         } catch {
             self.init(service: UnavailableScriptureService(error: error))
             presentedError = PresentedError(error)
@@ -499,6 +512,17 @@ final class AppModel {
         }
     }
 
+    func sendModuleToWatch(_ moduleID: String) async {
+        guard sendingModuleID == nil, let companionSync else { return }
+        sendingModuleID = moduleID
+        defer { sendingModuleID = nil }
+        do {
+            try await companionSync.sendModule(moduleID: moduleID)
+        } catch {
+            presentedError = PresentedError(error)
+        }
+    }
+
     private func loadChapter() {
         chapterTask?.cancel()
         guard let selectedModuleID, !reference.isEmpty else {
@@ -508,7 +532,9 @@ final class AppModel {
         isLoading = true
         chapterTask = Task {
             do {
-                chapter = try await service.chapter(reference, moduleID: selectedModuleID)
+                let loaded = try await service.chapter(reference, moduleID: selectedModuleID)
+                chapter = loaded
+                companionSync?.send(chapter: loaded)
             } catch is CancellationError {
                 return
             } catch {

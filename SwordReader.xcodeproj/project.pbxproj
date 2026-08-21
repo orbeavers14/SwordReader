@@ -7,12 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		023939437342C131EEF2B673 /* WatchReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44CFFBFC4CF764A0B1E8B34 /* WatchReaderView.swift */; };
+		122AC3474CA03999334E65CF /* CompanionSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 623DCE1E666AA2B7B050E275 /* CompanionSync.swift */; };
 		182BD29826550342634D175C /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7187879D676D30ECB4256EDC /* AppModel.swift */; };
 		1C5823E7EECCDC33AE1F2EB4 /* SwordKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1BFE90372642D93DEC251D88 /* SwordKit */; };
+		2007609C62F55BA0F0B8DE99 /* WatchReaderModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F19A26B63B5D593D21B65DF /* WatchReaderModel.swift */; };
 		264FD9BB898940E0CE221109 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE97C20016F8E4AD4AD5DCF /* LibraryView.swift */; };
+		2DE65A5A7FF91282FA01AC9D /* CompanionSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 623DCE1E666AA2B7B050E275 /* CompanionSync.swift */; };
 		3BAF876C5E73FDE361F42B85 /* SwordReaderCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDAEEF5A19F415E628AFC0F8 /* SwordReaderCommands.swift */; };
 		3DB20FC88172D40D6C6EC86A /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7187879D676D30ECB4256EDC /* AppModel.swift */; };
 		490B7C09AAEE89F570BE2493 /* StudyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 779909E15D9A44634284F23A /* StudyStore.swift */; };
+		57B344E1480A39125168264F /* SwordKit in Frameworks */ = {isa = PBXBuildFile; productRef = 18F967ADF67FF2D952214576 /* SwordKit */; };
 		5F8082E8C38A18BA4984E15F /* ScriptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1F04AA5EA5AB3CD6D26EF /* ScriptureService.swift */; };
 		6A072D123975D86B1083E062 /* ReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F56BD8D43DB695CDBF6FA1 /* ReaderView.swift */; };
 		6A351D71793BE44657B5FA4A /* SwordReaderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F1353239778C7BDA6745BE /* SwordReaderApp.swift */; };
@@ -24,6 +29,8 @@
 		A14388353CCED21CD2CC9DFF /* RemoteModuleBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD4F6E041939D1BDFAEA801 /* RemoteModuleBrowser.swift */; };
 		AAB7033D031B86D14ACC2CE4 /* SwordKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1DF7AC1CF36D2CDF52E0FC47 /* SwordKit */; };
 		B57C1C554734A5FFAC2B4AE3 /* ScriptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1F04AA5EA5AB3CD6D26EF /* ScriptureService.swift */; };
+		B8A3B1A45FCFA16787DC569C /* SwordReaderWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = FFF9F7612224C5049A38F285 /* SwordReaderWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		BE1539567FA191395F00429E /* SwordReaderWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEBDDD380A2DBC81DCD252FE /* SwordReaderWatchApp.swift */; };
 		C3702C2A075B71841E477363 /* AppModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B339F32346BF8D819B510313 /* AppModelTests.swift */; };
 		D0476DEFEBF151A2A2324B14 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F770C383F38C009A1AD8849 /* RootView.swift */; };
 		D99C4EB13C43952B2533BC3D /* ScriptureModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E1E8FB5D3F6DA959D2262C /* ScriptureModels.swift */; };
@@ -37,6 +44,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		39DB3744FD1A3387EE1B848A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 16C467349B56CD9E595855F1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3B1F91441D73EA9C0880F091;
+			remoteInfo = SwordReaderWatch;
+		};
 		FCC5205E32202D4B5CFBFF61 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 16C467349B56CD9E595855F1 /* Project object */;
@@ -46,14 +60,30 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		40FFC498A67FEDFE0EA73EA8 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				B8A3B1A45FCFA16787DC569C /* SwordReaderWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		12E1E8FB5D3F6DA959D2262C /* ScriptureModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptureModels.swift; sourceTree = "<group>"; };
 		16F1353239778C7BDA6745BE /* SwordReaderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwordReaderApp.swift; sourceTree = "<group>"; };
 		27949FEDA7BA18A660F53B7B /* SwordReaderMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwordReaderMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2F19A26B63B5D593D21B65DF /* WatchReaderModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchReaderModel.swift; sourceTree = "<group>"; };
 		3354BAF88C227A85054E11D8 /* SwordReader.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SwordReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AE97C20016F8E4AD4AD5DCF /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		5868C39750F4174ED6485C38 /* SwordReaderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwordReaderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F770C383F38C009A1AD8849 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		623DCE1E666AA2B7B050E275 /* CompanionSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionSync.swift; sourceTree = "<group>"; };
 		6469A607DD256F71E8190B92 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		7187879D676D30ECB4256EDC /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		779909E15D9A44634284F23A /* StudyStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyStore.swift; sourceTree = "<group>"; };
@@ -62,10 +92,21 @@
 		AD31039C38AF776EE199BD39 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
 		B339F32346BF8D819B510313 /* AppModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModelTests.swift; sourceTree = "<group>"; };
 		BDAEEF5A19F415E628AFC0F8 /* SwordReaderCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwordReaderCommands.swift; sourceTree = "<group>"; };
+		BEBDDD380A2DBC81DCD252FE /* SwordReaderWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwordReaderWatchApp.swift; sourceTree = "<group>"; };
+		E44CFFBFC4CF764A0B1E8B34 /* WatchReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchReaderView.swift; sourceTree = "<group>"; };
 		F9F56BD8D43DB695CDBF6FA1 /* ReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderView.swift; sourceTree = "<group>"; };
+		FFF9F7612224C5049A38F285 /* SwordReaderWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwordReaderWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		19C64A53C31931D8B22594A3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				57B344E1480A39125168264F /* SwordKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		2EC9D2AC12BE6ADD028D6017 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -85,6 +126,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0D7007C207D54C18950E12BF /* SwordReaderWatch */ = {
+			isa = PBXGroup;
+			children = (
+				BEBDDD380A2DBC81DCD252FE /* SwordReaderWatchApp.swift */,
+				2F19A26B63B5D593D21B65DF /* WatchReaderModel.swift */,
+				E44CFFBFC4CF764A0B1E8B34 /* WatchReaderView.swift */,
+			);
+			path = SwordReaderWatch;
+			sourceTree = "<group>";
+		};
 		3FA44ED71AC14BFBE494ECCE /* Model */ = {
 			isa = PBXGroup;
 			children = (
@@ -126,6 +177,7 @@
 		8852B1AC01E0AA4FB95C5055 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				623DCE1E666AA2B7B050E275 /* CompanionSync.swift */,
 				9CC1F04AA5EA5AB3CD6D26EF /* ScriptureService.swift */,
 			);
 			path = Services;
@@ -161,6 +213,7 @@
 			children = (
 				82FA916EA38CA6043226EBF8 /* SwordReader */,
 				43798D13C136E96574B5F255 /* SwordReaderTests */,
+				0D7007C207D54C18950E12BF /* SwordReaderWatch */,
 				BB0C71F8AAD2CCE4EAF275F0 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -171,6 +224,7 @@
 				3354BAF88C227A85054E11D8 /* SwordReader.app */,
 				27949FEDA7BA18A660F53B7B /* SwordReaderMac.app */,
 				5868C39750F4174ED6485C38 /* SwordReaderTests.xctest */,
+				FFF9F7612224C5049A38F285 /* SwordReaderWatch.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -236,10 +290,12 @@
 			buildPhases = (
 				644E7A5F61AE7800BBBC084E /* Sources */,
 				73FF209B731A8F342C5BF634 /* Frameworks */,
+				40FFC498A67FEDFE0EA73EA8 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				7D18BE754967378E15A3C47B /* PBXTargetDependency */,
 			);
 			name = SwordReader;
 			packageProductDependencies = (
@@ -247,6 +303,25 @@
 			);
 			productName = SwordReader;
 			productReference = 3354BAF88C227A85054E11D8 /* SwordReader.app */;
+			productType = "com.apple.product-type.application";
+		};
+		3B1F91441D73EA9C0880F091 /* SwordReaderWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2A9772F3F65DE622C3E0DBF2 /* Build configuration list for PBXNativeTarget "SwordReaderWatch" */;
+			buildPhases = (
+				97956F40CB4398B11DBA5EEC /* Sources */,
+				19C64A53C31931D8B22594A3 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SwordReaderWatch;
+			packageProductDependencies = (
+				18F967ADF67FF2D952214576 /* SwordKit */,
+			);
+			productName = SwordReaderWatch;
+			productReference = FFF9F7612224C5049A38F285 /* SwordReaderWatch.app */;
 			productType = "com.apple.product-type.application";
 		};
 		73B41B9F7144684A25E6BFD0 /* SwordReaderTests */ = {
@@ -298,6 +373,9 @@
 					0AD9380AC6E5FCDA8579BF69 = {
 						ProvisioningStyle = Automatic;
 					};
+					3B1F91441D73EA9C0880F091 = {
+						ProvisioningStyle = Automatic;
+					};
 					EC15686F40B9BCFC65ED270A = {
 						ProvisioningStyle = Automatic;
 					};
@@ -323,6 +401,7 @@
 				0AD9380AC6E5FCDA8579BF69 /* SwordReader */,
 				EC15686F40B9BCFC65ED270A /* SwordReaderMac */,
 				73B41B9F7144684A25E6BFD0 /* SwordReaderTests */,
+				3B1F91441D73EA9C0880F091 /* SwordReaderWatch */,
 			);
 		};
 /* End PBXProject section */
@@ -341,6 +420,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3DB20FC88172D40D6C6EC86A /* AppModel.swift in Sources */,
+				2DE65A5A7FF91282FA01AC9D /* CompanionSync.swift in Sources */,
 				264FD9BB898940E0CE221109 /* LibraryView.swift in Sources */,
 				9F9C8C85549F0BEB10525E5D /* OnboardingView.swift in Sources */,
 				E3422C241C41209E1A5340A7 /* ReaderView.swift in Sources */,
@@ -355,11 +435,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		97956F40CB4398B11DBA5EEC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BE1539567FA191395F00429E /* SwordReaderWatchApp.swift in Sources */,
+				2007609C62F55BA0F0B8DE99 /* WatchReaderModel.swift in Sources */,
+				023939437342C131EEF2B673 /* WatchReaderView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D5AE0D9B00AF70F52DD4202D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				182BD29826550342634D175C /* AppModel.swift in Sources */,
+				122AC3474CA03999334E65CF /* CompanionSync.swift in Sources */,
 				EF0A36C005481EB200119EE3 /* LibraryView.swift in Sources */,
 				6B37C3BDCC3C7D7D57C0D95F /* OnboardingView.swift in Sources */,
 				6A072D123975D86B1083E062 /* ReaderView.swift in Sources */,
@@ -381,6 +472,11 @@
 			isa = PBXTargetDependency;
 			target = EC15686F40B9BCFC65ED270A /* SwordReaderMac */;
 			targetProxy = FCC5205E32202D4B5CFBFF61 /* PBXContainerItemProxy */;
+		};
+		7D18BE754967378E15A3C47B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3B1F91441D73EA9C0880F091 /* SwordReaderWatch */;
+			targetProxy = 39DB3744FD1A3387EE1B848A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -487,6 +583,7 @@
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Debug;
 		};
@@ -617,12 +714,52 @@
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Release;
+		};
+		A8D0EB4F34C2C265840EBE50 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Support/SwordReaderWatch-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.SwordReader.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Release;
+		};
+		BC2EA10FC0C8B5456C96AD21 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "Support/SwordReaderWatch-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.SwordReader.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		2A9772F3F65DE622C3E0DBF2 /* Build configuration list for PBXNativeTarget "SwordReaderWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC2EA10FC0C8B5456C96AD21 /* Debug */,
+				A8D0EB4F34C2C265840EBE50 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		63B87D05E59AC393E94F215B /* Build configuration list for PBXNativeTarget "SwordReaderTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -667,12 +804,17 @@
 			repositoryURL = "https://github.com/orbeavers14/SwordKit.git";
 			requirement = {
 				kind = exactVersion;
-				version = 0.4.0;
+				version = 0.5.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		18F967ADF67FF2D952214576 /* SwordKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD71EAF3B74C4E6E94F09088 /* XCRemoteSwiftPackageReference "SwordKit" */;
+			productName = SwordKit;
+		};
 		1BFE90372642D93DEC251D88 /* SwordKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = DD71EAF3B74C4E6E94F09088 /* XCRemoteSwiftPackageReference "SwordKit" */;

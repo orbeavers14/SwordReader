@@ -69,6 +69,20 @@ struct AppModelTests {
         #expect(model.section == .library)
     }
 
+    @Test func sendingBibleToWatchClearsProgressAfterQueuing() async {
+        let companion = FakeCompanionSync()
+        let model = AppModel(
+            service: FakeScriptureService(),
+            companionSync: companion
+        )
+
+        await model.sendModuleToWatch("WEB")
+
+        #expect(companion.sentModuleIDs == ["WEB"])
+        #expect(model.sendingModuleID == nil)
+        #expect(model.presentedError == nil)
+    }
+
     @Test func openingSearchResultLoadsItsChapter() async throws {
         let service = FakeScriptureService()
         let model = AppModel(service: service)
@@ -355,6 +369,16 @@ private final class FakeStudyStore: StudyDataServing {
     }
 
     func savedItems() -> [StudyItem] { items }
+}
+
+@MainActor
+private final class FakeCompanionSync: CompanionSyncing {
+    private(set) var sentModuleIDs: [String] = []
+
+    func send(chapter: BibleChapter) {}
+    func sendModule(moduleID: String) async throws {
+        sentModuleIDs.append(moduleID)
+    }
 }
 
 private actor FakeScriptureService: ScriptureServing {

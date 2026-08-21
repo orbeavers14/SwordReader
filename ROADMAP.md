@@ -21,21 +21,22 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 - [x] App-owned study-data persistence and schema migrations
 - [x] Parallel translation and original-language comparison
 - [x] Reading history, deep links, scene restoration, and multiple windows
+- [x] Native watchOS reading with paired module delivery, standalone downloads,
+  and book/chapter navigation
 
 ## Ordered milestones
 
-1. watchOS companion reading, continuity, and compact module delivery
-2. Reading plans and optional reminders
-3. Platform-specific interaction and accessibility refinement
-4. Privacy, licensing, performance, localization, and release preparation
+1. Reading plans and optional reminders
+2. Platform-specific interaction and accessibility refinement
+3. Privacy, licensing, performance, localization, and release preparation
 
 ## Platform direction
 
 - iPhone and iPad are the primary product surfaces and use native tab,
   navigation-stack, gesture, pointer, and keyboard behaviors.
-- Apple Watch is the next platform: recent passages, plan readings, favorites,
-  and continuity should stay focused and Digital Crown friendly. The iPhone owns
-  module selection and delivery policy.
+- Apple Watch reads locally installed SWORD modules and supports both paired
+  iPhone delivery and standalone CrossWire downloads. Its focused interface is
+  Digital Crown friendly; search and heavier study tools remain on larger screens.
 - macOS retains its native sidebar, commands, keyboard navigation, and windowed
   reading workspace.
 - tvOS and visionOS remain later presentation targets. Shared domain values and
