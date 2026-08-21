@@ -20,6 +20,7 @@ final class AppModel {
     private(set) var searchScope: ScriptureSearchScope
     private(set) var searchProgress: Int?
     private(set) var recentSearches: [String]
+    private(set) var studyItems: [StudyItem] = []
     private(set) var catalog: LocalCatalog?
     private(set) var remoteModules: [CatalogModule] = []
     private(set) var isLoading = false
@@ -34,6 +35,7 @@ final class AppModel {
 
     private let service: any ScriptureServing
     private let defaults: UserDefaults
+    private let studyStore: (any StudyDataServing)?
     private var chapterTask: Task<Void, Never>?
     private var searchTask: Task<Void, Never>?
     private var searchGeneration = UUID()
@@ -52,9 +54,11 @@ final class AppModel {
 
     init(
         service: any ScriptureServing,
+        studyStore: (any StudyDataServing)? = nil,
         defaults: UserDefaults = .standard
     ) {
         self.service = service
+        self.studyStore = studyStore
         self.defaults = defaults
         readerFont = ReaderFont(
             rawValue: defaults.string(forKey: Self.readerFontKey) ?? ""
@@ -81,7 +85,9 @@ final class AppModel {
 
     convenience init() {
         do {
-            try self.init(service: SwordScriptureService())
+            let service = try SwordScriptureService()
+            let studyStore = try? StudyStore()
+            self.init(service: service, studyStore: studyStore)
         } catch {
             self.init(service: UnavailableScriptureService(error: error))
             presentedError = PresentedError(error)
@@ -93,6 +99,7 @@ final class AppModel {
             forKey: Self.completedOnboardingKey
         )
         do {
+            studyItems = try studyStore?.fetchAll() ?? []
             modules = try await service.installedBibles()
             let saved = defaults.string(forKey: Self.moduleKey)
             let moduleID = modules.contains(where: { $0.id == saved })
@@ -148,6 +155,51 @@ final class AppModel {
     func clearRecentSearches() {
         recentSearches = []
         defaults.removeObject(forKey: Self.recentSearchesKey)
+    }
+
+    func isBookmarked(reference: String) -> Bool {
+        guard let selectedModuleID else { return false }
+        return studyItems.contains {
+            $0.kind == .bookmark
+                && $0.moduleID == selectedModuleID
+                && $0.reference == reference
+        }
+    }
+
+    func note(reference: String) -> String? {
+        guard let selectedModuleID else { return nil }
+        return studyItems.first {
+            $0.kind == .note
+                && $0.moduleID == selectedModuleID
+                && $0.reference == reference
+        }?.text
+    }
+
+    func toggleBookmark(reference: String) async {
+        guard let selectedModuleID, let studyStore else { return }
+        do {
+            try studyStore.toggleBookmark(
+                moduleID: selectedModuleID,
+                reference: reference
+            )
+            studyItems = try studyStore.fetchAll()
+        } catch {
+            presentedError = PresentedError(error)
+        }
+    }
+
+    func saveNote(_ text: String, reference: String) async {
+        guard let selectedModuleID, let studyStore else { return }
+        do {
+            try studyStore.saveNote(
+                text,
+                moduleID: selectedModuleID,
+                reference: reference
+            )
+            studyItems = try studyStore.fetchAll()
+        } catch {
+            presentedError = PresentedError(error)
+        }
     }
 
     var reference: String {
