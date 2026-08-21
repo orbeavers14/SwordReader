@@ -3,6 +3,7 @@ import SwordKit
 
 protocol ScriptureServing: Sendable {
     func installedBibles() async throws -> [BibleModule]
+    func books(moduleID: String) async throws -> [BibleBook]
     func chapter(_ reference: String, moduleID: String) async throws -> BibleChapter
     func search(_ query: String, moduleID: String) async throws -> [BibleSearchResult]
     func catalog(at directory: URL) async throws -> LocalCatalog
@@ -31,6 +32,22 @@ actor SwordScriptureService: ScriptureServing {
             )
         }
         .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
+    }
+
+    func books(moduleID: String) throws -> [BibleBook] {
+        guard let module = library.module(named: moduleID) else {
+            throw SwordError.moduleNotFound(moduleID)
+        }
+
+        return try module.books().map {
+            BibleBook(
+                id: $0.osisName,
+                name: $0.name,
+                abbreviation: $0.preferredAbbreviation,
+                chapterCount: $0.chapterCount,
+                testament: $0.testament == .old ? .old : .new
+            )
+        }
     }
 
     func chapter(_ reference: String, moduleID: String) async throws -> BibleChapter {
@@ -92,4 +109,3 @@ actor SwordScriptureService: ScriptureServing {
         reference.split(separator: ":").last.map(String.init) ?? reference
     }
 }
-

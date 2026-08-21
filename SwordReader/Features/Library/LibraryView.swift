@@ -24,7 +24,7 @@ struct LibraryView: View {
                         }
                     }
                     .contentShape(Rectangle())
-                    .onTapGesture { model.selectedModuleID = module.id }
+                    .onTapGesture { model.selectModule(module.id) }
                 }
             }
 
@@ -60,4 +60,3 @@ struct LibraryView: View {
         .overlay { if model.isInstalling { ProgressView("Installing…").padding().background(.regularMaterial, in: .rect(cornerRadius: 12)) } }
     }
 }
-

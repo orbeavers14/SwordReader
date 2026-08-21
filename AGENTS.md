@@ -3,7 +3,8 @@
 ## Project
 
 SwordReader is a multiplatform SwiftUI Bible app and reference consumer for the
-public SwordKit package. It targets iOS, iPadOS, and macOS.
+public SwordKit package. It targets iOS, iPadOS, and macOS today, with watchOS
+next and tvOS and visionOS intentionally deferred.
 
 ## Required workflow
 

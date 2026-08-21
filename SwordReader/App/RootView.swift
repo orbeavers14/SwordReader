@@ -2,15 +2,14 @@ import SwiftUI
 
 struct RootView: View {
     @Environment(AppModel.self) private var model
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     var body: some View {
         Group {
-            if horizontalSizeClass == .compact {
-                CompactRootView()
-            } else {
-                SplitRootView()
-            }
+            #if os(macOS)
+            SplitRootView()
+            #else
+            TabRootView()
+            #endif
         }
         .alert(item: Bindable(model).presentedError) { error in
             Alert(
@@ -22,7 +21,7 @@ struct RootView: View {
     }
 }
 
-private struct CompactRootView: View {
+private struct TabRootView: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {

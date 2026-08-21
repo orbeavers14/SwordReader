@@ -7,6 +7,19 @@ struct BibleModule: Identifiable, Hashable, Sendable {
     let version: String?
 }
 
+struct BibleBook: Identifiable, Hashable, Sendable {
+    enum Testament: Hashable, Sendable {
+        case old
+        case new
+    }
+
+    let id: String
+    let name: String
+    let abbreviation: String
+    let chapterCount: Int
+    let testament: Testament
+}
+
 struct BibleVerse: Identifiable, Hashable, Sendable {
     var id: String { reference }
     let reference: String
@@ -63,4 +76,3 @@ enum AppSection: String, CaseIterable, Identifiable, Sendable {
         }
     }
 }
-
