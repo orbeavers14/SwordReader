@@ -97,11 +97,11 @@ enum ScriptureSearchMode: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .phrase: "Phrase"
-        case .allWords: "All Words"
-        case .regularExpression: "Pattern"
-        case .strongs: "Strong’s"
-        case .morphology: "Morphology"
+        case .phrase: String(localized: "Phrase")
+        case .allWords: String(localized: "All Words")
+        case .regularExpression: String(localized: "Pattern")
+        case .strongs: String(localized: "Strong’s")
+        case .morphology: String(localized: "Morphology")
         }
     }
 }
@@ -115,9 +115,9 @@ enum ScriptureSearchScope: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .wholeBible: "Whole Bible"
-        case .oldTestament: "Old Testament"
-        case .newTestament: "New Testament"
+        case .wholeBible: String(localized: "Whole Bible")
+        case .oldTestament: String(localized: "Old Testament")
+        case .newTestament: String(localized: "New Testament")
         }
     }
 }
@@ -155,9 +155,9 @@ enum ReaderFont: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .system: "System"
-        case .serif: "Serif"
-        case .rounded: "Rounded"
+        case .system: String(localized: "System")
+        case .serif: String(localized: "Serif")
+        case .rounded: String(localized: "Rounded")
         }
     }
 }
@@ -172,10 +172,10 @@ enum ReaderTextSize: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .small: "Small"
-        case .standard: "Default"
-        case .large: "Large"
-        case .extraLarge: "Extra Large"
+        case .small: String(localized: "Small")
+        case .standard: String(localized: "Default")
+        case .large: String(localized: "Large")
+        case .extraLarge: String(localized: "Extra Large")
         }
     }
 }
@@ -187,7 +187,13 @@ enum ReaderSpacing: String, CaseIterable, Identifiable, Sendable {
 
     var id: Self { self }
 
-    var title: String { rawValue.capitalized }
+    var title: String {
+        switch self {
+        case .compact: String(localized: "Compact")
+        case .comfortable: String(localized: "Comfortable")
+        case .relaxed: String(localized: "Relaxed")
+        }
+    }
 }
 
 enum AppAppearance: String, CaseIterable, Identifiable, Sendable {
@@ -197,7 +203,13 @@ enum AppAppearance: String, CaseIterable, Identifiable, Sendable {
 
     var id: Self { self }
 
-    var title: String { rawValue.capitalized }
+    var title: String {
+        switch self {
+        case .system: String(localized: "System")
+        case .light: String(localized: "Light")
+        case .dark: String(localized: "Dark")
+        }
+    }
 }
 
 struct StudyItem: Identifiable, Hashable, Sendable {
@@ -223,10 +235,10 @@ enum AppSection: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .read: "Read"
-        case .plans: "Plans"
-        case .search: "Search"
-        case .library: "Library"
+        case .read: String(localized: "Read")
+        case .plans: String(localized: "Plans")
+        case .search: String(localized: "Search")
+        case .library: String(localized: "Library")
         }
     }
 

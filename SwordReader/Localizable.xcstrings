@@ -1,0 +1,493 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%arg" : {
+
+    },
+    "%arg %arg" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$arg %2$arg"
+          }
+        }
+      }
+    },
+    "%arg chapter %arg" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$arg chapter %2$arg"
+          }
+        }
+      }
+    },
+    "%arg chapters" : {
+
+    },
+    "%arg is not currently available from CrossWire." : {
+
+    },
+    "%arg of %arg days" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$arg of %2$arg days"
+          }
+        }
+      }
+    },
+    "%arg will be removed from this device. You can install it again from its source catalog." : {
+
+    },
+    "90 days · Matthew through Revelation" : {
+
+    },
+    "A SwordReader-authored arrangement using traditional book-era ordering. Biblical chronology is not universally agreed upon; Job, Psalms, Wisdom books, and the Prophets may be placed differently in other plans." : {
+
+    },
+    "A focused, private place to read and search Scripture." : {
+
+    },
+    "Aligning translations…" : {
+
+    },
+    "All Words" : {
+
+    },
+    "App Appearance" : {
+
+    },
+    "Apple Watch is not paired or SwordReader is not installed on it." : {
+
+    },
+    "Available in %arg" : {
+
+    },
+    "Bible Not Installed" : {
+
+    },
+    "Bible in Canonical Order" : {
+
+    },
+    "Bible modules are separate works with their own copyright and distribution terms. Installing a module does not grant permission to redistribute it." : {
+
+    },
+    "Book" : {
+
+    },
+    "Bookmarks, notes, and Bible modules will not be affected." : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Changes font, text size, spacing, appearance, and verse numbers" : {
+
+    },
+    "Choose a Book" : {
+
+    },
+    "Choose a Chapter" : {
+
+    },
+    "Chronological Bible" : {
+
+    },
+    "Clear" : {
+
+    },
+    "Clear History" : {
+
+    },
+    "Close" : {
+
+    },
+    "Comfortable" : {
+
+    },
+    "Compact" : {
+
+    },
+    "Compare %arg" : {
+
+    },
+    "Compare Translation" : {
+
+    },
+    "Connect to CrossWire?" : {
+
+    },
+    "Contacting the CrossWire Bible Society…" : {
+
+    },
+    "Continue" : {
+
+    },
+    "Continue your optional SwordReader reading plan." : {
+
+    },
+    "Cross-References" : {
+
+    },
+    "Current book" : {
+
+    },
+    "Daily Reminder" : {
+
+    },
+    "Dark" : {
+
+    },
+    "Day %arg" : {
+
+    },
+    "Default" : {
+
+    },
+    "Done" : {
+
+    },
+    "Download & Continue" : {
+
+    },
+    "Downloading %arg" : {
+
+    },
+    "Extra Large" : {
+
+    },
+    "Finding Bibles" : {
+
+    },
+    "First Days" : {
+
+    },
+    "Follows New Testament canonical order." : {
+
+    },
+    "Follows the standard Protestant canonical book order." : {
+
+    },
+    "Font" : {
+
+    },
+    "Get" : {
+
+    },
+    "Get %arg" : {
+
+    },
+    "Get Bibles" : {
+
+    },
+    "Get a Bible from the Library to begin reading." : {
+
+    },
+    "Import Local Catalog" : {
+
+    },
+    "Install" : {
+
+    },
+    "Install a Bible from the Library first." : {
+
+    },
+    "Installed" : {
+
+    },
+    "Installed Bible Modules" : {
+
+    },
+    "Installed Bibles" : {
+
+    },
+    "Installing…" : {
+
+    },
+    "Large" : {
+
+    },
+    "Library" : {
+
+    },
+    "Light" : {
+
+    },
+    "Loading chapter…" : {
+
+    },
+    "Match" : {
+
+    },
+    "Morphology" : {
+
+    },
+    "Name, abbreviation, or language" : {
+
+    },
+    "Navigate" : {
+
+    },
+    "New Testament" : {
+
+    },
+    "Next Chapter" : {
+
+    },
+    "No Aligned Verses" : {
+
+    },
+    "No Bible modules installed" : {
+
+    },
+    "No Bible to Search" : {
+
+    },
+    "No Bibles Installed" : {
+
+    },
+    "No Bibles installed" : {
+
+    },
+    "No account or SwordReader server" : {
+
+    },
+    "No tracking or analytics" : {
+
+    },
+    "Notes" : {
+
+    },
+    "Notifications are disabled for SwordReader. You can enable them in System Settings." : {
+
+    },
+    "Notifications stay off until you enable this setting." : {
+
+    },
+    "OK" : {
+
+    },
+    "Old Testament" : {
+
+    },
+    "One year · Genesis through Revelation" : {
+
+    },
+    "One year · traditional historical sequence" : {
+
+    },
+    "Open Library" : {
+
+    },
+    "Open Source Components" : {
+
+    },
+    "Open in New Window" : {
+
+    },
+    "Opens the project website" : {
+
+    },
+    "Optional Reminder" : {
+
+    },
+    "Original-Language Links" : {
+
+    },
+    "Passage" : {
+
+    },
+    "Pattern" : {
+
+    },
+    "Phrase" : {
+
+    },
+    "Plans" : {
+
+    },
+    "Previous Chapter" : {
+
+    },
+    "Privacy" : {
+
+    },
+    "Privacy & Licenses" : {
+
+    },
+    "Read" : {
+
+    },
+    "Reading Appearance" : {
+
+    },
+    "Reading History" : {
+
+    },
+    "Reading Plans" : {
+
+    },
+    "Reading data stays on your devices" : {
+
+    },
+    "Recent Searches" : {
+
+    },
+    "Recommended" : {
+
+    },
+    "Refresh" : {
+
+    },
+    "Relaxed" : {
+
+    },
+    "Remove" : {
+
+    },
+    "Remove %arg?" : {
+
+    },
+    "Remove Bible" : {
+
+    },
+    "Removing…" : {
+
+    },
+    "Rounded" : {
+
+    },
+    "Save" : {
+
+    },
+    "Scope" : {
+
+    },
+    "Search" : {
+
+    },
+    "Search Options" : {
+
+    },
+    "Search Scripture" : {
+
+    },
+    "Search the selected translation by phrase, words, pattern, Strong’s number, or morphology." : {
+
+    },
+    "Searching %arg…" : {
+
+    },
+    "Searching…" : {
+
+    },
+    "Selected" : {
+
+    },
+    "Send to Apple Watch" : {
+
+    },
+    "Sending %arg to Apple Watch…" : {
+
+    },
+    "Serif" : {
+
+    },
+    "Set Up Later" : {
+
+    },
+    "Showing the first %arg of %arg matches. Narrow the search or scope to see different results." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Showing the first %1$arg of %2$arg matches. Narrow the search or scope to see different results."
+          }
+        }
+      }
+    },
+    "Shows books and chapters" : {
+
+    },
+    "Shows notes and Scripture references for %arg" : {
+
+    },
+    "Small" : {
+
+    },
+    "Something Went Wrong" : {
+
+    },
+    "Spacing" : {
+
+    },
+    "Start Plan" : {
+
+    },
+    "Started %arg" : {
+
+    },
+    "Stop Plan" : {
+
+    },
+    "Stop and Delete Progress" : {
+
+    },
+    "Stop this reading plan?" : {
+
+    },
+    "Strong’s" : {
+
+    },
+    "SwordReader" : {
+
+    },
+    "SwordReader contacts the CrossWire Bible Society only when you choose to browse or download Bible modules. CrossWire receives the network information ordinarily required to serve that request." : {
+
+    },
+    "SwordReader is free software licensed under GNU GPL version 2 only. It is provided without warranty." : {
+
+    },
+    "SwordReader will contact the CrossWire Bible Society to retrieve its module catalog. This network request may reveal that you use a Bible reader. Modules are supplied by their publishers and have separate licenses." : {
+
+    },
+    "System" : {
+
+    },
+    "Text Size" : {
+
+    },
+    "This Bible cannot be prepared for Apple Watch." : {
+
+    },
+    "Time" : {
+
+    },
+    "Today’s Reading" : {
+
+    },
+    "Translation" : {
+
+    },
+    "Verse Numbers" : {
+
+    },
+    "View Source and Complete License" : {
+
+    },
+    "Welcome to SwordReader" : {
+
+    },
+    "Whole Bible" : {
+
+    },
+    "Word or phrase" : {
+
+    }
+  },
+  "version" : "1.2"
+}

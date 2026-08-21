@@ -1,0 +1,76 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%arg · %arg" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$arg · %2$arg"
+          }
+        }
+      }
+    },
+    "Bible" : {
+
+    },
+    "Book" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Chapter" : {
+
+    },
+    "Chapter %arg" : {
+
+    },
+    "Choose Passage" : {
+
+    },
+    "Connect to CrossWire?" : {
+
+    },
+    "Continue" : {
+
+    },
+    "Done" : {
+
+    },
+    "Finding Bibles…" : {
+
+    },
+    "Get Bibles" : {
+
+    },
+    "Installing…" : {
+
+    },
+    "Loading…" : {
+
+    },
+    "Next" : {
+
+    },
+    "No Bible" : {
+
+    },
+    "OK" : {
+
+    },
+    "Previous" : {
+
+    },
+    "Send a Bible from iPhone or download one directly." : {
+
+    },
+    "SwordReader" : {
+
+    },
+    "SwordReader will contact the CrossWire Bible Society. This may reveal that you use a Bible reader. Modules have separate licenses." : {
+
+    }
+  },
+  "version" : "1.2"
+}

@@ -39,8 +39,10 @@ enum CompanionSyncError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .unavailable: "Apple Watch is not paired or SwordReader is not installed on it."
-        case .invalidModuleID: "This Bible cannot be prepared for Apple Watch."
+        case .unavailable:
+            String(localized: "Apple Watch is not paired or SwordReader is not installed on it.")
+        case .invalidModuleID:
+            String(localized: "This Bible cannot be prepared for Apple Watch.")
         }
     }
 }
