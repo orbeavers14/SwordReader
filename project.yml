@@ -43,6 +43,8 @@ targetTemplates:
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
         NSHumanReadableCopyright: "SwordReader is licensed under GPL-2.0-only. Bible modules have separate licenses."
+        NSUserActivityTypes:
+          - com.example.SwordReader.reading
 targets:
   SwordReader:
     templates: [SwordReaderApp]

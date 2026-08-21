@@ -42,6 +42,18 @@ private struct SwordReaderSceneView: View {
             .onOpenURL { url in
                 Task { await model.open(url: url) }
             }
+            .onContinueUserActivity(ReaderContinuityActivity.activityType) { activity in
+                guard let destination = ReaderContinuityActivity.destination(from: activity) else {
+                    return
+                }
+                Task { await model.continueReading(from: destination) }
+            }
+            .userActivity(
+                ReaderContinuityActivity.activityType,
+                element: model.currentDestination
+            ) { destination, activity in
+                ReaderContinuityActivity.update(activity, with: destination)
+            }
             .onChange(of: model.currentDestination) { _, destination in
                 storedDestination = destination?.url?.absoluteString ?? ""
             }

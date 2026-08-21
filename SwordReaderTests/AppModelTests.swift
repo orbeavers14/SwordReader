@@ -322,6 +322,48 @@ struct AppModelTests {
         #expect(ReaderDestination(url: url) == destination)
     }
 
+    @Test func handoffActivityRoundTripsReadingDestination() throws {
+        let expected = ReaderDestination(moduleID: "WEB", reference: "John 3")
+        let activity = NSUserActivity(
+            activityType: ReaderContinuityActivity.activityType
+        )
+
+        ReaderContinuityActivity.update(activity, with: expected)
+
+        #expect(ReaderContinuityActivity.destination(from: activity) == expected)
+        #expect(activity.isEligibleForHandoff)
+        #expect(!activity.isEligibleForPublicIndexing)
+    }
+
+    @Test func handoffFallsBackWhenRequestedBibleIsMissing() async {
+        let model = AppModel(service: FakeScriptureService())
+        await model.start()
+
+        await model.continueReading(
+            from: ReaderDestination(moduleID: "KJV", reference: "John 2")
+        )
+
+        #expect(model.selectedModuleID == "WEB")
+        #expect(model.reference == "John 2")
+        #expect(model.continuityNotice?.destination.moduleID == "KJV")
+        #expect(model.continuityNotice?.currentTranslationTitle == "World English Bible")
+    }
+
+    @Test func handoffCanDownloadMissingBibleAndContinue() async {
+        let model = AppModel(service: FakeScriptureService())
+        await model.start()
+        await model.continueReading(
+            from: ReaderDestination(moduleID: "ASV", reference: "John 2")
+        )
+
+        await model.downloadContinuityModule()
+
+        #expect(model.selectedModuleID == "ASV")
+        #expect(model.reference == "John 2")
+        #expect(model.continuityNotice == nil)
+        #expect(model.presentedError == nil)
+    }
+
     @Test func readingHistoryDeduplicatesMostRecentLocation() async throws {
         let defaults = try #require(UserDefaults(suiteName: #function))
         defaults.removePersistentDomain(forName: #function)
