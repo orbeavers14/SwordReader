@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import SwordKit
 
 @MainActor
 @Observable
@@ -25,6 +26,8 @@ final class AppModel {
     private(set) var recentSearches: [String]
     private(set) var studyItems: [StudyItem] = []
     private(set) var readingHistory: [ReadingHistoryEntry]
+    private(set) var readingPlanSelection: ReadingPlanSelection?
+    private(set) var readingPlanReminderTime: Date?
     private(set) var catalog: LocalCatalog?
     private(set) var remoteModules: [CatalogModule] = []
     private(set) var isLoading = false
@@ -43,6 +46,7 @@ final class AppModel {
     private let defaults: UserDefaults
     private let studyStore: (any StudyDataServing)?
     private let companionSync: (any CompanionSyncing)?
+    private let reminderScheduler: (any ReadingPlanReminderScheduling)?
     private var chapterTask: Task<Void, Never>?
     private var searchTask: Task<Void, Never>?
     private var searchGeneration = UUID()
@@ -60,16 +64,21 @@ final class AppModel {
     private static let searchScopeKey = "search.scope"
     private static let recentSearchesKey = "search.recents"
     private static let readingHistoryKey = "reader.history"
+    private static let readingPlanKey = "plans.selection"
+    private static let readingPlanReminderHourKey = "plans.reminder.hour"
+    private static let readingPlanReminderMinuteKey = "plans.reminder.minute"
 
     init(
         service: any ScriptureServing,
         studyStore: (any StudyDataServing)? = nil,
         companionSync: (any CompanionSyncing)? = nil,
+        reminderScheduler: (any ReadingPlanReminderScheduling)? = nil,
         defaults: UserDefaults = .standard
     ) {
         self.service = service
         self.studyStore = studyStore
         self.companionSync = companionSync
+        self.reminderScheduler = reminderScheduler
         self.defaults = defaults
         readerFont = ReaderFont(
             rawValue: defaults.string(forKey: Self.readerFontKey) ?? ""
@@ -95,6 +104,83 @@ final class AppModel {
         readingHistory = defaults.data(forKey: Self.readingHistoryKey)
             .flatMap { try? JSONDecoder().decode([ReadingHistoryEntry].self, from: $0) }
             ?? []
+        readingPlanSelection = defaults.data(forKey: Self.readingPlanKey)
+            .flatMap { try? JSONDecoder().decode(ReadingPlanSelection.self, from: $0) }
+        if defaults.object(forKey: Self.readingPlanReminderHourKey) != nil {
+            readingPlanReminderTime = Calendar.current.date(
+                from: DateComponents(
+                    hour: defaults.integer(forKey: Self.readingPlanReminderHourKey),
+                    minute: defaults.integer(forKey: Self.readingPlanReminderMinuteKey)
+                )
+            )
+        }
+    }
+
+    var readingPlans: [SwordReadingPlan] { BuiltInReadingPlans.all }
+
+    var selectedReadingPlan: SwordReadingPlan? {
+        guard let id = readingPlanSelection?.planID else { return nil }
+        return readingPlans.first { $0.id == id }
+    }
+
+    func startReadingPlan(_ planID: String) {
+        guard readingPlans.contains(where: { $0.id == planID }) else { return }
+        readingPlanSelection = ReadingPlanSelection(
+            planID: planID,
+            startedAt: .now,
+            completedDayIDs: []
+        )
+        persistReadingPlanSelection()
+    }
+
+    func stopReadingPlan() {
+        readingPlanSelection = nil
+        defaults.removeObject(forKey: Self.readingPlanKey)
+        disableReadingPlanReminder()
+    }
+
+    func setReadingPlanReminder(at time: Date) async {
+        guard readingPlanSelection != nil, let reminderScheduler else { return }
+        let components = Calendar.current.dateComponents([.hour, .minute], from: time)
+        guard let hour = components.hour, let minute = components.minute else { return }
+        do {
+            try await reminderScheduler.scheduleDaily(hour: hour, minute: minute)
+            readingPlanReminderTime = time
+            defaults.set(hour, forKey: Self.readingPlanReminderHourKey)
+            defaults.set(minute, forKey: Self.readingPlanReminderMinuteKey)
+        } catch { presentedError = PresentedError(error) }
+    }
+
+    func disableReadingPlanReminder() {
+        reminderScheduler?.disable()
+        readingPlanReminderTime = nil
+        defaults.removeObject(forKey: Self.readingPlanReminderHourKey)
+        defaults.removeObject(forKey: Self.readingPlanReminderMinuteKey)
+    }
+
+    func toggleReadingPlanDay(_ dayID: Int) {
+        guard var selection = readingPlanSelection,
+              selectedReadingPlan?.days.contains(where: { $0.id == dayID }) == true
+        else { return }
+        if selection.completedDayIDs.contains(dayID) {
+            selection.completedDayIDs.remove(dayID)
+        } else {
+            selection.completedDayIDs.insert(dayID)
+        }
+        readingPlanSelection = selection
+        persistReadingPlanSelection()
+    }
+
+    func openPlanReading(_ reference: String) {
+        section = .read
+        open(reference: reference)
+    }
+
+    private func persistReadingPlanSelection() {
+        guard let readingPlanSelection,
+              let data = try? JSONEncoder().encode(readingPlanSelection)
+        else { return }
+        defaults.set(data, forKey: Self.readingPlanKey)
     }
 
     convenience init() {
@@ -109,7 +195,8 @@ final class AppModel {
             self.init(
                 service: service,
                 studyStore: studyStore,
-                companionSync: companionSync
+                companionSync: companionSync,
+                reminderScheduler: ReadingPlanReminderScheduler()
             )
         } catch {
             self.init(service: UnavailableScriptureService(error: error))
@@ -306,7 +393,7 @@ final class AppModel {
 
         await open(destination: destination)
 
-        if isMissingRequestedModule, let requestedModuleID {
+        if isMissingRequestedModule, requestedModuleID != nil {
             if let selectedModule = modules.first(where: { $0.id == selectedModuleID }) {
                 continuityNotice = ContinuityNotice(
                     destination: destination,

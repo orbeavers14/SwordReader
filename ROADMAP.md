@@ -24,12 +24,12 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 - [x] Native watchOS reading with paired module delivery, standalone downloads,
   and book/chapter navigation
 - [x] Handoff continuity for reading locations across iPhone, iPad, and Mac
+- [x] Optional built-in reading plans, saved progress, and opt-in reminders
 
 ## Ordered milestones
 
-1. Reading plans and optional reminders
-2. Platform-specific interaction and accessibility refinement
-3. Privacy, licensing, performance, localization, and release preparation
+1. Platform-specific interaction and accessibility refinement
+2. Privacy, licensing, performance, localization, and release preparation
 
 ## Platform direction
 
