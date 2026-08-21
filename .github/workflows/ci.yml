@@ -1,0 +1,31 @@
+name: Apple platform builds
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  macos:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test macOS
+        run: >-
+          xcodebuild test
+          -project SwordReader.xcodeproj
+          -scheme SwordReader-macOS
+          -destination 'platform=macOS'
+          CODE_SIGNING_ALLOWED=NO
+
+  ios:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build iOS and iPadOS
+        run: >-
+          xcodebuild build
+          -project SwordReader.xcodeproj
+          -scheme SwordReader
+          -destination 'generic/platform=iOS'
+          CODE_SIGNING_ALLOWED=NO
