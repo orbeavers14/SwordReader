@@ -4,6 +4,7 @@ import UniformTypeIdentifiers
 struct LibraryView: View {
     @Environment(AppModel.self) private var model
     @State private var isImporting = false
+    @State private var modulePendingRemoval: BibleModule?
 
     var body: some View {
         List {
@@ -12,19 +13,39 @@ struct LibraryView: View {
                     Text("No Bibles installed").foregroundStyle(.secondary)
                 }
                 ForEach(model.modules) { module in
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(module.title)
-                            Text([module.id, module.language].filter { !$0.isEmpty }.joined(separator: " · "))
-                                .font(.caption).foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        if module.id == model.selectedModuleID {
-                            Image(systemName: "checkmark").foregroundStyle(.tint).accessibilityLabel("Selected")
+                    Button {
+                        model.selectModule(module.id)
+                    } label: {
+                        HStack {
+                            moduleDescription(
+                                title: module.title,
+                                details: [module.id, module.language, module.version]
+                            )
+                            Spacer()
+                            if module.id == model.selectedModuleID {
+                                Image(systemName: "checkmark")
+                                    .foregroundStyle(.tint)
+                                    .accessibilityLabel("Selected")
+                            }
                         }
                     }
-                    .contentShape(Rectangle())
-                    .onTapGesture { model.selectModule(module.id) }
+                    .buttonStyle(.plain)
+                    .contextMenu {
+                        if let copyright = module.copyright {
+                            Text(copyright)
+                        }
+                        Button("Remove Bible", systemImage: "trash", role: .destructive) {
+                            modulePendingRemoval = module
+                        }
+                    }
+                    #if !os(macOS)
+                    .swipeActions {
+                        Button("Remove", systemImage: "trash", role: .destructive) {
+                            modulePendingRemoval = module
+                        }
+                    }
+                    #endif
+                    .disabled(model.removingModuleID != nil)
                 }
             }
 
@@ -32,13 +53,24 @@ struct LibraryView: View {
                 Section("Available in \(catalog.directory.lastPathComponent)") {
                     ForEach(catalog.modules.filter(\.isBible)) { module in
                         HStack {
-                            VStack(alignment: .leading) {
-                                Text(module.title)
-                                Text(module.id).font(.caption).foregroundStyle(.secondary)
-                            }
+                            moduleDescription(
+                                title: module.title,
+                                details: [module.id, module.language, module.version]
+                            )
                             Spacer()
-                            Button("Install") { Task { await model.install(module) } }
-                                .disabled(model.isInstalling)
+                            if model.modules.contains(where: { $0.id == module.id }) {
+                                Text("Installed")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Button("Install") { Task { await model.install(module) } }
+                                    .disabled(model.isInstalling)
+                            }
+                        }
+                        if let copyright = module.copyright {
+                            Text(copyright)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
                     }
                 }
@@ -57,6 +89,45 @@ struct LibraryView: View {
                 model.presentedError = PresentedError(error)
             }
         }
-        .overlay { if model.isInstalling { ProgressView("Installing…").padding().background(.regularMaterial, in: .rect(cornerRadius: 12)) } }
+        .confirmationDialog(
+            "Remove \(modulePendingRemoval?.title ?? "Bible")?",
+            isPresented: Binding(
+                get: { modulePendingRemoval != nil },
+                set: { if !$0 { modulePendingRemoval = nil } }
+            ),
+            titleVisibility: .visible,
+            presenting: modulePendingRemoval
+        ) { module in
+            Button("Remove Bible", role: .destructive) {
+                modulePendingRemoval = nil
+                Task { await model.removeModule(id: module.id) }
+            }
+            Button("Cancel", role: .cancel) { modulePendingRemoval = nil }
+        } message: { module in
+            Text("\(module.title) will be removed from this device. You can install it again from its source catalog.")
+        }
+        .overlay {
+            if model.isInstalling {
+                ProgressView("Installing…")
+                    .padding()
+                    .background(.regularMaterial, in: .rect(cornerRadius: 12))
+            } else if model.removingModuleID != nil {
+                ProgressView("Removing…")
+                    .padding()
+                    .background(.regularMaterial, in: .rect(cornerRadius: 12))
+            }
+        }
+    }
+
+    private func moduleDescription(
+        title: String,
+        details: [String?]
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(title)
+            Text(details.compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · "))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
     }
 }

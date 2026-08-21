@@ -5,6 +5,7 @@ struct BibleModule: Identifiable, Hashable, Sendable {
     let title: String
     let language: String
     let version: String?
+    let copyright: String?
 }
 
 struct BibleBook: Identifiable, Hashable, Sendable {
@@ -45,6 +46,8 @@ struct CatalogModule: Identifiable, Hashable, Sendable {
     let id: String
     let title: String
     let language: String
+    let version: String?
+    let copyright: String?
     let isBible: Bool
 }
 

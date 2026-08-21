@@ -16,6 +16,8 @@ final class AppModel {
     private(set) var isLoading = false
     private(set) var isSearching = false
     private(set) var isInstalling = false
+    private(set) var removingModuleID: String?
+    private(set) var isPresentingOnboarding = false
     var presentedError: PresentedError?
 
     private let service: any ScriptureServing
@@ -25,6 +27,7 @@ final class AppModel {
     private static let moduleKey = "selectedBibleModule"
     private static let bookKeyPrefix = "readerBook."
     private static let chapterKeyPrefix = "readerChapter."
+    private static let completedOnboardingKey = "completedOnboarding"
 
     init(
         service: any ScriptureServing,
@@ -44,6 +47,9 @@ final class AppModel {
     }
 
     func start() async {
+        isPresentingOnboarding = !defaults.bool(
+            forKey: Self.completedOnboardingKey
+        )
         do {
             modules = try await service.installedBibles()
             let saved = defaults.string(forKey: Self.moduleKey)
@@ -56,6 +62,14 @@ final class AppModel {
             }
         } catch {
             presentedError = PresentedError(error)
+        }
+    }
+
+    func completeOnboarding() {
+        defaults.set(true, forKey: Self.completedOnboardingKey)
+        isPresentingOnboarding = false
+        if modules.isEmpty {
+            section = .library
         }
     }
 
@@ -179,6 +193,39 @@ final class AppModel {
         }
     }
 
+    func removeModule(id moduleID: String) async {
+        guard modules.contains(where: { $0.id == moduleID }) else { return }
+        removingModuleID = moduleID
+        defer { removingModuleID = nil }
+
+        do {
+            try await service.remove(moduleID: moduleID)
+            defaults.removeObject(forKey: Self.bookKeyPrefix + moduleID)
+            defaults.removeObject(forKey: Self.chapterKeyPrefix + moduleID)
+            modules = try await service.installedBibles()
+
+            guard selectedModuleID == moduleID else { return }
+            chapterTask?.cancel()
+            searchTask?.cancel()
+            isLoading = false
+            isSearching = false
+            if let replacement = modules.first?.id {
+                try await activateModule(replacement, restoring: true)
+            } else {
+                defaults.removeObject(forKey: Self.moduleKey)
+                selectedModuleID = nil
+                selectedBookID = nil
+                selectedChapter = 1
+                books = []
+                chapter = nil
+                searchResults = []
+                section = .library
+            }
+        } catch {
+            presentedError = PresentedError(error)
+        }
+    }
+
     private func loadChapter() {
         chapterTask?.cancel()
         guard let selectedModuleID, !reference.isEmpty else {
@@ -295,4 +342,5 @@ private actor UnavailableScriptureService: ScriptureServing {
     func search(_ query: String, moduleID: String) async throws -> [BibleSearchResult] { throw error }
     func catalog(at directory: URL) async throws -> LocalCatalog { throw error }
     func install(moduleID: String, from catalog: LocalCatalog) async throws { throw error }
+    func remove(moduleID: String) async throws { throw error }
 }
