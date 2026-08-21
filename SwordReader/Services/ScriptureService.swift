@@ -5,6 +5,10 @@ protocol ScriptureServing: Sendable {
     func installedBibles() async throws -> [BibleModule]
     func books(moduleID: String) async throws -> [BibleBook]
     func chapter(_ reference: String, moduleID: String) async throws -> BibleChapter
+    func parallelChapter(
+        _ reference: String,
+        moduleIDs: [String]
+    ) async throws -> [ParallelVerse]
     func search(
         _ query: String,
         moduleID: String,
@@ -115,6 +119,45 @@ actor SwordScriptureService: ScriptureServing {
             moduleID: chapter.moduleName,
             verses: verses
         )
+    }
+
+    func parallelChapter(
+        _ reference: String,
+        moduleIDs: [String]
+    ) async throws -> [ParallelVerse] {
+        guard let primary = moduleIDs.first,
+              let module = library.module(named: primary)
+        else { throw SwordError.moduleNotFound(moduleIDs.first ?? "") }
+
+        let chapter = try module.chapter(reference)
+        guard let first = chapter.verses.first?.reference.value,
+              let last = chapter.verses.last?.reference.value,
+              let endingVerse = last.split(separator: ":").last
+        else { return [] }
+
+        let parallel = try await library.parallelPassageAsync(
+            "\(first)-\(endingVerse)",
+            modules: moduleIDs
+        )
+        return parallel.alignedVerses.map { row in
+            ParallelVerse(
+                reference: row.reference.value,
+                texts: moduleIDs.map {
+                    ParallelVerseText(
+                        moduleID: $0,
+                        text: row.versesByModule[$0]?.text
+                    )
+                },
+                lexicalLinks: row.comparison.wordLinks.map { link in
+                    OriginalLanguageLink(
+                        strongsNumber: link.strongsNumber,
+                        words: link.locations.map {
+                            "\($0.moduleName): \($0.token.text)"
+                        }
+                    )
+                }
+            )
+        }
     }
 
     func search(

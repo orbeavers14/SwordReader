@@ -59,6 +59,25 @@ struct BibleChapter: Hashable, Sendable {
     let verses: [BibleVerse]
 }
 
+struct ParallelVerse: Identifiable, Hashable, Sendable {
+    var id: String { reference }
+    let reference: String
+    let texts: [ParallelVerseText]
+    let lexicalLinks: [OriginalLanguageLink]
+}
+
+struct ParallelVerseText: Identifiable, Hashable, Sendable {
+    var id: String { moduleID }
+    let moduleID: String
+    let text: String?
+}
+
+struct OriginalLanguageLink: Identifiable, Hashable, Sendable {
+    var id: String { strongsNumber }
+    let strongsNumber: String
+    let words: [String]
+}
+
 struct BibleSearchResult: Identifiable, Hashable, Sendable {
     var id: String { "\(moduleID):\(reference)" }
     let reference: String

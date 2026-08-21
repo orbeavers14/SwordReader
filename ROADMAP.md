@@ -19,15 +19,15 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 - [x] Rich attributed Scripture content, footnotes, and cross references
 - [x] Advanced search modes, scope, progress, highlighting, and recent searches
 - [x] App-owned study-data persistence and schema migrations
+- [x] Parallel translation and original-language comparison
 
 ## Ordered milestones
 
-1. Parallel translation and original-language comparison
-2. Reading history, deep links, scene restoration, and multiple windows
-3. watchOS companion reading, continuity, and compact module delivery
-4. Reading plans and optional reminders
-5. Platform-specific interaction and accessibility refinement
-6. Privacy, licensing, performance, localization, and release preparation
+1. Reading history, deep links, scene restoration, and multiple windows
+2. watchOS companion reading, continuity, and compact module delivery
+3. Reading plans and optional reminders
+4. Platform-specific interaction and accessibility refinement
+5. Privacy, licensing, performance, localization, and release preparation
 
 ## Platform direction
 
