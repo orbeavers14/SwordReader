@@ -14,6 +14,61 @@ struct AppModelTests {
         #expect(model.selectedModuleID == "WEB")
     }
 
+    @Test func firstLaunchPresentsOnboardingUntilCompleted() async throws {
+        let defaults = try #require(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+        let model = AppModel(
+            service: FakeScriptureService(),
+            defaults: defaults
+        )
+
+        await model.start()
+        #expect(model.isPresentingOnboarding)
+
+        model.completeOnboarding()
+        #expect(!model.isPresentingOnboarding)
+
+        let restored = AppModel(
+            service: FakeScriptureService(),
+            defaults: defaults
+        )
+        await restored.start()
+        #expect(!restored.isPresentingOnboarding)
+    }
+
+    @Test func removingSelectedBibleFallsBackToRemainingModule() async throws {
+        let defaults = try #require(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+        let service = FakeScriptureService(modules: [
+            BibleModule(id: "WEB", title: "World English Bible", language: "en", version: "1.0", copyright: nil),
+            BibleModule(id: "KJV", title: "King James Version", language: "en", version: nil, copyright: "Public domain")
+        ])
+        let model = AppModel(service: service, defaults: defaults)
+        await model.start()
+
+        await model.removeModule(id: "WEB")
+
+        #expect(model.modules.map(\.id) == ["KJV"])
+        #expect(model.selectedModuleID == "KJV")
+        #expect(await service.removedModuleIDs() == ["WEB"])
+    }
+
+    @Test func removingLastBibleLeavesReaderEmpty() async throws {
+        let defaults = try #require(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+        let service = FakeScriptureService()
+        let model = AppModel(service: service, defaults: defaults)
+        await model.start()
+
+        await model.removeModule(id: "WEB")
+
+        #expect(model.modules.isEmpty)
+        #expect(model.selectedModuleID == nil)
+        #expect(model.books.isEmpty)
+        #expect(model.chapter == nil)
+        #expect(model.section == .library)
+    }
+
     @Test func openingSearchResultLoadsItsChapter() async throws {
         let service = FakeScriptureService()
         let model = AppModel(service: service)
@@ -101,8 +156,23 @@ struct AppModelTests {
 }
 
 private actor FakeScriptureService: ScriptureServing {
+    private var availableModules: [BibleModule]
+    private var removedIDs: [String] = []
+
+    init(modules: [BibleModule] = [
+        BibleModule(
+            id: "WEB",
+            title: "World English Bible",
+            language: "en",
+            version: nil,
+            copyright: nil
+        )
+    ]) {
+        availableModules = modules
+    }
+
     func installedBibles() -> [BibleModule] {
-        [BibleModule(id: "WEB", title: "World English Bible", language: "en", version: nil)]
+        availableModules
     }
 
     func chapter(_ reference: String, moduleID: String) -> BibleChapter {
@@ -148,4 +218,11 @@ private actor FakeScriptureService: ScriptureServing {
 
     func catalog(at directory: URL) -> LocalCatalog { LocalCatalog(directory: directory, modules: []) }
     func install(moduleID: String, from catalog: LocalCatalog) {}
+
+    func remove(moduleID: String) {
+        availableModules.removeAll { $0.id == moduleID }
+        removedIDs.append(moduleID)
+    }
+
+    func removedModuleIDs() -> [String] { removedIDs }
 }

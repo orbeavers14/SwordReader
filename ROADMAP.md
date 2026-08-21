@@ -13,19 +13,19 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 - [x] Local SWORD catalog inspection and installation
 - [x] Initial Swift Testing coverage
 - [x] Canonical book and chapter navigation with state restoration
+- [x] First-launch onboarding and production module-library management
 
 ## Ordered milestones
 
-1. First-launch onboarding and production module-library management
-2. Accessible reading typography, rich content, footnotes, and cross references
-3. Advanced search modes, scope, progress, highlighting, and recent searches
-4. App-owned study-data persistence and schema migrations
-5. Parallel translation and original-language comparison
-6. Reading history, deep links, scene restoration, and multiple windows
-7. watchOS companion reading, continuity, and compact module delivery
-8. Reading plans and optional reminders
-9. Platform-specific interaction and accessibility refinement
-10. Privacy, licensing, performance, localization, and release preparation
+1. Accessible reading typography, rich content, footnotes, and cross references
+2. Advanced search modes, scope, progress, highlighting, and recent searches
+3. App-owned study-data persistence and schema migrations
+4. Parallel translation and original-language comparison
+5. Reading history, deep links, scene restoration, and multiple windows
+6. watchOS companion reading, continuity, and compact module delivery
+7. Reading plans and optional reminders
+8. Platform-specific interaction and accessibility refinement
+9. Privacy, licensing, performance, localization, and release preparation
 
 ## Platform direction
 

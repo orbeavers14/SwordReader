@@ -8,6 +8,7 @@ protocol ScriptureServing: Sendable {
     func search(_ query: String, moduleID: String) async throws -> [BibleSearchResult]
     func catalog(at directory: URL) async throws -> LocalCatalog
     func install(moduleID: String, from catalog: LocalCatalog) async throws
+    func remove(moduleID: String) async throws
 }
 
 actor SwordScriptureService: ScriptureServing {
@@ -28,7 +29,8 @@ actor SwordScriptureService: ScriptureServing {
                 id: $0.name,
                 title: $0.title.isEmpty ? $0.name : $0.title,
                 language: $0.language,
-                version: $0.version
+                version: $0.version,
+                copyright: $0.copyright
             )
         }
         .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
@@ -93,6 +95,8 @@ actor SwordScriptureService: ScriptureServing {
                     id: $0.name,
                     title: $0.title.isEmpty ? $0.name : $0.title,
                     language: $0.language,
+                    version: $0.version,
+                    copyright: $0.copyright,
                     isBible: $0.category == .bible
                 )
             }
@@ -102,6 +106,11 @@ actor SwordScriptureService: ScriptureServing {
     func install(moduleID: String, from catalog: LocalCatalog) throws {
         let source = try SwordModuleCatalog(directory: catalog.directory)
         try installer.install(moduleNamed: moduleID, from: source)
+        library.refresh()
+    }
+
+    func remove(moduleID: String) throws {
+        try installer.remove(moduleNamed: moduleID)
         library.refresh()
     }
 

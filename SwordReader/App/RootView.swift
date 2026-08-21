@@ -18,6 +18,22 @@ struct RootView: View {
                 dismissButton: .default(Text("OK"))
             )
         }
+        #if os(macOS)
+        .sheet(isPresented: onboardingBinding) {
+            OnboardingView().environment(model)
+        }
+        #else
+        .fullScreenCover(isPresented: onboardingBinding) {
+            OnboardingView().environment(model)
+        }
+        #endif
+    }
+
+    private var onboardingBinding: Binding<Bool> {
+        Binding(
+            get: { model.isPresentingOnboarding },
+            set: { if !$0 { model.completeOnboarding() } }
+        )
     }
 }
 

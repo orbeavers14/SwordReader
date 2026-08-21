@@ -14,7 +14,10 @@ and iPadOS, or `SwordReader-macOS` for macOS.
 
 SwordKit does not bundle or implicitly download Bible modules. Use **Library →
 Import Local Catalog** to select a local SWORD repository containing a `mods.d`
-directory, then install a Bible from that catalog.
+directory, then install a Bible from that catalog. The Library shows module
+version and licensing metadata when supplied by the publisher. Swipe an
+installed Bible on iPhone or iPad, or use its context menu on any platform, to
+remove it after confirmation.
 
 ## Architecture
 
