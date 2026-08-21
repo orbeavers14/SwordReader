@@ -153,11 +153,51 @@ struct AppModelTests {
         #expect(restored.selectedBookID == "John")
         #expect(restored.selectedChapter == 3)
     }
+
+    @Test func refreshRemoteCatalogShowsOnlyBibles() async {
+        let service = FakeScriptureService()
+        let model = AppModel(service: service)
+
+        await model.refreshRemoteCatalog()
+
+        #expect(model.remoteModules.map(\.id) == ["ASV", "WEB"])
+        #expect(!model.isRefreshingRemoteCatalog)
+    }
+
+    @Test func installingRemoteBibleSelectsItAndReportsCompletion() async {
+        let service = FakeScriptureService()
+        let model = AppModel(service: service)
+        await model.start()
+        await model.refreshRemoteCatalog()
+
+        await model.installRemote(model.remoteModules[0])
+
+        #expect(model.selectedModuleID == "ASV")
+        #expect(model.installingModuleID == nil)
+        #expect(model.installProgress == nil)
+        #expect(await service.installedRemoteModuleIDs() == ["ASV"])
+    }
+
+    @Test func cancellingRemoteInstallDoesNotPresentAnError() async throws {
+        let service = FakeScriptureService(remoteInstallDelay: .seconds(5))
+        let model = AppModel(service: service)
+        await model.refreshRemoteCatalog()
+
+        let install = Task { await model.installRemote(model.remoteModules[0]) }
+        try await Task.sleep(for: .milliseconds(20))
+        model.cancelRemoteInstall()
+        await install.value
+
+        #expect(model.installingModuleID == nil)
+        #expect(model.presentedError == nil)
+    }
 }
 
 private actor FakeScriptureService: ScriptureServing {
     private var availableModules: [BibleModule]
     private var removedIDs: [String] = []
+    private var installedRemoteIDs: [String] = []
+    private let remoteInstallDelay: Duration
 
     init(modules: [BibleModule] = [
         BibleModule(
@@ -167,8 +207,9 @@ private actor FakeScriptureService: ScriptureServing {
             version: nil,
             copyright: nil
         )
-    ]) {
+    ], remoteInstallDelay: Duration = .zero) {
         availableModules = modules
+        self.remoteInstallDelay = remoteInstallDelay
     }
 
     func installedBibles() -> [BibleModule] {
@@ -219,10 +260,34 @@ private actor FakeScriptureService: ScriptureServing {
     func catalog(at directory: URL) -> LocalCatalog { LocalCatalog(directory: directory, modules: []) }
     func install(moduleID: String, from catalog: LocalCatalog) {}
 
+    func remoteBibles() -> [CatalogModule] {
+        [
+            CatalogModule(id: "WEB", title: "World English Bible", language: "en", version: nil, copyright: "Public domain", isBible: true),
+            CatalogModule(id: "ASV", title: "American Standard Version", language: "en", version: "1.2", copyright: "Public domain", isBible: true)
+        ]
+    }
+
+    func installRemote(
+        moduleID: String,
+        progress: @escaping @Sendable (ModuleTransferProgress) -> Void
+    ) async throws {
+        progress(ModuleTransferProgress(completedBytes: 50, totalBytes: 100))
+        if remoteInstallDelay > .zero {
+            try await Task.sleep(for: remoteInstallDelay)
+        }
+        installedRemoteIDs.append(moduleID)
+        if !availableModules.contains(where: { $0.id == moduleID }) {
+            availableModules.append(
+                BibleModule(id: moduleID, title: moduleID, language: "en", version: nil, copyright: nil)
+            )
+        }
+    }
+
     func remove(moduleID: String) {
         availableModules.removeAll { $0.id == moduleID }
         removedIDs.append(moduleID)
     }
 
     func removedModuleIDs() -> [String] { removedIDs }
+    func installedRemoteModuleIDs() -> [String] { installedRemoteIDs }
 }

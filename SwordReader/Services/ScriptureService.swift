@@ -8,19 +8,37 @@ protocol ScriptureServing: Sendable {
     func search(_ query: String, moduleID: String) async throws -> [BibleSearchResult]
     func catalog(at directory: URL) async throws -> LocalCatalog
     func install(moduleID: String, from catalog: LocalCatalog) async throws
+    func remoteBibles() async throws -> [CatalogModule]
+    func installRemote(
+        moduleID: String,
+        progress: @escaping @Sendable (ModuleTransferProgress) -> Void
+    ) async throws
     func remove(moduleID: String) async throws
 }
 
 actor SwordScriptureService: ScriptureServing {
     private let library: SwordLibrary
     private let installer: SwordModuleInstaller
+    private let repository: SwordModuleRepository
 
     init() throws {
         let location = try SwordModuleLocation.applicationSupport()
+        let repository = try SwordModuleRepository(
+            identifier: "crosswire",
+            name: "CrossWire Bible Society",
+            transport: .https,
+            host: "www.crosswire.org",
+            directory: "/ftpmirror/pub/sword/raw",
+            packageDirectory: "/ftpmirror/pub/sword/packages/rawzip"
+        )
         library = try SwordLibrary(location: location)
         installer = SwordModuleInstaller(
-            configuration: SwordInstallerConfiguration(location: location)
+            configuration: SwordInstallerConfiguration(
+                location: location,
+                repositories: [repository]
+            )
         )
+        self.repository = repository
     }
 
     func installedBibles() -> [BibleModule] {
@@ -109,6 +127,36 @@ actor SwordScriptureService: ScriptureServing {
         library.refresh()
     }
 
+    func remoteBibles() async throws -> [CatalogModule] {
+        let catalog = try await installer.refreshCatalog(
+            for: repository,
+            acknowledgingRemoteAccessRisks: true
+        )
+        return catalog.modules
+            .filter { $0.category == .bible }
+            .map(Self.catalogModule)
+            .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
+    }
+
+    func installRemote(
+        moduleID: String,
+        progress: @escaping @Sendable (ModuleTransferProgress) -> Void
+    ) async throws {
+        try await installer.install(
+            moduleNamed: moduleID,
+            from: repository,
+            acknowledgingRemoteAccessRisks: true
+        ) { transfer in
+            progress(
+                ModuleTransferProgress(
+                    completedBytes: transfer.completedBytes,
+                    totalBytes: transfer.totalBytes
+                )
+            )
+        }
+        library.refresh()
+    }
+
     func remove(moduleID: String) throws {
         try installer.remove(moduleNamed: moduleID)
         library.refresh()
@@ -116,5 +164,18 @@ actor SwordScriptureService: ScriptureServing {
 
     private static func verseNumber(from reference: String) -> String {
         reference.split(separator: ":").last.map(String.init) ?? reference
+    }
+
+    private static func catalogModule(
+        _ module: SwordModuleCatalogEntry
+    ) -> CatalogModule {
+        CatalogModule(
+            id: module.name,
+            title: module.title.isEmpty ? module.name : module.title,
+            language: module.language,
+            version: module.version,
+            copyright: module.copyright,
+            isBible: module.category == .bible
+        )
     }
 }
