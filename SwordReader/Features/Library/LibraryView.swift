@@ -7,6 +7,7 @@ struct LibraryView: View {
     @State private var modulePendingRemoval: BibleModule?
     @State private var isShowingRemoteAccessWarning = false
     @State private var isShowingModuleBrowser = false
+    @State private var isShowingPrivacyAndLicenses = false
 
     var body: some View {
         List {
@@ -96,6 +97,11 @@ struct LibraryView: View {
                     isImporting = true
                 }
             }
+            ToolbarItem(placement: .secondaryAction) {
+                Button("Privacy & Licenses", systemImage: "info.circle") {
+                    isShowingPrivacyAndLicenses = true
+                }
+            }
         }
         .confirmationDialog(
             "Connect to CrossWire?",
@@ -112,6 +118,9 @@ struct LibraryView: View {
         }
         .sheet(isPresented: $isShowingModuleBrowser) {
             RemoteModuleBrowser().environment(model)
+        }
+        .sheet(isPresented: $isShowingPrivacyAndLicenses) {
+            PrivacyAndLicensesView().environment(model)
         }
         .fileImporter(isPresented: $isImporting, allowedContentTypes: [.folder]) { result in
             if case .success(let url) = result {
