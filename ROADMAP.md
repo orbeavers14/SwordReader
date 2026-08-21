@@ -6,7 +6,7 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 ## Completed
 
 - [x] Shared observable application model
-- [x] Public SwordKit 0.4.0 dependency
+- [x] Public SwordKit 0.5.1 dependency
 - [x] Adaptive iPhone, iPad, and Mac navigation shell
 - [x] Chapter reading and translation selection
 - [x] Cancellable Scripture search
@@ -36,10 +36,16 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 - [x] Off-main Watch chapter decoding with cancellation and stale-load isolation
 - [x] Separate English string catalogs for the shared app and Watch, with
   explicit localization for runtime labels, plans, notifications, and errors
+- [x] Original app icon artwork and native iOS, iPadOS, macOS, and watchOS icon
+  assets
+- [x] Pre-release versioning, production bundle identity, launch metadata, and
+  independent Watch companion declaration
 
 ## Ordered milestones
 
-1. App identity, icons, launch presentation, and release preparation
+The initial development roadmap is complete. Remaining launch work requires
+Apple Developer signing, device testing, App Store records, screenshots,
+support and privacy-policy URLs, and beta feedback.
 
 ## Platform direction
 
