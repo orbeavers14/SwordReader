@@ -1,7 +1,7 @@
 import Foundation
 
 enum ReaderContinuityActivity {
-    static let activityType = "com.example.SwordReader.reading"
+    static let activityType = "com.orbeavers14.SwordReader.reading"
     private static let moduleKey = "module"
     private static let referenceKey = "reference"
 
