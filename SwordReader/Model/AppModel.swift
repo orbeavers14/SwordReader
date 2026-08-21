@@ -15,6 +15,9 @@ final class AppModel {
     private(set) var selectedBookID: String?
     private(set) var selectedChapter = 1
     private(set) var chapter: BibleChapter?
+    private(set) var parallelVerses: [ParallelVerse] = []
+    private(set) var comparisonModuleID: String?
+    private(set) var isLoadingComparison = false
     private(set) var searchResults: [BibleSearchResult] = []
     private(set) var searchMode: ScriptureSearchMode
     private(set) var searchScope: ScriptureSearchScope
@@ -40,6 +43,7 @@ final class AppModel {
     private var searchTask: Task<Void, Never>?
     private var searchGeneration = UUID()
     private var remoteInstallTask: Task<Void, Error>?
+    private var comparisonTask: Task<Void, Never>?
     private static let moduleKey = "selectedBibleModule"
     private static let bookKeyPrefix = "readerBook."
     private static let chapterKeyPrefix = "readerChapter."
@@ -272,6 +276,39 @@ final class AppModel {
             let next = books[books.index(after: index)]
             select(bookID: next.id, chapter: 1)
         }
+    }
+
+    func compare(with moduleID: String) async {
+        guard let selectedModuleID,
+              moduleID != selectedModuleID,
+              !reference.isEmpty
+        else { return }
+        comparisonTask?.cancel()
+        comparisonModuleID = moduleID
+        isLoadingComparison = true
+        let task = Task {
+            do {
+                parallelVerses = try await service.parallelChapter(
+                    reference,
+                    moduleIDs: [selectedModuleID, moduleID]
+                )
+            } catch is CancellationError {
+                return
+            } catch {
+                presentedError = PresentedError(error)
+            }
+            isLoadingComparison = false
+        }
+        comparisonTask = task
+        await task.value
+    }
+
+    func endComparison() {
+        comparisonTask?.cancel()
+        comparisonTask = nil
+        comparisonModuleID = nil
+        parallelVerses = []
+        isLoadingComparison = false
     }
 
     func search(_ query: String) {
@@ -540,6 +577,10 @@ private actor UnavailableScriptureService: ScriptureServing {
     func installedBibles() async throws -> [BibleModule] { throw error }
     func books(moduleID: String) async throws -> [BibleBook] { throw error }
     func chapter(_ reference: String, moduleID: String) async throws -> BibleChapter { throw error }
+    func parallelChapter(
+        _ reference: String,
+        moduleIDs: [String]
+    ) async throws -> [ParallelVerse] { throw error }
     func search(
         _ query: String,
         moduleID: String,

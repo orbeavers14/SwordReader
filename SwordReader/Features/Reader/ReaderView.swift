@@ -3,6 +3,7 @@ import SwiftUI
 struct ReaderView: View {
     @Environment(AppModel.self) private var model
     @State private var isChoosingChapter = false
+    @State private var isShowingComparison = false
 
     var body: some View {
         Group {
@@ -33,6 +34,9 @@ struct ReaderView: View {
                 .environment(model)
                 .frame(minWidth: 340, idealWidth: 420, minHeight: 480)
                 .presentationCompactAdaptation(.sheet)
+        }
+        .sheet(isPresented: $isShowingComparison, onDismiss: { model.endComparison() }) {
+            TranslationComparisonView().environment(model)
         }
     }
 
@@ -99,6 +103,19 @@ struct ReaderView: View {
             ReaderAppearanceMenu()
         }
 
+        if model.modules.count > 1 {
+            ToolbarItem(placement: .secondaryAction) {
+                Menu("Compare Translation", systemImage: "rectangle.split.2x1") {
+                    ForEach(model.modules.filter { $0.id != model.selectedModuleID }) { module in
+                        Button(module.title) {
+                            isShowingComparison = true
+                            Task { await model.compare(with: module.id) }
+                        }
+                    }
+                }
+            }
+        }
+
         ToolbarItem(placement: .secondaryAction) {
             Menu {
                 ForEach(model.modules) { module in
@@ -120,6 +137,88 @@ struct ReaderView: View {
             }
             .accessibilityLabel("Translation")
         }
+    }
+}
+
+private struct TranslationComparisonView: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    private var moduleIDs: [String] {
+        [model.selectedModuleID, model.comparisonModuleID].compactMap { $0 }
+    }
+
+    var body: some View {
+        NavigationStack {
+            Group {
+                if model.isLoadingComparison {
+                    ProgressView("Aligning translations…")
+                } else if model.parallelVerses.isEmpty {
+                    ContentUnavailableView(
+                        "No Aligned Verses",
+                        systemImage: "rectangle.split.2x1"
+                    )
+                } else {
+                    List(model.parallelVerses) { row in
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(row.reference)
+                                .font(.headline)
+                                .accessibilityAddTraits(.isHeader)
+
+                            if horizontalSizeClass == .compact {
+                                VStack(alignment: .leading, spacing: 12) {
+                                    ForEach(row.texts) { comparisonText($0) }
+                                }
+                            } else {
+                                HStack(alignment: .top, spacing: 20) {
+                                    ForEach(row.texts) { comparisonText($0) }
+                                }
+                            }
+
+                            if !row.lexicalLinks.isEmpty {
+                                DisclosureGroup("Original-Language Links") {
+                                    ForEach(row.lexicalLinks) { link in
+                                        VStack(alignment: .leading, spacing: 3) {
+                                            Text(link.strongsNumber).font(.caption.bold())
+                                            Text(link.words.joined(separator: " · "))
+                                                .font(.caption)
+                                                .foregroundStyle(.secondary)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.vertical, 6)
+                    }
+                }
+            }
+            .navigationTitle("Compare \(model.reference)")
+            .toolbarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+        .frame(idealWidth: 760, idealHeight: 620)
+    }
+
+    private func comparisonText(_ value: ParallelVerseText) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(moduleTitle(value.moduleID))
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Text(value.text ?? "Verse unavailable")
+                .font(.body)
+                .foregroundStyle(value.text == nil ? .secondary : .primary)
+                .textSelection(.enabled)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func moduleTitle(_ id: String) -> String {
+        model.modules.first { $0.id == id }?.title ?? id
     }
 }
 

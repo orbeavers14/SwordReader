@@ -283,6 +283,20 @@ struct AppModelTests {
         await model.saveNote("", reference: "John 3:16")
         #expect(model.note(reference: "John 3:16") == nil)
     }
+
+    @Test func comparisonPreservesRequestedModuleOrder() async {
+        let service = FakeScriptureService(modules: [
+            BibleModule(id: "WEB", title: "World English Bible", language: "en", version: nil, copyright: nil),
+            BibleModule(id: "KJV", title: "King James Version", language: "en", version: nil, copyright: nil)
+        ])
+        let model = AppModel(service: service)
+        await model.start()
+
+        await model.compare(with: "KJV")
+
+        #expect(model.comparisonModuleID == "KJV")
+        #expect(model.parallelVerses.first?.texts.map(\.moduleID) == ["WEB", "KJV"])
+    }
 }
 
 @MainActor
@@ -344,6 +358,21 @@ private actor FakeScriptureService: ScriptureServing {
 
     func chapter(_ reference: String, moduleID: String) -> BibleChapter {
         BibleChapter(reference: reference, moduleID: moduleID, verses: [])
+    }
+
+    func parallelChapter(
+        _ reference: String,
+        moduleIDs: [String]
+    ) -> [ParallelVerse] {
+        [
+            ParallelVerse(
+                reference: "John 3:16",
+                texts: moduleIDs.map {
+                    ParallelVerseText(moduleID: $0, text: "Text from \($0)")
+                },
+                lexicalLinks: []
+            )
+        ]
     }
 
     func books(moduleID: String) -> [BibleBook] {

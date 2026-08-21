@@ -46,6 +46,10 @@ remove it after confirmation.
 - Bookmarks and personal verse notes are stored separately from Bible modules in
   a versioned SwiftData schema with an explicit migration plan. Removing or
   updating a module does not silently delete the app-owned study records.
+- Installed translations can be compared in canonical verse alignment. Compact
+  layouts stack translations, wider layouts place them side by side, missing
+  verses stay explicit, and genuine Strong’s links expose original-language
+  relationships without implying links that the modules do not provide.
 
 ## Verify
 
