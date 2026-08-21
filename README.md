@@ -4,7 +4,7 @@
 [![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](LICENSE)
 
 SwordReader is a multiplatform SwiftUI Bible reader for iOS, iPadOS, and macOS.
-It consumes the public `SwordKit` 0.1.0 package and keeps SWORD modules in the
+It consumes the public `SwordKit` 0.2.0 package and keeps SWORD modules in the
 application's Application Support container.
 
 ## Open and run

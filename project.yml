@@ -7,7 +7,7 @@ options:
 packages:
   SwordKit:
     url: https://github.com/orbeavers14/SwordKit.git
-    exactVersion: 0.1.0
+    exactVersion: 0.2.0
 targetTemplates:
   SwordReaderApp:
     type: application
@@ -27,6 +27,15 @@ targetTemplates:
       properties:
         CFBundleDisplayName: SwordReader
         UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
         NSHumanReadableCopyright: "SwordReader is licensed under GPL-2.0-only. Bible modules have separate licenses."
 targets:
   SwordReader:
