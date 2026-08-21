@@ -25,11 +25,12 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
   and book/chapter navigation
 - [x] Handoff continuity for reading locations across iPhone, iPad, and Mac
 - [x] Optional built-in reading plans, saved progress, and opt-in reminders
+- [x] System-aware Dark Mode with optional appearance overrides, non-color-only
+  selection states, VoiceOver traits, and native Mac keyboard navigation
 
 ## Ordered milestones
 
-1. Platform-specific interaction and accessibility refinement
-2. Privacy, licensing, performance, localization, and release preparation
+1. Privacy, licensing, performance, localization, and release preparation
 
 ## Platform direction
 

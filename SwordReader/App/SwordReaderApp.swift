@@ -27,6 +27,7 @@ private struct SwordReaderSceneView: View {
     var body: some View {
         RootView()
             .environment(model)
+            .preferredColorScheme(model.appAppearance.colorScheme)
             #if os(macOS)
             .focusedSceneValue(\.swordReaderModel, model)
             #endif
@@ -57,5 +58,15 @@ private struct SwordReaderSceneView: View {
             .onChange(of: model.currentDestination) { _, destination in
                 storedDestination = destination?.url?.absoluteString ?? ""
             }
+    }
+}
+
+private extension AppAppearance {
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system: nil
+        case .light: .light
+        case .dark: .dark
+        }
     }
 }

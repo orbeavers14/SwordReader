@@ -190,6 +190,16 @@ enum ReaderSpacing: String, CaseIterable, Identifiable, Sendable {
     var title: String { rawValue.capitalized }
 }
 
+enum AppAppearance: String, CaseIterable, Identifiable, Sendable {
+    case system
+    case light
+    case dark
+
+    var id: Self { self }
+
+    var title: String { rawValue.capitalized }
+}
+
 struct StudyItem: Identifiable, Hashable, Sendable {
     enum Kind: String, Hashable, Sendable {
         case bookmark

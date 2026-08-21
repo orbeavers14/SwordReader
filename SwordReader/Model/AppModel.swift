@@ -10,6 +10,7 @@ final class AppModel {
     private(set) var readerTextSize: ReaderTextSize
     private(set) var readerSpacing: ReaderSpacing
     private(set) var showsVerseNumbers: Bool
+    private(set) var appAppearance: AppAppearance
     private(set) var modules: [BibleModule] = []
     private(set) var selectedModuleID: String?
     private(set) var books: [BibleBook] = []
@@ -60,6 +61,7 @@ final class AppModel {
     private static let readerTextSizeKey = "reader.textSize"
     private static let readerSpacingKey = "reader.spacing"
     private static let showsVerseNumbersKey = "reader.showsVerseNumbers"
+    private static let appAppearanceKey = "app.appearance"
     private static let searchModeKey = "search.mode"
     private static let searchScopeKey = "search.scope"
     private static let recentSearchesKey = "search.recents"
@@ -92,6 +94,9 @@ final class AppModel {
         showsVerseNumbers = defaults.object(
             forKey: Self.showsVerseNumbersKey
         ).map { _ in defaults.bool(forKey: Self.showsVerseNumbersKey) } ?? true
+        appAppearance = AppAppearance(
+            rawValue: defaults.string(forKey: Self.appAppearanceKey) ?? ""
+        ) ?? .system
         searchMode = ScriptureSearchMode(
             rawValue: defaults.string(forKey: Self.searchModeKey) ?? ""
         ) ?? .phrase
@@ -250,6 +255,11 @@ final class AppModel {
     func setShowsVerseNumbers(_ shows: Bool) {
         showsVerseNumbers = shows
         defaults.set(shows, forKey: Self.showsVerseNumbersKey)
+    }
+
+    func setAppAppearance(_ appearance: AppAppearance) {
+        appAppearance = appearance
+        defaults.set(appearance.rawValue, forKey: Self.appAppearanceKey)
     }
 
     func setSearchMode(_ mode: ScriptureSearchMode) {

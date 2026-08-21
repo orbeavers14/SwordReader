@@ -80,12 +80,22 @@ private struct SplitRootView: View {
                 Button {
                     model.section = section
                 } label: {
-                    Label(section.title, systemImage: section.systemImage)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .contentShape(Rectangle())
+                    HStack {
+                        Label(section.title, systemImage: section.systemImage)
+                        Spacer()
+                        if model.section == section {
+                            Image(systemName: "checkmark")
+                                .accessibilityHidden(true)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .listRowBackground(model.section == section ? Color.accentColor.opacity(0.14) : Color.clear)
+                .accessibilityAddTraits(
+                    model.section == section ? .isSelected : []
+                )
             }
             .navigationTitle("SwordReader")
         } detail: {
