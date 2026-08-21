@@ -31,6 +31,8 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
   no-tracking posture
 - [x] In-app privacy, open-source attribution, and installed-module licensing
   information
+- [x] Bounded large-module search presentation with full result counts and
+  stale-search isolation
 
 ## Ordered milestones
 
