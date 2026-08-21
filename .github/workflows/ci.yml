@@ -9,7 +9,7 @@ jobs:
   macos:
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Test macOS
         run: >-
           xcodebuild test
@@ -21,7 +21,7 @@ jobs:
   ios:
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build iOS and iPadOS
         run: >-
           xcodebuild build
