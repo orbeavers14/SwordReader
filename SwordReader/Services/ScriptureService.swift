@@ -83,7 +83,13 @@ actor SwordScriptureService: ScriptureServing {
                 BibleVerse(
                     reference: $0.reference.value,
                     number: Self.verseNumber(from: $0.reference.value),
-                    text: $0.text
+                    text: $0.text,
+                    headings: $0.headings.map {
+                        BibleHeading(
+                            identifier: $0.identifier,
+                            text: $0.body
+                        )
+                    }
                 )
             }
         )

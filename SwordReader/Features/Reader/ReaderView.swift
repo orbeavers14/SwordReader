@@ -10,7 +10,7 @@ struct ReaderView: View {
                 ContentUnavailableView {
                     Label("No Bibles Installed", systemImage: "book.closed")
                 } description: {
-                    Text("Import a local SWORD catalog from the Library to begin reading.")
+                    Text("Get a Bible from the Library to begin reading.")
                 } actions: {
                     Button("Open Library") { model.section = .library }
                 }
@@ -38,7 +38,7 @@ struct ReaderView: View {
 
     private func chapterContent(_ chapter: BibleChapter) -> some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 18) {
+            LazyVStack(alignment: .leading, spacing: model.readerSpacing.verseSpacing) {
                 ForEach(chapter.verses) { verse in
                     VerseView(verse: verse)
                 }
@@ -96,6 +96,10 @@ struct ReaderView: View {
         }
 
         ToolbarItem(placement: .secondaryAction) {
+            ReaderAppearanceMenu()
+        }
+
+        ToolbarItem(placement: .secondaryAction) {
             Menu {
                 ForEach(model.modules) { module in
                     Button {
@@ -120,14 +124,130 @@ struct ReaderView: View {
 }
 
 private struct VerseView: View {
+    @Environment(AppModel.self) private var model
     let verse: BibleVerse
 
     var body: some View {
-        Text(verse.number + " ")
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(.secondary)
-        + Text(verse.text)
-            .font(.body)
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(verse.headings) { heading in
+                Text(heading.text)
+                    .font(.system(.title3, design: model.readerFont.design, weight: .semibold))
+                    .accessibilityAddTraits(.isHeader)
+                    .padding(.top, 8)
+            }
+
+            verseText
+                .font(.system(model.readerTextSize.textStyle, design: model.readerFont.design))
+                .lineSpacing(model.readerSpacing.lineSpacing)
+                .textSelection(.enabled)
+        }
+    }
+
+    private var verseText: Text {
+        if model.showsVerseNumbers {
+            Text(verse.number + " ")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+            + Text(verse.text)
+        } else {
+            Text(verse.text)
+        }
+    }
+}
+
+private struct ReaderAppearanceMenu: View {
+    @Environment(AppModel.self) private var model
+
+    var body: some View {
+        Menu("Reading Appearance", systemImage: "textformat.size") {
+            Picker("Font", selection: fontBinding) {
+                ForEach(ReaderFont.allCases) { font in
+                    Text(font.title).tag(font)
+                }
+            }
+
+            Picker("Text Size", selection: sizeBinding) {
+                ForEach(ReaderTextSize.allCases) { size in
+                    Text(size.title).tag(size)
+                }
+            }
+
+            Picker("Spacing", selection: spacingBinding) {
+                ForEach(ReaderSpacing.allCases) { spacing in
+                    Text(spacing.title).tag(spacing)
+                }
+            }
+
+            Toggle("Verse Numbers", isOn: verseNumberBinding)
+        }
+        .accessibilityHint("Changes font, text size, spacing, and verse numbers")
+    }
+
+    private var fontBinding: Binding<ReaderFont> {
+        Binding(
+            get: { model.readerFont },
+            set: { model.setReaderFont($0) }
+        )
+    }
+
+    private var sizeBinding: Binding<ReaderTextSize> {
+        Binding(
+            get: { model.readerTextSize },
+            set: { model.setReaderTextSize($0) }
+        )
+    }
+
+    private var spacingBinding: Binding<ReaderSpacing> {
+        Binding(
+            get: { model.readerSpacing },
+            set: { model.setReaderSpacing($0) }
+        )
+    }
+
+    private var verseNumberBinding: Binding<Bool> {
+        Binding(
+            get: { model.showsVerseNumbers },
+            set: { model.setShowsVerseNumbers($0) }
+        )
+    }
+}
+
+private extension ReaderFont {
+    var design: Font.Design {
+        switch self {
+        case .system: .default
+        case .serif: .serif
+        case .rounded: .rounded
+        }
+    }
+}
+
+private extension ReaderTextSize {
+    var textStyle: Font.TextStyle {
+        switch self {
+        case .small: .callout
+        case .standard: .body
+        case .large: .title3
+        case .extraLarge: .title2
+        }
+    }
+}
+
+private extension ReaderSpacing {
+    var verseSpacing: CGFloat {
+        switch self {
+        case .compact: 12
+        case .comfortable: 18
+        case .relaxed: 26
+        }
+    }
+
+    var lineSpacing: CGFloat {
+        switch self {
+        case .compact: 2
+        case .comfortable: 6
+        case .relaxed: 10
+        }
     }
 }
 
