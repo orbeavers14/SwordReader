@@ -6,7 +6,7 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 ## Completed
 
 - [x] Shared observable application model
-- [x] Public SwordKit 0.2.0 dependency
+- [x] Public SwordKit 0.4.0 dependency
 - [x] Adaptive iPhone, iPad, and Mac navigation shell
 - [x] Chapter reading and translation selection
 - [x] Cancellable Scripture search
@@ -14,6 +14,7 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 - [x] Initial Swift Testing coverage
 - [x] Canonical book and chapter navigation with state restoration
 - [x] First-launch onboarding and production module-library management
+- [x] HTTPS module discovery, licensing review, progress, and cancellation
 
 ## Ordered milestones
 

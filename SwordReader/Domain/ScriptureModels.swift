@@ -56,6 +56,16 @@ struct LocalCatalog: Hashable, Sendable {
     let modules: [CatalogModule]
 }
 
+struct ModuleTransferProgress: Hashable, Sendable {
+    let completedBytes: UInt64
+    let totalBytes: UInt64
+
+    var fractionCompleted: Double? {
+        guard totalBytes > 0 else { return nil }
+        return min(Double(completedBytes) / Double(totalBytes), 1)
+    }
+}
+
 enum AppSection: String, CaseIterable, Identifiable, Sendable {
     case read
     case search

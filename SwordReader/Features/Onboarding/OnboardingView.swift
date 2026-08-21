@@ -2,6 +2,8 @@ import SwiftUI
 
 struct OnboardingView: View {
     @Environment(AppModel.self) private var model
+    @State private var isShowingRemoteAccessWarning = false
+    @State private var isShowingModuleBrowser = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -44,17 +46,44 @@ struct OnboardingView: View {
 
             Spacer(minLength: 20)
 
-            Button(model.modules.isEmpty ? "Choose a Bible" : "Start Reading") {
-                model.completeOnboarding()
+            Button(model.modules.isEmpty ? "Browse Bibles" : "Start Reading") {
+                if model.modules.isEmpty {
+                    isShowingRemoteAccessWarning = true
+                } else {
+                    model.completeOnboarding()
+                }
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
             .frame(maxWidth: .infinity)
+
+            if model.modules.isEmpty {
+                Button("Set Up Later") { model.completeOnboarding() }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 14)
+            }
         }
         .frame(maxWidth: 520)
         .padding(.horizontal, 32)
         .padding(.vertical, 24)
         .interactiveDismissDisabled()
+        .confirmationDialog(
+            "Connect to CrossWire?",
+            isPresented: $isShowingRemoteAccessWarning,
+            titleVisibility: .visible
+        ) {
+            Button("Continue") {
+                isShowingModuleBrowser = true
+                Task { await model.refreshRemoteCatalog() }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("SwordReader will contact the CrossWire Bible Society to retrieve its module catalog. This network request may reveal that you use a Bible reader. Modules are supplied by their publishers and have separate licenses.")
+        }
+        .sheet(isPresented: $isShowingModuleBrowser) {
+            RemoteModuleBrowser().environment(model)
+        }
     }
 }
 

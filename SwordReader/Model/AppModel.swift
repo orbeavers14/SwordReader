@@ -13,9 +13,13 @@ final class AppModel {
     private(set) var chapter: BibleChapter?
     private(set) var searchResults: [BibleSearchResult] = []
     private(set) var catalog: LocalCatalog?
+    private(set) var remoteModules: [CatalogModule] = []
     private(set) var isLoading = false
     private(set) var isSearching = false
     private(set) var isInstalling = false
+    private(set) var isRefreshingRemoteCatalog = false
+    private(set) var installingModuleID: String?
+    private(set) var installProgress: ModuleTransferProgress?
     private(set) var removingModuleID: String?
     private(set) var isPresentingOnboarding = false
     var presentedError: PresentedError?
@@ -24,6 +28,7 @@ final class AppModel {
     private let defaults: UserDefaults
     private var chapterTask: Task<Void, Never>?
     private var searchTask: Task<Void, Never>?
+    private var remoteInstallTask: Task<Void, Error>?
     private static let moduleKey = "selectedBibleModule"
     private static let bookKeyPrefix = "readerBook."
     private static let chapterKeyPrefix = "readerChapter."
@@ -193,6 +198,53 @@ final class AppModel {
         }
     }
 
+    func refreshRemoteCatalog() async {
+        guard !isRefreshingRemoteCatalog else { return }
+        isRefreshingRemoteCatalog = true
+        defer { isRefreshingRemoteCatalog = false }
+        do {
+            remoteModules = try await service.remoteBibles().sorted {
+                if $0.id == "ASV" { return true }
+                if $1.id == "ASV" { return false }
+                return $0.title.localizedStandardCompare($1.title) == .orderedAscending
+            }
+        } catch is CancellationError {
+            return
+        } catch {
+            presentedError = PresentedError(error)
+        }
+    }
+
+    func installRemote(_ module: CatalogModule) async {
+        guard installingModuleID == nil else { return }
+        installingModuleID = module.id
+        installProgress = nil
+
+        let task = Task {
+            try await service.installRemote(moduleID: module.id) { [weak self] progress in
+                Task { @MainActor in self?.installProgress = progress }
+            }
+        }
+        remoteInstallTask = task
+
+        do {
+            try await task.value
+            modules = try await service.installedBibles()
+            try await activateModule(module.id, restoring: true)
+        } catch is CancellationError {
+            // Cancellation is an explicit user action, not an error to present.
+        } catch {
+            presentedError = PresentedError(error)
+        }
+        remoteInstallTask = nil
+        installingModuleID = nil
+        installProgress = nil
+    }
+
+    func cancelRemoteInstall() {
+        remoteInstallTask?.cancel()
+    }
+
     func removeModule(id moduleID: String) async {
         guard modules.contains(where: { $0.id == moduleID }) else { return }
         removingModuleID = moduleID
@@ -342,5 +394,10 @@ private actor UnavailableScriptureService: ScriptureServing {
     func search(_ query: String, moduleID: String) async throws -> [BibleSearchResult] { throw error }
     func catalog(at directory: URL) async throws -> LocalCatalog { throw error }
     func install(moduleID: String, from catalog: LocalCatalog) async throws { throw error }
+    func remoteBibles() async throws -> [CatalogModule] { throw error }
+    func installRemote(
+        moduleID: String,
+        progress: @escaping @Sendable (ModuleTransferProgress) -> Void
+    ) async throws { throw error }
     func remove(moduleID: String) async throws { throw error }
 }

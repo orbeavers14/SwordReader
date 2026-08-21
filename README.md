@@ -4,7 +4,7 @@
 [![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](LICENSE)
 
 SwordReader is a multiplatform SwiftUI Bible reader for iOS, iPadOS, and macOS.
-It consumes the public `SwordKit` 0.2.0 package and keeps SWORD modules in the
+It consumes the public `SwordKit` 0.4.0 package and keeps SWORD modules in the
 application's Application Support container.
 
 ## Open and run
@@ -13,9 +13,11 @@ Open `SwordReader.xcodeproj` in Xcode 26 or later. Choose `SwordReader` for iOS
 and iPadOS, or `SwordReader-macOS` for macOS.
 
 SwordKit does not bundle or implicitly download Bible modules. Use **Library →
-Import Local Catalog** to select a local SWORD repository containing a `mods.d`
-directory, then install a Bible from that catalog. The Library shows module
-version and licensing metadata when supplied by the publisher. Swipe an
+Get Bibles** to review the privacy notice, browse and search the CrossWire Bible
+Society catalog over HTTPS, and download a translation. Download progress can be
+cancelled, and publisher-supplied licensing metadata is shown before installation.
+**Import Local Catalog** remains available as an advanced offline option for a
+SWORD repository containing a `mods.d` directory. Swipe an
 installed Bible on iPhone or iPad, or use its context menu on any platform, to
 remove it after confirmation.
 
@@ -28,6 +30,8 @@ remove it after confirmation.
 - Compact layouts use a native tab-based hierarchy; iPad and macOS use a
   `NavigationSplitView` workspace.
 - Platform-specific commands and toolbar placement stay in platform files.
+- App preferences and reading position use `UserDefaults`, which participates in
+  normal encrypted device backups; SwordReader does not require an account or server.
 
 ## Verify
 

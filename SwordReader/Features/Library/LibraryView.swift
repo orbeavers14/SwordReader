@@ -5,6 +5,8 @@ struct LibraryView: View {
     @Environment(AppModel.self) private var model
     @State private var isImporting = false
     @State private var modulePendingRemoval: BibleModule?
+    @State private var isShowingRemoteAccessWarning = false
+    @State private var isShowingModuleBrowser = false
 
     var body: some View {
         List {
@@ -79,8 +81,31 @@ struct LibraryView: View {
         .navigationTitle("Library")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button("Import Local Catalog", systemImage: "folder.badge.plus") { isImporting = true }
+                Button("Get Bibles", systemImage: "arrow.down.circle") {
+                    isShowingRemoteAccessWarning = true
+                }
             }
+            ToolbarItem(placement: .secondaryAction) {
+                Button("Import Local Catalog", systemImage: "folder.badge.plus") {
+                    isImporting = true
+                }
+            }
+        }
+        .confirmationDialog(
+            "Connect to CrossWire?",
+            isPresented: $isShowingRemoteAccessWarning,
+            titleVisibility: .visible
+        ) {
+            Button("Continue") {
+                isShowingModuleBrowser = true
+                Task { await model.refreshRemoteCatalog() }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("SwordReader will contact the CrossWire Bible Society to retrieve its module catalog. This network request may reveal that you use a Bible reader. Modules are supplied by their publishers and have separate licenses.")
+        }
+        .sheet(isPresented: $isShowingModuleBrowser) {
+            RemoteModuleBrowser().environment(model)
         }
         .fileImporter(isPresented: $isImporting, allowedContentTypes: [.folder]) { result in
             if case .success(let url) = result {

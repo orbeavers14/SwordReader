@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/orbeavers14/SwordKit.git",
       "state" : {
-        "revision" : "c4d43dfeebe5609305e6565aa0bf316059138c48",
-        "version" : "0.2.0"
+        "revision" : "91e921870403495b245bbdea49739583a8b2d7ca",
+        "version" : "0.4.0"
       }
     }
   ],
