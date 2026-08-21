@@ -33,6 +33,7 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
   information
 - [x] Bounded large-module search presentation with full result counts and
   stale-search isolation
+- [x] Off-main Watch chapter decoding with cancellation and stale-load isolation
 
 ## Ordered milestones
 

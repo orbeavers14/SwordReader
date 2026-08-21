@@ -19,6 +19,7 @@ final class WatchReaderModel: NSObject, WCSessionDelegate {
     private(set) var selectedChapter = 1
     private(set) var isLoading = false
     private(set) var isInstalling = false
+    private(set) var isLoadingChapter = false
     private(set) var installingModuleID: String?
     var presentedError: String?
 
@@ -28,6 +29,8 @@ final class WatchReaderModel: NSObject, WCSessionDelegate {
     private static let moduleKey = "watch.module"
     private static let bookKey = "watch.book"
     private static let chapterKey = "watch.chapter"
+    private var chapterTask: Task<Void, Never>?
+    private var chapterGeneration = UUID()
 
     override init() {
         do {
@@ -138,12 +141,44 @@ final class WatchReaderModel: NSObject, WCSessionDelegate {
         } catch { presentedError = error.localizedDescription }
     }
     private func loadChapter() {
-        guard let moduleID = selectedModuleID, let module = library.module(named: moduleID), !reference.isEmpty else { return }
-        do {
-            verses = try module.chapter(reference).verses.map {
-                WatchVerse(id: $0.reference.value, number: $0.reference.value.split(separator: ":").last.map(String.init) ?? "", text: $0.text)
+        chapterTask?.cancel()
+        guard let moduleID = selectedModuleID,
+              let module = library.module(named: moduleID),
+              !reference.isEmpty
+        else { return }
+
+        let requestedReference = reference
+        let generation = UUID()
+        chapterGeneration = generation
+        isLoadingChapter = true
+        chapterTask = Task {
+            do {
+                let loaded = try await Task.detached(priority: .userInitiated) {
+                    try Task.checkCancellation()
+                    let chapter = try module.chapter(requestedReference)
+                    try Task.checkCancellation()
+                    return chapter.verses.map {
+                        WatchVerse(
+                            id: $0.reference.value,
+                            number: $0.reference.value.split(separator: ":")
+                                .last.map(String.init) ?? "",
+                            text: $0.text
+                        )
+                    }
+                }.value
+                guard !Task.isCancelled,
+                      chapterGeneration == generation
+                else { return }
+                verses = loaded
+            } catch is CancellationError {
+                // A newer chapter owns the visible state.
+            } catch {
+                guard chapterGeneration == generation else { return }
+                presentedError = error.localizedDescription
             }
-        } catch { presentedError = error.localizedDescription }
+            guard chapterGeneration == generation else { return }
+            isLoadingChapter = false
+        }
     }
     private func persistSelection() {
         UserDefaults.standard.set(selectedModuleID, forKey: Self.moduleKey)
