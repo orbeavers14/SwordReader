@@ -34,12 +34,12 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 - [x] Bounded large-module search presentation with full result counts and
   stale-search isolation
 - [x] Off-main Watch chapter decoding with cancellation and stale-load isolation
+- [x] Separate English string catalogs for the shared app and Watch, with
+  explicit localization for runtime labels, plans, notifications, and errors
 
 ## Ordered milestones
 
-1. Performance profiling and large-module safeguards
-2. Localization foundation and English string catalog
-3. App identity, icons, launch presentation, and release preparation
+1. App identity, icons, launch presentation, and release preparation
 
 ## Platform direction
 

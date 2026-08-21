@@ -5,37 +5,37 @@ enum BuiltInReadingPlans {
     static let all: [SwordReadingPlan] = [
         makePlan(
             id: "chronological-365",
-            title: "Chronological Bible",
-            subtitle: "One year · traditional historical sequence",
+            title: String(localized: "Chronological Bible"),
+            subtitle: String(localized: "One year · traditional historical sequence"),
             chapters: chronologicalChapters,
             dayCount: 365
         ),
         makePlan(
             id: "canonical-365",
-            title: "Bible in Canonical Order",
-            subtitle: "One year · Genesis through Revelation",
+            title: String(localized: "Bible in Canonical Order"),
+            subtitle: String(localized: "One year · Genesis through Revelation"),
             chapters: canonicalChapters,
             dayCount: 365
         ),
         makePlan(
             id: "new-testament-90",
-            title: "New Testament",
-            subtitle: "90 days · Matthew through Revelation",
+            title: String(localized: "New Testament"),
+            subtitle: String(localized: "90 days · Matthew through Revelation"),
             chapters: chapters(in: Array(canonicalBooks.dropFirst(39))),
             dayCount: 90
         )
     ]
 
     static let subtitles: [String: String] = [
-        "chronological-365": "One year · traditional historical sequence",
-        "canonical-365": "One year · Genesis through Revelation",
-        "new-testament-90": "90 days · Matthew through Revelation"
+        "chronological-365": String(localized: "One year · traditional historical sequence"),
+        "canonical-365": String(localized: "One year · Genesis through Revelation"),
+        "new-testament-90": String(localized: "90 days · Matthew through Revelation")
     ]
 
     static let notes: [String: String] = [
-        "chronological-365": "A SwordReader-authored arrangement using traditional book-era ordering. Biblical chronology is not universally agreed upon; Job, Psalms, Wisdom books, and the Prophets may be placed differently in other plans.",
-        "canonical-365": "Follows the standard Protestant canonical book order.",
-        "new-testament-90": "Follows New Testament canonical order."
+        "chronological-365": String(localized: "A SwordReader-authored arrangement using traditional book-era ordering. Biblical chronology is not universally agreed upon; Job, Psalms, Wisdom books, and the Prophets may be placed differently in other plans."),
+        "canonical-365": String(localized: "Follows the standard Protestant canonical book order."),
+        "new-testament-90": String(localized: "Follows New Testament canonical order.")
     ]
 
     private static func makePlan(
@@ -54,7 +54,7 @@ enum BuiltInReadingPlans {
             defer { index += count }
             return try! SwordReadingPlanDay(
                 id: day,
-                title: "Day \(day)",
+                title: String(localized: "Day \(day)"),
                 readings: Array(chapters[index..<(index + count)])
             )
         }

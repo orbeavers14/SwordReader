@@ -20,9 +20,11 @@
 		3DB20FC88172D40D6C6EC86A /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7187879D676D30ECB4256EDC /* AppModel.swift */; };
 		490B7C09AAEE89F570BE2493 /* StudyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 779909E15D9A44634284F23A /* StudyStore.swift */; };
 		4D095ED2041DEF217FE3D2BC /* ReadingPlansView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9521D193DBFADA37E949C355 /* ReadingPlansView.swift */; };
+		4EAC21187D8B67F6731F0EB2 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 2491B52C76E1C3649C3451F7 /* Localizable.xcstrings */; };
 		57B344E1480A39125168264F /* SwordKit in Frameworks */ = {isa = PBXBuildFile; productRef = 18F967ADF67FF2D952214576 /* SwordKit */; };
 		5B88F4C1D948610C9501EC5C /* ReadingPlanReminderScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07CE999C39AF639F6A5DAAAE /* ReadingPlanReminderScheduler.swift */; };
 		5F8082E8C38A18BA4984E15F /* ScriptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CC1F04AA5EA5AB3CD6D26EF /* ScriptureService.swift */; };
+		6009634BCF33445C26D9BA47 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 2491B52C76E1C3649C3451F7 /* Localizable.xcstrings */; };
 		6A072D123975D86B1083E062 /* ReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F56BD8D43DB695CDBF6FA1 /* ReaderView.swift */; };
 		6A351D71793BE44657B5FA4A /* SwordReaderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F1353239778C7BDA6745BE /* SwordReaderApp.swift */; };
 		6B37C3BDCC3C7D7D57C0D95F /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6469A607DD256F71E8190B92 /* OnboardingView.swift */; };
@@ -51,6 +53,7 @@
 		EF0A36C005481EB200119EE3 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE97C20016F8E4AD4AD5DCF /* LibraryView.swift */; };
 		EFEE74F426EE1C5291DFC796 /* ReaderContinuityActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED025CDA228F5BF1BFC0211 /* ReaderContinuityActivity.swift */; };
 		F53FF6732884320783B04C88 /* ReadingPlanReminderScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07CE999C39AF639F6A5DAAAE /* ReadingPlanReminderScheduler.swift */; };
+		F618F5CB75642F8BF1C91214 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 5CCAF77317D7CE2995A1B755 /* Localizable.xcstrings */; };
 		F7378B214BADAC5C6DC40B7D /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F770C383F38C009A1AD8849 /* RootView.swift */; };
 		F77AE960E371172484B061CC /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD31039C38AF776EE199BD39 /* SearchView.swift */; };
 		FA41661C793F5DA18FB1C312 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD31039C38AF776EE199BD39 /* SearchView.swift */; };
@@ -91,6 +94,7 @@
 		07CE999C39AF639F6A5DAAAE /* ReadingPlanReminderScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingPlanReminderScheduler.swift; sourceTree = "<group>"; };
 		12E1E8FB5D3F6DA959D2262C /* ScriptureModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScriptureModels.swift; sourceTree = "<group>"; };
 		16F1353239778C7BDA6745BE /* SwordReaderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwordReaderApp.swift; sourceTree = "<group>"; };
+		2491B52C76E1C3649C3451F7 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		27949FEDA7BA18A660F53B7B /* SwordReaderMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwordReaderMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F19A26B63B5D593D21B65DF /* WatchReaderModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchReaderModel.swift; sourceTree = "<group>"; };
 		3354BAF88C227A85054E11D8 /* SwordReader.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SwordReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -98,6 +102,7 @@
 		3AE97C20016F8E4AD4AD5DCF /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
 		4ED025CDA228F5BF1BFC0211 /* ReaderContinuityActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderContinuityActivity.swift; sourceTree = "<group>"; };
 		5868C39750F4174ED6485C38 /* SwordReaderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwordReaderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5CCAF77317D7CE2995A1B755 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		5F770C383F38C009A1AD8849 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		5FF4650224CED85ED1D26859 /* PrivacyAndLicensesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyAndLicensesView.swift; sourceTree = "<group>"; };
 		623DCE1E666AA2B7B050E275 /* CompanionSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionSync.swift; sourceTree = "<group>"; };
@@ -149,6 +154,7 @@
 		0D7007C207D54C18950E12BF /* SwordReaderWatch */ = {
 			isa = PBXGroup;
 			children = (
+				5CCAF77317D7CE2995A1B755 /* Localizable.xcstrings */,
 				33F43383FF3D4DDA7EBF9BB1 /* PrivacyInfo.xcprivacy */,
 				BEBDDD380A2DBC81DCD252FE /* SwordReaderWatchApp.swift */,
 				2F19A26B63B5D593D21B65DF /* WatchReaderModel.swift */,
@@ -193,6 +199,7 @@
 		82FA916EA38CA6043226EBF8 /* SwordReader */ = {
 			isa = PBXGroup;
 			children = (
+				2491B52C76E1C3649C3451F7 /* Localizable.xcstrings */,
 				6CFB6AFF829370098E85374A /* PrivacyInfo.xcprivacy */,
 				F3CC7BF8F2443C947946422A /* App */,
 				F151B0D27F5B97939524068D /* Domain */,
@@ -449,6 +456,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F618F5CB75642F8BF1C91214 /* Localizable.xcstrings in Resources */,
 				A43909D98CB5E98F7D7FAE86 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -457,6 +465,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4EAC21187D8B67F6731F0EB2 /* Localizable.xcstrings in Resources */,
 				C3207A64496F3151B78A3775 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -465,6 +474,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6009634BCF33445C26D9BA47 /* Localizable.xcstrings in Resources */,
 				6FF718927442EFFE1CE9D83C /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

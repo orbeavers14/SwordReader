@@ -835,7 +835,7 @@ enum ContinuityError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .moduleUnavailable(let moduleID):
-            "\(moduleID) is not currently available from CrossWire."
+            String(localized: "\(moduleID) is not currently available from CrossWire.")
         }
     }
 }
