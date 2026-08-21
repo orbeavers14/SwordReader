@@ -2,6 +2,8 @@ import SwiftUI
 
 struct ReaderView: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.openWindow) private var openWindow
+    @Environment(\.supportsMultipleWindows) private var supportsMultipleWindows
     @State private var isChoosingChapter = false
     @State private var isShowingComparison = false
 
@@ -112,6 +114,37 @@ struct ReaderView: View {
                             Task { await model.compare(with: module.id) }
                         }
                     }
+                }
+            }
+        }
+
+        if !model.readingHistory.isEmpty {
+            ToolbarItem(placement: .secondaryAction) {
+                Menu("Reading History", systemImage: "clock.arrow.circlepath") {
+                    ForEach(model.readingHistory.prefix(10)) { entry in
+                        Button(entry.reference) {
+                            Task {
+                                await model.open(
+                                    destination: ReaderDestination(
+                                        moduleID: entry.moduleID,
+                                        reference: entry.reference
+                                    )
+                                )
+                            }
+                        }
+                    }
+                    Divider()
+                    Button("Clear History", role: .destructive) {
+                        model.clearReadingHistory()
+                    }
+                }
+            }
+        }
+
+        if supportsMultipleWindows, let destination = model.currentDestination {
+            ToolbarItem(placement: .secondaryAction) {
+                Button("Open in New Window", systemImage: "plus.rectangle.on.rectangle") {
+                    openWindow(value: destination)
                 }
             }
         }

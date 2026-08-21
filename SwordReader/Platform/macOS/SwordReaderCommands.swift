@@ -2,20 +2,33 @@
 import SwiftUI
 
 struct SwordReaderCommands: Commands {
-    let model: AppModel
+    @FocusedValue(\.swordReaderModel) private var model
 
     var body: some Commands {
         CommandMenu("Navigate") {
-            Button("Previous Chapter") { model.moveChapter(by: -1) }
+            Button("Previous Chapter") { model?.moveChapter(by: -1) }
                 .keyboardShortcut(.leftArrow, modifiers: [.command])
-            Button("Next Chapter") { model.moveChapter(by: 1) }
+                .disabled(model == nil)
+            Button("Next Chapter") { model?.moveChapter(by: 1) }
                 .keyboardShortcut(.rightArrow, modifiers: [.command])
+                .disabled(model == nil)
             Divider()
             ForEach(AppSection.allCases) { section in
-                Button(section.title) { model.section = section }
+                Button(section.title) { model?.section = section }
+                    .disabled(model == nil)
             }
         }
     }
 }
-#endif
 
+private struct SwordReaderModelFocusedValueKey: FocusedValueKey {
+    typealias Value = AppModel
+}
+
+extension FocusedValues {
+    var swordReaderModel: AppModel? {
+        get { self[SwordReaderModelFocusedValueKey.self] }
+        set { self[SwordReaderModelFocusedValueKey.self] = newValue }
+    }
+}
+#endif

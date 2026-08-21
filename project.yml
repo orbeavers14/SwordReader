@@ -26,6 +26,11 @@ targetTemplates:
       path: Support/${target_name}-Info.plist
       properties:
         CFBundleDisplayName: SwordReader
+        CFBundleURLTypes:
+          - CFBundleTypeRole: Viewer
+            CFBundleURLName: com.example.SwordReader.read
+            CFBundleURLSchemes:
+              - swordreader
         UILaunchScreen: {}
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait

@@ -297,6 +297,32 @@ struct AppModelTests {
         #expect(model.comparisonModuleID == "KJV")
         #expect(model.parallelVerses.first?.texts.map(\.moduleID) == ["WEB", "KJV"])
     }
+
+    @Test func deepLinkRoundTripsModuleAndReference() throws {
+        let destination = ReaderDestination(
+            moduleID: "WEB",
+            reference: "John 3:16"
+        )
+        let url = try #require(destination.url)
+
+        #expect(ReaderDestination(url: url) == destination)
+    }
+
+    @Test func readingHistoryDeduplicatesMostRecentLocation() async throws {
+        let defaults = try #require(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+        let model = AppModel(
+            service: FakeScriptureService(),
+            defaults: defaults
+        )
+        await model.start()
+
+        model.select(bookID: "John", chapter: 2)
+        model.select(bookID: "John", chapter: 3)
+        model.select(bookID: "John", chapter: 2)
+
+        #expect(model.readingHistory.map(\.reference) == ["John 2", "John 3"])
+    }
 }
 
 @MainActor
