@@ -1,0 +1,11 @@
+SwordReader
+Copyright (C) 2026 SwordReader contributors
+SPDX-License-Identifier: GPL-2.0-only
+
+SwordReader is licensed under version 2 only of the GNU General Public License.
+The complete license text is in LICENSE.
+
+SwordReader uses SwordKit, which statically links the CrossWire SWORD engine.
+SwordKit and SWORD retain their respective copyright and GPL notices. Bible and
+study modules are separate works with independent licenses and distribution
+terms; SwordReader does not grant permission to redistribute module content.

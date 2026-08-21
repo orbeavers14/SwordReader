@@ -1,13 +1,16 @@
 # SwordReader
 
+[![Apple platform builds](https://github.com/orbeavers14/SwordReader/actions/workflows/ci.yml/badge.svg)](https://github.com/orbeavers14/SwordReader/actions/workflows/ci.yml)
+[![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](LICENSE)
+
 SwordReader is a multiplatform SwiftUI Bible reader for iOS, iPadOS, and macOS.
 It consumes the public `SwordKit` 0.1.0 package and keeps SWORD modules in the
 application's Application Support container.
 
 ## Open and run
 
-Open `SwordReader.xcodeproj` in Xcode 26 or later, choose the SwordReader scheme,
-and run on macOS or an iOS 17+ device or simulator.
+Open `SwordReader.xcodeproj` in Xcode 26 or later. Choose `SwordReader` for iOS
+and iPadOS, or `SwordReader-macOS` for macOS.
 
 SwordKit does not bundle or implicitly download Bible modules. Use **Library →
 Import Local Catalog** to select a local SWORD repository containing a `mods.d`
@@ -28,7 +31,20 @@ directory, then install a Bible from that catalog.
 ```sh
 xcodebuild test \
   -project SwordReader.xcodeproj \
-  -scheme SwordReader \
+  -scheme SwordReader-macOS \
   -destination 'platform=macOS'
 ```
 
+CI also builds the generic iOS destination to validate iPhone and iPad support.
+
+## Development policy
+
+SwordReader is both a potential shipping application and the reference consumer
+for public SwordKit releases. It must depend on a tagged public SwordKit version,
+not a modified local copy.
+
+Reproduce framework problems in SwordKit and fix them upstream. After a tagged
+SwordKit release contains the correction, update SwordReader's pinned dependency.
+Application behavior, persistence, navigation, and presentation remain here.
+
+See [ROADMAP.md](ROADMAP.md) for the ordered product milestones.
