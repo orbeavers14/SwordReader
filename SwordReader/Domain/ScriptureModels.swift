@@ -26,6 +26,13 @@ struct BibleVerse: Identifiable, Hashable, Sendable {
     let reference: String
     let number: String
     let text: String
+    let headings: [BibleHeading]
+}
+
+struct BibleHeading: Identifiable, Hashable, Sendable {
+    var id: String { identifier }
+    let identifier: String
+    let text: String
 }
 
 struct BibleChapter: Hashable, Sendable {
@@ -64,6 +71,50 @@ struct ModuleTransferProgress: Hashable, Sendable {
         guard totalBytes > 0 else { return nil }
         return min(Double(completedBytes) / Double(totalBytes), 1)
     }
+}
+
+enum ReaderFont: String, CaseIterable, Identifiable, Sendable {
+    case system
+    case serif
+    case rounded
+
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .system: "System"
+        case .serif: "Serif"
+        case .rounded: "Rounded"
+        }
+    }
+}
+
+enum ReaderTextSize: String, CaseIterable, Identifiable, Sendable {
+    case small
+    case standard
+    case large
+    case extraLarge
+
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .small: "Small"
+        case .standard: "Default"
+        case .large: "Large"
+        case .extraLarge: "Extra Large"
+        }
+    }
+}
+
+enum ReaderSpacing: String, CaseIterable, Identifiable, Sendable {
+    case compact
+    case comfortable
+    case relaxed
+
+    var id: Self { self }
+
+    var title: String { rawValue.capitalized }
 }
 
 enum AppSection: String, CaseIterable, Identifiable, Sendable {

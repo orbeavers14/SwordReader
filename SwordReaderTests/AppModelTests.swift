@@ -191,6 +191,29 @@ struct AppModelTests {
         #expect(model.installingModuleID == nil)
         #expect(model.presentedError == nil)
     }
+
+    @Test func readerAppearancePersistsForAReplacementModel() throws {
+        let defaults = try #require(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+        let first = AppModel(
+            service: FakeScriptureService(),
+            defaults: defaults
+        )
+
+        first.setReaderFont(.serif)
+        first.setReaderTextSize(.large)
+        first.setReaderSpacing(.relaxed)
+        first.setShowsVerseNumbers(false)
+
+        let restored = AppModel(
+            service: FakeScriptureService(),
+            defaults: defaults
+        )
+        #expect(restored.readerFont == .serif)
+        #expect(restored.readerTextSize == .large)
+        #expect(restored.readerSpacing == .relaxed)
+        #expect(!restored.showsVerseNumbers)
+    }
 }
 
 private actor FakeScriptureService: ScriptureServing {

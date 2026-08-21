@@ -5,6 +5,10 @@ import Observation
 @Observable
 final class AppModel {
     var section: AppSection = .read
+    private(set) var readerFont: ReaderFont
+    private(set) var readerTextSize: ReaderTextSize
+    private(set) var readerSpacing: ReaderSpacing
+    private(set) var showsVerseNumbers: Bool
     private(set) var modules: [BibleModule] = []
     private(set) var selectedModuleID: String?
     private(set) var books: [BibleBook] = []
@@ -33,6 +37,10 @@ final class AppModel {
     private static let bookKeyPrefix = "readerBook."
     private static let chapterKeyPrefix = "readerChapter."
     private static let completedOnboardingKey = "completedOnboarding"
+    private static let readerFontKey = "reader.font"
+    private static let readerTextSizeKey = "reader.textSize"
+    private static let readerSpacingKey = "reader.spacing"
+    private static let showsVerseNumbersKey = "reader.showsVerseNumbers"
 
     init(
         service: any ScriptureServing,
@@ -40,6 +48,18 @@ final class AppModel {
     ) {
         self.service = service
         self.defaults = defaults
+        readerFont = ReaderFont(
+            rawValue: defaults.string(forKey: Self.readerFontKey) ?? ""
+        ) ?? .system
+        readerTextSize = ReaderTextSize(
+            rawValue: defaults.string(forKey: Self.readerTextSizeKey) ?? ""
+        ) ?? .standard
+        readerSpacing = ReaderSpacing(
+            rawValue: defaults.string(forKey: Self.readerSpacingKey) ?? ""
+        ) ?? .comfortable
+        showsVerseNumbers = defaults.object(
+            forKey: Self.showsVerseNumbersKey
+        ).map { _ in defaults.bool(forKey: Self.showsVerseNumbersKey) } ?? true
     }
 
     convenience init() {
@@ -76,6 +96,26 @@ final class AppModel {
         if modules.isEmpty {
             section = .library
         }
+    }
+
+    func setReaderFont(_ font: ReaderFont) {
+        readerFont = font
+        defaults.set(font.rawValue, forKey: Self.readerFontKey)
+    }
+
+    func setReaderTextSize(_ size: ReaderTextSize) {
+        readerTextSize = size
+        defaults.set(size.rawValue, forKey: Self.readerTextSizeKey)
+    }
+
+    func setReaderSpacing(_ spacing: ReaderSpacing) {
+        readerSpacing = spacing
+        defaults.set(spacing.rawValue, forKey: Self.readerSpacingKey)
+    }
+
+    func setShowsVerseNumbers(_ shows: Bool) {
+        showsVerseNumbers = shows
+        defaults.set(shows, forKey: Self.showsVerseNumbersKey)
     }
 
     var reference: String {

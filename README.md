@@ -32,6 +32,10 @@ remove it after confirmation.
 - Platform-specific commands and toolbar placement stay in platform files.
 - App preferences and reading position use `UserDefaults`, which participates in
   normal encrypted device backups; SwordReader does not require an account or server.
+- Reader appearance uses semantic Dynamic Type styles with persisted system,
+  serif, or rounded design, text-size, spacing, and verse-number choices.
+- Publisher-supplied Scripture headings are rendered as accessible headings in
+  the native reading flow.
 
 ## Verify
 
