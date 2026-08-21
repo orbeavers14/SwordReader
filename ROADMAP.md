@@ -23,6 +23,7 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 - [x] Reading history, deep links, scene restoration, and multiple windows
 - [x] Native watchOS reading with paired module delivery, standalone downloads,
   and book/chapter navigation
+- [x] Handoff continuity for reading locations across iPhone, iPad, and Mac
 
 ## Ordered milestones
 

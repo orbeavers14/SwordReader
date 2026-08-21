@@ -25,6 +25,7 @@
 		7188B75C2FE76BDD8F424BDE /* SwordReaderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F1353239778C7BDA6745BE /* SwordReaderApp.swift */; };
 		83EE1E8A576CC2D940596B8E /* ScriptureModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E1E8FB5D3F6DA959D2262C /* ScriptureModels.swift */; };
 		86E7749B2AB62AE5490BA88C /* SwordReaderCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDAEEF5A19F415E628AFC0F8 /* SwordReaderCommands.swift */; };
+		9A11462734D192571B619533 /* ReaderContinuityActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED025CDA228F5BF1BFC0211 /* ReaderContinuityActivity.swift */; };
 		9F9C8C85549F0BEB10525E5D /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6469A607DD256F71E8190B92 /* OnboardingView.swift */; };
 		A14388353CCED21CD2CC9DFF /* RemoteModuleBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD4F6E041939D1BDFAEA801 /* RemoteModuleBrowser.swift */; };
 		AAB7033D031B86D14ACC2CE4 /* SwordKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1DF7AC1CF36D2CDF52E0FC47 /* SwordKit */; };
@@ -38,6 +39,7 @@
 		E3422C241C41209E1A5340A7 /* ReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F56BD8D43DB695CDBF6FA1 /* ReaderView.swift */; };
 		E7E464A945855B2B7D586AEC /* StudyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 779909E15D9A44634284F23A /* StudyStore.swift */; };
 		EF0A36C005481EB200119EE3 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AE97C20016F8E4AD4AD5DCF /* LibraryView.swift */; };
+		EFEE74F426EE1C5291DFC796 /* ReaderContinuityActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED025CDA228F5BF1BFC0211 /* ReaderContinuityActivity.swift */; };
 		F7378B214BADAC5C6DC40B7D /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F770C383F38C009A1AD8849 /* RootView.swift */; };
 		F77AE960E371172484B061CC /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD31039C38AF776EE199BD39 /* SearchView.swift */; };
 		FA41661C793F5DA18FB1C312 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD31039C38AF776EE199BD39 /* SearchView.swift */; };
@@ -81,6 +83,7 @@
 		2F19A26B63B5D593D21B65DF /* WatchReaderModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchReaderModel.swift; sourceTree = "<group>"; };
 		3354BAF88C227A85054E11D8 /* SwordReader.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SwordReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3AE97C20016F8E4AD4AD5DCF /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
+		4ED025CDA228F5BF1BFC0211 /* ReaderContinuityActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderContinuityActivity.swift; sourceTree = "<group>"; };
 		5868C39750F4174ED6485C38 /* SwordReaderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwordReaderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5F770C383F38C009A1AD8849 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		623DCE1E666AA2B7B050E275 /* CompanionSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompanionSync.swift; sourceTree = "<group>"; };
@@ -178,6 +181,7 @@
 			isa = PBXGroup;
 			children = (
 				623DCE1E666AA2B7B050E275 /* CompanionSync.swift */,
+				4ED025CDA228F5BF1BFC0211 /* ReaderContinuityActivity.swift */,
 				9CC1F04AA5EA5AB3CD6D26EF /* ScriptureService.swift */,
 			);
 			path = Services;
@@ -423,6 +427,7 @@
 				2DE65A5A7FF91282FA01AC9D /* CompanionSync.swift in Sources */,
 				264FD9BB898940E0CE221109 /* LibraryView.swift in Sources */,
 				9F9C8C85549F0BEB10525E5D /* OnboardingView.swift in Sources */,
+				EFEE74F426EE1C5291DFC796 /* ReaderContinuityActivity.swift in Sources */,
 				E3422C241C41209E1A5340A7 /* ReaderView.swift in Sources */,
 				DCD641C8F1931CFCFA7E8AEC /* RemoteModuleBrowser.swift in Sources */,
 				F7378B214BADAC5C6DC40B7D /* RootView.swift in Sources */,
@@ -453,6 +458,7 @@
 				122AC3474CA03999334E65CF /* CompanionSync.swift in Sources */,
 				EF0A36C005481EB200119EE3 /* LibraryView.swift in Sources */,
 				6B37C3BDCC3C7D7D57C0D95F /* OnboardingView.swift in Sources */,
+				9A11462734D192571B619533 /* ReaderContinuityActivity.swift in Sources */,
 				6A072D123975D86B1083E062 /* ReaderView.swift in Sources */,
 				A14388353CCED21CD2CC9DFF /* RemoteModuleBrowser.swift in Sources */,
 				D0476DEFEBF151A2A2324B14 /* RootView.swift in Sources */,

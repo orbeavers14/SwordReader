@@ -37,6 +37,7 @@ final class AppModel {
     private(set) var sendingModuleID: String?
     private(set) var isPresentingOnboarding = false
     var presentedError: PresentedError?
+    var continuityNotice: ContinuityNotice?
 
     private let service: any ScriptureServing
     private let defaults: UserDefaults
@@ -295,6 +296,61 @@ final class AppModel {
             }
         }
         open(reference: destination.reference)
+    }
+
+    func continueReading(from destination: ReaderDestination) async {
+        let requestedModuleID = destination.moduleID
+        let isMissingRequestedModule = requestedModuleID.map { requested in
+            !modules.contains { $0.id.caseInsensitiveCompare(requested) == .orderedSame }
+        } ?? false
+
+        await open(destination: destination)
+
+        if isMissingRequestedModule, let requestedModuleID {
+            if let selectedModule = modules.first(where: { $0.id == selectedModuleID }) {
+                continuityNotice = ContinuityNotice(
+                    destination: destination,
+                    currentTranslationTitle: selectedModule.title
+                )
+            } else {
+                section = .library
+                continuityNotice = ContinuityNotice(
+                    destination: destination,
+                    currentTranslationTitle: nil
+                )
+            }
+        }
+    }
+
+    func downloadContinuityModule() async {
+        guard let notice = continuityNotice,
+              let moduleID = notice.destination.moduleID,
+              installingModuleID == nil
+        else { return }
+        continuityNotice = nil
+        installingModuleID = moduleID
+        installProgress = nil
+        defer {
+            installingModuleID = nil
+            installProgress = nil
+        }
+
+        do {
+            let available = try await service.remoteBibles()
+            guard available.contains(where: {
+                $0.id.caseInsensitiveCompare(moduleID) == .orderedSame
+            }) else {
+                throw ContinuityError.moduleUnavailable(moduleID)
+            }
+            try await service.installRemote(moduleID: moduleID) { [weak self] progress in
+                Task { @MainActor in self?.installProgress = progress }
+            }
+            modules = try await service.installedBibles()
+            try await activateModule(moduleID, restoring: false)
+            open(reference: notice.destination.reference)
+        } catch {
+            presentedError = PresentedError(error)
+        }
     }
 
     func open(url: URL) async {
@@ -644,6 +700,31 @@ struct PresentedError: Identifiable {
 
     init(_ error: any Error) {
         message = error.localizedDescription
+    }
+}
+
+struct ContinuityNotice: Identifiable {
+    let id = UUID()
+    let destination: ReaderDestination
+    let currentTranslationTitle: String?
+
+    var message: String {
+        let moduleID = destination.moduleID ?? "That Bible"
+        if let currentTranslationTitle {
+            return "\(moduleID) isn’t installed on this device. Keep \(destination.reference) open in \(currentTranslationTitle), or download \(moduleID) and continue there."
+        }
+        return "\(moduleID) isn’t installed on this device. Download it to continue at \(destination.reference)."
+    }
+}
+
+enum ContinuityError: LocalizedError {
+    case moduleUnavailable(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .moduleUnavailable(let moduleID):
+            "\(moduleID) is not currently available from CrossWire."
+        }
     }
 }
 

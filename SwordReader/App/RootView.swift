@@ -18,6 +18,18 @@ struct RootView: View {
                 dismissButton: .default(Text("OK"))
             )
         }
+        .alert(item: Bindable(model).continuityNotice) { notice in
+            Alert(
+                title: Text("Bible Not Installed"),
+                message: Text(notice.message),
+                primaryButton: .default(Text("Download & Continue")) {
+                    Task { await model.downloadContinuityModule() }
+                },
+                secondaryButton: .cancel(
+                    Text(notice.currentTranslationTitle == nil ? "Not Now" : "Use Current Bible")
+                )
+            )
+        }
         #if os(macOS)
         .sheet(isPresented: onboardingBinding) {
             OnboardingView().environment(model)
