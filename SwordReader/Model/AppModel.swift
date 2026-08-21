@@ -16,6 +16,10 @@ final class AppModel {
     private(set) var selectedChapter = 1
     private(set) var chapter: BibleChapter?
     private(set) var searchResults: [BibleSearchResult] = []
+    private(set) var searchMode: ScriptureSearchMode
+    private(set) var searchScope: ScriptureSearchScope
+    private(set) var searchProgress: Int?
+    private(set) var recentSearches: [String]
     private(set) var catalog: LocalCatalog?
     private(set) var remoteModules: [CatalogModule] = []
     private(set) var isLoading = false
@@ -32,6 +36,7 @@ final class AppModel {
     private let defaults: UserDefaults
     private var chapterTask: Task<Void, Never>?
     private var searchTask: Task<Void, Never>?
+    private var searchGeneration = UUID()
     private var remoteInstallTask: Task<Void, Error>?
     private static let moduleKey = "selectedBibleModule"
     private static let bookKeyPrefix = "readerBook."
@@ -41,6 +46,9 @@ final class AppModel {
     private static let readerTextSizeKey = "reader.textSize"
     private static let readerSpacingKey = "reader.spacing"
     private static let showsVerseNumbersKey = "reader.showsVerseNumbers"
+    private static let searchModeKey = "search.mode"
+    private static let searchScopeKey = "search.scope"
+    private static let recentSearchesKey = "search.recents"
 
     init(
         service: any ScriptureServing,
@@ -60,6 +68,15 @@ final class AppModel {
         showsVerseNumbers = defaults.object(
             forKey: Self.showsVerseNumbersKey
         ).map { _ in defaults.bool(forKey: Self.showsVerseNumbersKey) } ?? true
+        searchMode = ScriptureSearchMode(
+            rawValue: defaults.string(forKey: Self.searchModeKey) ?? ""
+        ) ?? .phrase
+        searchScope = ScriptureSearchScope(
+            rawValue: defaults.string(forKey: Self.searchScopeKey) ?? ""
+        ) ?? .wholeBible
+        recentSearches = defaults.stringArray(
+            forKey: Self.recentSearchesKey
+        ) ?? []
     }
 
     convenience init() {
@@ -116,6 +133,21 @@ final class AppModel {
     func setShowsVerseNumbers(_ shows: Bool) {
         showsVerseNumbers = shows
         defaults.set(shows, forKey: Self.showsVerseNumbersKey)
+    }
+
+    func setSearchMode(_ mode: ScriptureSearchMode) {
+        searchMode = mode
+        defaults.set(mode.rawValue, forKey: Self.searchModeKey)
+    }
+
+    func setSearchScope(_ scope: ScriptureSearchScope) {
+        searchScope = scope
+        defaults.set(scope.rawValue, forKey: Self.searchScopeKey)
+    }
+
+    func clearRecentSearches() {
+        recentSearches = []
+        defaults.removeObject(forKey: Self.recentSearchesKey)
     }
 
     var reference: String {
@@ -196,20 +228,45 @@ final class AppModel {
         guard !normalized.isEmpty, let selectedModuleID else {
             searchResults = []
             isSearching = false
+            searchProgress = nil
             return
         }
 
         isSearching = true
+        searchProgress = 0
+        rememberSearch(normalized)
+        let mode = searchMode
+        let scope = searchScope
+        let generation = UUID()
+        searchGeneration = generation
         searchTask = Task {
             do {
-                searchResults = try await service.search(normalized, moduleID: selectedModuleID)
+                searchResults = try await service.search(
+                    normalized,
+                    moduleID: selectedModuleID,
+                    mode: mode,
+                    scope: scope
+                ) { [weak self] percentage in
+                    Task { @MainActor in self?.searchProgress = percentage }
+                }
             } catch is CancellationError {
-                return
+                // A newer search owns the visible state.
             } catch {
                 presentedError = PresentedError(error)
             }
+            guard searchGeneration == generation else { return }
             isSearching = false
+            searchProgress = nil
         }
+    }
+
+    private func rememberSearch(_ query: String) {
+        recentSearches.removeAll {
+            $0.caseInsensitiveCompare(query) == .orderedSame
+        }
+        recentSearches.insert(query, at: 0)
+        recentSearches = Array(recentSearches.prefix(8))
+        defaults.set(recentSearches, forKey: Self.recentSearchesKey)
     }
 
     func inspectCatalog(at directory: URL) async {
@@ -431,7 +488,13 @@ private actor UnavailableScriptureService: ScriptureServing {
     func installedBibles() async throws -> [BibleModule] { throw error }
     func books(moduleID: String) async throws -> [BibleBook] { throw error }
     func chapter(_ reference: String, moduleID: String) async throws -> BibleChapter { throw error }
-    func search(_ query: String, moduleID: String) async throws -> [BibleSearchResult] { throw error }
+    func search(
+        _ query: String,
+        moduleID: String,
+        mode: ScriptureSearchMode,
+        scope: ScriptureSearchScope,
+        progress: @escaping @Sendable (Int) -> Void
+    ) async throws -> [BibleSearchResult] { throw error }
     func catalog(at directory: URL) async throws -> LocalCatalog { throw error }
     func install(moduleID: String, from catalog: LocalCatalog) async throws { throw error }
     func remoteBibles() async throws -> [CatalogModule] { throw error }

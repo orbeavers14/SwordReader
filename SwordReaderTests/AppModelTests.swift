@@ -232,6 +232,28 @@ struct AppModelTests {
 
         #expect(verse.annotationCount == 3)
     }
+
+    @Test func searchUsesSelectedOptionsAndStoresBoundedRecents() async throws {
+        let defaults = try #require(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+        let service = FakeScriptureService()
+        let model = AppModel(service: service, defaults: defaults)
+        await model.start()
+        model.setSearchMode(.allWords)
+        model.setSearchScope(.newTestament)
+
+        for index in 0..<10 {
+            model.search("query \(index)")
+            try await Task.sleep(for: .milliseconds(5))
+        }
+        try await Task.sleep(for: .milliseconds(20))
+
+        #expect(model.recentSearches.count == 8)
+        #expect(model.recentSearches.first == "query 9")
+        #expect(model.recentSearches.last == "query 2")
+        #expect(await service.lastSearchMode() == .allWords)
+        #expect(await service.lastSearchScope() == .newTestament)
+    }
 }
 
 private actor FakeScriptureService: ScriptureServing {
@@ -239,6 +261,8 @@ private actor FakeScriptureService: ScriptureServing {
     private var removedIDs: [String] = []
     private var installedRemoteIDs: [String] = []
     private let remoteInstallDelay: Duration
+    private var capturedSearchMode: ScriptureSearchMode?
+    private var capturedSearchScope: ScriptureSearchScope?
 
     init(modules: [BibleModule] = [
         BibleModule(
@@ -294,8 +318,17 @@ private actor FakeScriptureService: ScriptureServing {
         ]
     }
 
-    func search(_ query: String, moduleID: String) -> [BibleSearchResult] {
-        [BibleSearchResult(reference: "Ephesians 2:8", moduleID: moduleID, text: query, score: 100)]
+    func search(
+        _ query: String,
+        moduleID: String,
+        mode: ScriptureSearchMode,
+        scope: ScriptureSearchScope,
+        progress: @escaping @Sendable (Int) -> Void
+    ) -> [BibleSearchResult] {
+        capturedSearchMode = mode
+        capturedSearchScope = scope
+        progress(100)
+        return [BibleSearchResult(reference: "Ephesians 2:8", moduleID: moduleID, text: query, score: 100)]
     }
 
     func catalog(at directory: URL) -> LocalCatalog { LocalCatalog(directory: directory, modules: []) }
@@ -331,4 +364,6 @@ private actor FakeScriptureService: ScriptureServing {
 
     func removedModuleIDs() -> [String] { removedIDs }
     func installedRemoteModuleIDs() -> [String] { installedRemoteIDs }
+    func lastSearchMode() -> ScriptureSearchMode? { capturedSearchMode }
+    func lastSearchScope() -> ScriptureSearchScope? { capturedSearchScope }
 }
