@@ -67,6 +67,42 @@ struct BibleSearchResult: Identifiable, Hashable, Sendable {
     let score: Int
 }
 
+enum ScriptureSearchMode: String, CaseIterable, Identifiable, Sendable {
+    case phrase
+    case allWords
+    case regularExpression
+    case strongs
+    case morphology
+
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .phrase: "Phrase"
+        case .allWords: "All Words"
+        case .regularExpression: "Pattern"
+        case .strongs: "Strong’s"
+        case .morphology: "Morphology"
+        }
+    }
+}
+
+enum ScriptureSearchScope: String, CaseIterable, Identifiable, Sendable {
+    case wholeBible
+    case oldTestament
+    case newTestament
+
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .wholeBible: "Whole Bible"
+        case .oldTestament: "Old Testament"
+        case .newTestament: "New Testament"
+        }
+    }
+}
+
 struct CatalogModule: Identifiable, Hashable, Sendable {
     let id: String
     let title: String

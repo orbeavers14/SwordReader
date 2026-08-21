@@ -39,6 +39,10 @@ remove it after confirmation.
 - Supported module markup is rendered as native attributed text with a
   plain-text fallback. Verse notes and parsed cross-references open in a native
   sheet, and Scripture references navigate through the shared reader model.
+- Search supports phrase, all-word, regular-expression, Strong’s-number, and
+  morphology matching across the whole Bible or either testament. Results are
+  ranked, matched text is emphasized, progress is visible, and recent searches
+  remain on-device.
 
 ## Verify
 

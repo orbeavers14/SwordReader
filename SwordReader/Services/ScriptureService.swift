@@ -5,7 +5,13 @@ protocol ScriptureServing: Sendable {
     func installedBibles() async throws -> [BibleModule]
     func books(moduleID: String) async throws -> [BibleBook]
     func chapter(_ reference: String, moduleID: String) async throws -> BibleChapter
-    func search(_ query: String, moduleID: String) async throws -> [BibleSearchResult]
+    func search(
+        _ query: String,
+        moduleID: String,
+        mode: ScriptureSearchMode,
+        scope: ScriptureSearchScope,
+        progress: @escaping @Sendable (Int) -> Void
+    ) async throws -> [BibleSearchResult]
     func catalog(at directory: URL) async throws -> LocalCatalog
     func install(moduleID: String, from catalog: LocalCatalog) async throws
     func remoteBibles() async throws -> [CatalogModule]
@@ -111,12 +117,24 @@ actor SwordScriptureService: ScriptureServing {
         )
     }
 
-    func search(_ query: String, moduleID: String) async throws -> [BibleSearchResult] {
+    func search(
+        _ query: String,
+        moduleID: String,
+        mode: ScriptureSearchMode,
+        scope: ScriptureSearchScope,
+        progress: @escaping @Sendable (Int) -> Void
+    ) async throws -> [BibleSearchResult] {
         guard let module = library.module(named: moduleID) else {
             throw SwordError.moduleNotFound(moduleID)
         }
 
-        return try await module.searchAsync(query, caseSensitive: false).map {
+        return try await module.searchAsync(
+            query,
+            type: mode.swordType,
+            caseSensitive: false,
+            scope: scope.swordScope,
+            progress: progress
+        ).rankedByRelevance().map {
             BibleSearchResult(
                 reference: $0.reference.value,
                 moduleID: $0.moduleName,
@@ -199,5 +217,27 @@ actor SwordScriptureService: ScriptureServing {
             copyright: module.copyright,
             isBible: module.category == .bible
         )
+    }
+}
+
+private extension ScriptureSearchMode {
+    var swordType: SwordSearchType {
+        switch self {
+        case .phrase: .phrase
+        case .allWords: .multiWord
+        case .regularExpression: .regularExpression
+        case .strongs: .strongs
+        case .morphology: .morphology
+        }
+    }
+}
+
+private extension ScriptureSearchScope {
+    var swordScope: String? {
+        switch self {
+        case .wholeBible: nil
+        case .oldTestament: "Gen-Mal"
+        case .newTestament: "Matt-Rev"
+        }
     }
 }
