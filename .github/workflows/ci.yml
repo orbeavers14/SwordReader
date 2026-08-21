@@ -29,3 +29,15 @@ jobs:
           -scheme SwordReader
           -destination 'generic/platform=iOS'
           CODE_SIGNING_ALLOWED=NO
+
+  watchos:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build watchOS
+        run: >-
+          xcodebuild build
+          -project SwordReader.xcodeproj
+          -scheme SwordReader-watchOS
+          -destination 'generic/platform=watchOS'
+          CODE_SIGNING_ALLOWED=NO

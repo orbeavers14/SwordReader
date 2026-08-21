@@ -36,6 +36,12 @@ struct LibraryView: View {
                         if let copyright = module.copyright {
                             Text(copyright)
                         }
+                        #if os(iOS)
+                        Button("Send to Apple Watch", systemImage: "applewatch") {
+                            Task { await model.sendModuleToWatch(module.id) }
+                        }
+                        .disabled(model.sendingModuleID != nil)
+                        #endif
                         Button("Remove Bible", systemImage: "trash", role: .destructive) {
                             modulePendingRemoval = module
                         }
@@ -134,6 +140,10 @@ struct LibraryView: View {
         .overlay {
             if model.isInstalling {
                 ProgressView("Installing…")
+                    .padding()
+                    .background(.regularMaterial, in: .rect(cornerRadius: 12))
+            } else if let moduleID = model.sendingModuleID {
+                ProgressView("Sending \(moduleID) to Apple Watch…")
                     .padding()
                     .background(.regularMaterial, in: .rect(cornerRadius: 12))
             } else if model.removingModuleID != nil {
