@@ -229,6 +229,57 @@ struct AppModelTests {
         #expect(!restored.showsVerseNumbers)
     }
 
+    @Test func builtInChronologicalPlanCoversOneYear() throws {
+        let plan = try #require(
+            BuiltInReadingPlans.all.first { $0.id == "chronological-365" }
+        )
+
+        #expect(plan.days.count == 365)
+        #expect(plan.days.flatMap(\.readings).count == 1_189)
+        #expect(plan.days.first?.readings.first == "Genesis 1")
+        #expect(plan.days.last?.readings.last == "Revelation 22")
+    }
+
+    @Test func readingPlanProgressIsOptionalAndPersists() throws {
+        let defaults = try #require(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+        let first = AppModel(service: FakeScriptureService(), defaults: defaults)
+
+        #expect(first.readingPlanSelection == nil)
+        first.startReadingPlan("new-testament-90")
+        first.toggleReadingPlanDay(1)
+
+        let restored = AppModel(service: FakeScriptureService(), defaults: defaults)
+        #expect(restored.readingPlanSelection?.planID == "new-testament-90")
+        #expect(restored.readingPlanSelection?.completedDayIDs == [1])
+
+        restored.stopReadingPlan()
+        #expect(restored.readingPlanSelection == nil)
+    }
+
+    @Test func readingPlanReminderRequiresExplicitEnableAndStopsWithPlan() async throws {
+        let defaults = try #require(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+        let scheduler = FakeReadingPlanReminderScheduler()
+        let model = AppModel(
+            service: FakeScriptureService(),
+            reminderScheduler: scheduler,
+            defaults: defaults
+        )
+        model.startReadingPlan("new-testament-90")
+
+        #expect(scheduler.scheduledTimes.isEmpty)
+        let time = try #require(Calendar.current.date(from: DateComponents(hour: 8, minute: 15)))
+        await model.setReadingPlanReminder(at: time)
+
+        #expect(scheduler.scheduledTimes == [FakeReadingPlanReminderScheduler.Time(hour: 8, minute: 15)])
+        #expect(model.readingPlanReminderTime != nil)
+
+        model.stopReadingPlan()
+        #expect(scheduler.disableCount == 1)
+        #expect(model.readingPlanReminderTime == nil)
+    }
+
     @Test func verseCountsNotesAndCrossReferences() {
         let verse = BibleVerse(
             reference: "John 3:16",
@@ -421,6 +472,18 @@ private final class FakeCompanionSync: CompanionSyncing {
     func sendModule(moduleID: String) async throws {
         sentModuleIDs.append(moduleID)
     }
+}
+
+@MainActor
+private final class FakeReadingPlanReminderScheduler: ReadingPlanReminderScheduling {
+    struct Time: Equatable { let hour: Int; let minute: Int }
+    private(set) var scheduledTimes: [Time] = []
+    private(set) var disableCount = 0
+
+    func scheduleDaily(hour: Int, minute: Int) async throws {
+        scheduledTimes.append(Time(hour: hour, minute: minute))
+    }
+    func disable() { disableCount += 1 }
 }
 
 private actor FakeScriptureService: ScriptureServing {

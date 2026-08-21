@@ -205,6 +205,7 @@ struct StudyItem: Identifiable, Hashable, Sendable {
 
 enum AppSection: String, CaseIterable, Identifiable, Sendable {
     case read
+    case plans
     case search
     case library
 
@@ -213,6 +214,7 @@ enum AppSection: String, CaseIterable, Identifiable, Sendable {
     var title: String {
         switch self {
         case .read: "Read"
+        case .plans: "Plans"
         case .search: "Search"
         case .library: "Library"
         }
@@ -221,10 +223,17 @@ enum AppSection: String, CaseIterable, Identifiable, Sendable {
     var systemImage: String {
         switch self {
         case .read: "book.pages"
+        case .plans: "calendar"
         case .search: "magnifyingglass"
         case .library: "books.vertical"
         }
     }
+}
+
+struct ReadingPlanSelection: Codable, Hashable, Sendable {
+    let planID: String
+    let startedAt: Date
+    var completedDayIDs: Set<Int>
 }
 
 struct ReaderDestination: Codable, Hashable, Sendable {
