@@ -254,6 +254,67 @@ struct AppModelTests {
         #expect(await service.lastSearchMode() == .allWords)
         #expect(await service.lastSearchScope() == .newTestament)
     }
+
+    @Test func bookmarkPersistsThroughStudyStore() async {
+        let store = FakeStudyStore()
+        let model = AppModel(
+            service: FakeScriptureService(),
+            studyStore: store
+        )
+        await model.start()
+
+        await model.toggleBookmark(reference: "John 3:16")
+
+        #expect(model.isBookmarked(reference: "John 3:16"))
+        #expect(store.savedItems().map(\.reference) == ["John 3:16"])
+    }
+
+    @Test func noteCanBeUpdatedAndRemoved() async {
+        let store = FakeStudyStore()
+        let model = AppModel(
+            service: FakeScriptureService(),
+            studyStore: store
+        )
+        await model.start()
+
+        await model.saveNote("Remember this", reference: "John 3:16")
+        #expect(model.note(reference: "John 3:16") == "Remember this")
+
+        await model.saveNote("", reference: "John 3:16")
+        #expect(model.note(reference: "John 3:16") == nil)
+    }
+}
+
+@MainActor
+private final class FakeStudyStore: StudyDataServing {
+    private var items: [StudyItem] = []
+
+    func fetchAll() throws -> [StudyItem] { items }
+
+    func toggleBookmark(moduleID: String, reference: String) throws {
+        if let index = items.firstIndex(where: {
+            $0.kind == .bookmark && $0.moduleID == moduleID && $0.reference == reference
+        }) {
+            items.remove(at: index)
+        } else {
+            items.append(
+                StudyItem(kind: .bookmark, moduleID: moduleID, reference: reference, text: nil)
+            )
+        }
+    }
+
+    func saveNote(_ text: String?, moduleID: String, reference: String) throws {
+        items.removeAll {
+            $0.kind == .note && $0.moduleID == moduleID && $0.reference == reference
+        }
+        if let text, !text.isEmpty {
+            items.append(
+                StudyItem(kind: .note, moduleID: moduleID, reference: reference, text: text)
+            )
+        }
+    }
+
+    func savedItems() -> [StudyItem] { items }
 }
 
 private actor FakeScriptureService: ScriptureServing {

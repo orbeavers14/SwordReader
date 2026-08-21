@@ -43,6 +43,9 @@ remove it after confirmation.
   morphology matching across the whole Bible or either testament. Results are
   ranked, matched text is emphasized, progress is visible, and recent searches
   remain on-device.
+- Bookmarks and personal verse notes are stored separately from Bible modules in
+  a versioned SwiftData schema with an explicit migration plan. Removing or
+  updating a module does not silently delete the app-owned study records.
 
 ## Verify
 

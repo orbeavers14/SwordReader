@@ -127,6 +127,7 @@ private struct VerseView: View {
     @Environment(AppModel.self) private var model
     let verse: BibleVerse
     @State private var isShowingAnnotations = false
+    @State private var isEditingNote = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -142,24 +143,51 @@ private struct VerseView: View {
                 .lineSpacing(model.readerSpacing.lineSpacing)
                 .textSelection(.enabled)
 
-            if verse.annotationCount > 0 {
+            HStack(spacing: 18) {
+                if verse.annotationCount > 0 {
+                    Button {
+                        isShowingAnnotations = true
+                    } label: {
+                        Label(
+                            "\(verse.annotationCount) \(verse.annotationCount == 1 ? "note" : "notes")",
+                            systemImage: "text.bubble"
+                        )
+                    }
+                    .accessibilityHint("Shows notes and Scripture references for \(verse.reference)")
+                }
+
                 Button {
-                    isShowingAnnotations = true
+                    Task { await model.toggleBookmark(reference: verse.reference) }
                 } label: {
                     Label(
-                        "\(verse.annotationCount) \(verse.annotationCount == 1 ? "note" : "notes")",
-                        systemImage: "text.bubble"
+                        model.isBookmarked(reference: verse.reference) ? "Bookmarked" : "Bookmark",
+                        systemImage: model.isBookmarked(reference: verse.reference) ? "bookmark.fill" : "bookmark"
                     )
-                    .font(.caption)
                 }
-                .buttonStyle(.plain)
-                .foregroundStyle(.tint)
-                .accessibilityHint("Shows notes and Scripture references for \(verse.reference)")
+
+                Button {
+                    isEditingNote = true
+                } label: {
+                    Label(
+                        model.note(reference: verse.reference) == nil ? "Add Note" : "Edit Note",
+                        systemImage: "square.and.pencil"
+                    )
+                }
             }
+            .font(.caption)
+            .buttonStyle(.plain)
+            .foregroundStyle(.tint)
         }
         .sheet(isPresented: $isShowingAnnotations) {
             VerseAnnotationsView(verse: verse)
                 .environment(model)
+        }
+        .sheet(isPresented: $isEditingNote) {
+            StudyNoteEditor(
+                reference: verse.reference,
+                initialText: model.note(reference: verse.reference) ?? ""
+            )
+            .environment(model)
         }
     }
 
@@ -172,6 +200,42 @@ private struct VerseView: View {
         } else {
             Text(verse.content)
         }
+    }
+}
+
+private struct StudyNoteEditor: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.dismiss) private var dismiss
+    let reference: String
+    @State private var text: String
+
+    init(reference: String, initialText: String) {
+        self.reference = reference
+        _text = State(initialValue: initialText)
+    }
+
+    var body: some View {
+        NavigationStack {
+            TextEditor(text: $text)
+                .font(.body)
+                .padding()
+                .navigationTitle(reference)
+                .toolbarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") { dismiss() }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Save") {
+                            Task {
+                                await model.saveNote(text, reference: reference)
+                                dismiss()
+                            }
+                        }
+                    }
+                }
+        }
+        .frame(minWidth: 360, minHeight: 280)
     }
 }
 

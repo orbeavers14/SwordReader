@@ -171,6 +171,19 @@ enum ReaderSpacing: String, CaseIterable, Identifiable, Sendable {
     var title: String { rawValue.capitalized }
 }
 
+struct StudyItem: Identifiable, Hashable, Sendable {
+    enum Kind: String, Hashable, Sendable {
+        case bookmark
+        case note
+    }
+
+    var id: String { "\(kind.rawValue):\(moduleID):\(reference)" }
+    let kind: Kind
+    let moduleID: String
+    let reference: String
+    let text: String?
+}
+
 enum AppSection: String, CaseIterable, Identifiable, Sendable {
     case read
     case search
