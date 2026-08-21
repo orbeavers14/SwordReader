@@ -36,6 +36,9 @@ remove it after confirmation.
   serif, or rounded design, text-size, spacing, and verse-number choices.
 - Publisher-supplied Scripture headings are rendered as accessible headings in
   the native reading flow.
+- Supported module markup is rendered as native attributed text with a
+  plain-text fallback. Verse notes and parsed cross-references open in a native
+  sheet, and Scripture references navigate through the shared reader model.
 
 ## Verify
 

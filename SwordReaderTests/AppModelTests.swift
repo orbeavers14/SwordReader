@@ -214,6 +214,24 @@ struct AppModelTests {
         #expect(restored.readerSpacing == .relaxed)
         #expect(!restored.showsVerseNumbers)
     }
+
+    @Test func verseCountsNotesAndCrossReferences() {
+        let verse = BibleVerse(
+            reference: "John 3:16",
+            number: "16",
+            text: "For God so loved the world.",
+            content: AttributedString("For God so loved the world."),
+            headings: [],
+            footnotes: [
+                BibleFootnote(id: "1", text: "Or, only begotten", type: nil)
+            ],
+            crossReferences: [
+                BibleCrossReference(id: "2", references: ["Romans 5:8", "1 John 4:9"])
+            ]
+        )
+
+        #expect(verse.annotationCount == 3)
+    }
 }
 
 private actor FakeScriptureService: ScriptureServing {
