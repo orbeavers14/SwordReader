@@ -24,6 +24,7 @@ final class AppModel {
     private(set) var searchProgress: Int?
     private(set) var recentSearches: [String]
     private(set) var studyItems: [StudyItem] = []
+    private(set) var readingHistory: [ReadingHistoryEntry]
     private(set) var catalog: LocalCatalog?
     private(set) var remoteModules: [CatalogModule] = []
     private(set) var isLoading = false
@@ -55,6 +56,7 @@ final class AppModel {
     private static let searchModeKey = "search.mode"
     private static let searchScopeKey = "search.scope"
     private static let recentSearchesKey = "search.recents"
+    private static let readingHistoryKey = "reader.history"
 
     init(
         service: any ScriptureServing,
@@ -85,6 +87,9 @@ final class AppModel {
         recentSearches = defaults.stringArray(
             forKey: Self.recentSearchesKey
         ) ?? []
+        readingHistory = defaults.data(forKey: Self.readingHistoryKey)
+            .flatMap { try? JSONDecoder().decode([ReadingHistoryEntry].self, from: $0) }
+            ?? []
     }
 
     convenience init() {
@@ -215,6 +220,11 @@ final class AppModel {
         books.first { $0.id == selectedBookID }
     }
 
+    var currentDestination: ReaderDestination? {
+        guard let selectedModuleID, !reference.isEmpty else { return nil }
+        return ReaderDestination(moduleID: selectedModuleID, reference: reference)
+    }
+
     var canMoveToPreviousChapter: Bool {
         guard let selectedBookID,
               let index = books.firstIndex(where: { $0.id == selectedBookID })
@@ -250,6 +260,7 @@ final class AppModel {
         selectedBookID = book.id
         selectedChapter = chapter
         persistLocation()
+        rememberReadingLocation()
         loadChapter()
     }
 
@@ -257,6 +268,30 @@ final class AppModel {
         section = .read
         guard let location = location(from: newReference) else { return }
         select(bookID: location.book.id, chapter: location.chapter)
+    }
+
+    func open(destination: ReaderDestination) async {
+        if let moduleID = destination.moduleID,
+           modules.contains(where: { $0.id == moduleID }),
+           moduleID != selectedModuleID {
+            do {
+                try await activateModule(moduleID, restoring: true)
+            } catch {
+                presentedError = PresentedError(error)
+                return
+            }
+        }
+        open(reference: destination.reference)
+    }
+
+    func open(url: URL) async {
+        guard let destination = ReaderDestination(url: url) else { return }
+        await open(destination: destination)
+    }
+
+    func clearReadingHistory() {
+        readingHistory = []
+        defaults.removeObject(forKey: Self.readingHistoryKey)
     }
 
     func moveChapter(by offset: Int) {
@@ -528,6 +563,25 @@ final class AppModel {
             selectedChapter,
             forKey: Self.chapterKeyPrefix + selectedModuleID
         )
+    }
+
+    private func rememberReadingLocation() {
+        guard let selectedModuleID, !reference.isEmpty else { return }
+        readingHistory.removeAll {
+            $0.moduleID == selectedModuleID && $0.reference == reference
+        }
+        readingHistory.insert(
+            ReadingHistoryEntry(
+                moduleID: selectedModuleID,
+                reference: reference,
+                visitedAt: .now
+            ),
+            at: 0
+        )
+        readingHistory = Array(readingHistory.prefix(50))
+        if let data = try? JSONEncoder().encode(readingHistory) {
+            defaults.set(data, forKey: Self.readingHistoryKey)
+        }
     }
 
     private func location(

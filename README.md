@@ -50,6 +50,9 @@ remove it after confirmation.
   layouts stack translations, wider layouts place them side by side, missing
   verses stay explicit, and genuine Strong’s links expose original-language
   relationships without implying links that the modules do not provide.
+- Reading history is bounded and deduplicated, `swordreader://read` links carry
+  stable module/reference destinations, and each iPad or Mac window owns its own
+  restorable reading model. Mac commands follow the focused window.
 
 ## Verify
 

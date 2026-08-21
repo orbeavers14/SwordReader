@@ -226,3 +226,45 @@ enum AppSection: String, CaseIterable, Identifiable, Sendable {
         }
     }
 }
+
+struct ReaderDestination: Codable, Hashable, Sendable {
+    let moduleID: String?
+    let reference: String
+
+    init(moduleID: String? = nil, reference: String) {
+        self.moduleID = moduleID
+        self.reference = reference
+    }
+
+    init?(url: URL) {
+        guard url.scheme?.lowercased() == "swordreader",
+              url.host?.lowercased() == "read",
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let reference = components.queryItems?.first(
+                where: { $0.name == "reference" }
+              )?.value,
+              !reference.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        else { return nil }
+
+        self.reference = reference
+        moduleID = components.queryItems?.first { $0.name == "module" }?.value
+    }
+
+    var url: URL? {
+        var components = URLComponents()
+        components.scheme = "swordreader"
+        components.host = "read"
+        components.queryItems = [
+            URLQueryItem(name: "reference", value: reference),
+            moduleID.map { URLQueryItem(name: "module", value: $0) }
+        ].compactMap { $0 }
+        return components.url
+    }
+}
+
+struct ReadingHistoryEntry: Codable, Identifiable, Hashable, Sendable {
+    var id: String { "\(moduleID):\(reference)" }
+    let moduleID: String
+    let reference: String
+    let visitedAt: Date
+}
