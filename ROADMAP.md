@@ -27,10 +27,15 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 - [x] Optional built-in reading plans, saved progress, and opt-in reminders
 - [x] System-aware Dark Mode with optional appearance overrides, non-color-only
   selection states, VoiceOver traits, and native Mac keyboard navigation
+- [x] App and Watch privacy manifests with documented no-collection and
+  no-tracking posture
 
 ## Ordered milestones
 
-1. Privacy, licensing, performance, localization, and release preparation
+1. In-app privacy, licensing, and open-source notices
+2. Performance profiling and large-module safeguards
+3. Localization foundation and English string catalog
+4. App identity, icons, launch presentation, and release preparation
 
 ## Platform direction
 
