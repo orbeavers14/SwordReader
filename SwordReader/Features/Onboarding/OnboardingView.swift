@@ -42,6 +42,7 @@ struct OnboardingView: View {
                     detail: "Each Bible module has separate copyright and distribution terms shown in the Library."
                 )
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 36)
 
             Spacer(minLength: 20)
@@ -102,9 +103,15 @@ private struct OnboardingFeature: View {
                 .frame(width: 32)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 3) {
-                Text(title).font(.headline)
-                Text(detail).foregroundStyle(.secondary)
+                Text(title)
+                    .font(.headline)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(detail)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
