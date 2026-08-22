@@ -46,15 +46,17 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
   editable GitHub issue drafts, and native Copy and Share alternatives
 - [x] User-approved CrossWire, eBible.org, and custom HTTPS SWORD module
   sources with persistent source management and catalog compatibility checks
+- [x] System-selected iOS and iPadOS light, dark, and tinted app-icon artwork
+  with release-time dimension, opacity, and appearance validation
 
 ## Ordered milestones
 
-1. System-adaptive layered app icon
+1. Liquid Glass layered app icon
    - Rebuild the current book-and-sword mark as editable layers in Apple Icon
      Composer rather than relying only on flattened PNG artwork.
-   - Tune and preview Default, Dark, Clear Light, Clear Dark, Tinted Light, and
-     Tinted Dark appearances on iPhone, iPad, and Mac while keeping the same
-     recognizable silhouette in every appearance.
+   - Import the existing default, dark, and monochrome artwork and tune Default,
+     Dark, Clear Light, Clear Dark, Tinted Light, and Tinted Dark appearances on
+     iPhone, iPad, and Mac while keeping the same recognizable silhouette.
    - Provide the native layered watchOS rendering, recognizing that watchOS does
      not currently expose the appearance variants available on iOS and macOS.
    - Verify legibility and contrast at every system-generated size, on varied

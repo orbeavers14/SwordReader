@@ -35,12 +35,23 @@ fi
 
 for icon in \
     SwordReader/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png \
+    SwordReader/Assets.xcassets/AppIcon.appiconset/AppIcon-Dark-1024.png \
+    SwordReader/Assets.xcassets/AppIcon.appiconset/AppIcon-Tinted-1024.png \
     SwordReaderWatch/Assets.xcassets/AppIcon.appiconset/AppIcon-1024.png; do
     width="$(sips -g pixelWidth "$icon" | awk '/pixelWidth/ { print $2 }')"
     height="$(sips -g pixelHeight "$icon" | awk '/pixelHeight/ { print $2 }')"
     alpha="$(sips -g hasAlpha "$icon" | awk '/hasAlpha/ { print $2 }')"
     if [[ "$width" != "1024" || "$height" != "1024" || "$alpha" != "no" ]]; then
         echo "$icon must be an opaque 1024×1024 PNG."
+        exit 1
+    fi
+done
+
+for appearance in dark tinted; do
+    if ! jq -e --arg appearance "$appearance" \
+        '.images[] | select(.platform == "ios") | select(.appearances[]?.value == $appearance)' \
+        SwordReader/Assets.xcassets/AppIcon.appiconset/Contents.json >/dev/null; then
+        echo "The iOS AppIcon set is missing its $appearance appearance."
         exit 1
     fi
 done
