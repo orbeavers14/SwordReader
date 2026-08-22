@@ -5,6 +5,7 @@ struct LibraryView: View {
     @Environment(AppModel.self) private var model
     @State private var isImporting = false
     @State private var modulePendingRemoval: BibleModule?
+    @State private var keyedModulePendingRemoval: KeyedModule?
     @State private var isShowingRemoteAccessWarning = false
     @State private var isShowingModuleBrowser = false
     @State private var isShowingPrivacyAndLicenses = false
@@ -59,16 +60,41 @@ struct LibraryView: View {
                 }
             }
 
+            Section("Books & Devotionals") {
+                if model.keyedModules.isEmpty {
+                    Text("No books or devotionals installed")
+                        .foregroundStyle(.secondary)
+                }
+                ForEach(model.keyedModules) { module in
+                    NavigationLink {
+                        KeyedModuleReaderView(module: module)
+                            .environment(model)
+                    } label: {
+                        moduleDescription(
+                            title: module.title,
+                            details: [module.category.title, module.language, module.version]
+                        )
+                    }
+                    .contextMenu {
+                        if let copyright = module.copyright { Text(copyright) }
+                        Button("Remove", systemImage: "trash", role: .destructive) {
+                            keyedModulePendingRemoval = module
+                        }
+                    }
+                }
+            }
+
             if let catalog = model.catalog {
                 Section("Available in \(catalog.directory.lastPathComponent)") {
-                    ForEach(catalog.modules.filter(\.isBible)) { module in
+                    ForEach(catalog.modules.filter { $0.compatibility == .compatible }) { module in
                         HStack {
                             moduleDescription(
                                 title: module.title,
                                 details: [module.id, module.language, module.version]
                             )
                             Spacer()
-                            if model.modules.contains(where: { $0.id == module.id }) {
+                            if model.modules.contains(where: { $0.id == module.id })
+                                || model.keyedModules.contains(where: { $0.id == module.id }) {
                                 Text("Installed")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
@@ -89,7 +115,7 @@ struct LibraryView: View {
         .navigationTitle("Library")
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button("Get Bibles", systemImage: "arrow.down.circle") {
+                Button("Get Modules", systemImage: "arrow.down.circle") {
                     isShowingRemoteAccessWarning = true
                 }
             }
@@ -155,6 +181,23 @@ struct LibraryView: View {
         } message: { module in
             Text("\(module.title) will be removed from this device. You can install it again from its source catalog.")
         }
+        .confirmationDialog(
+            "Remove \(keyedModulePendingRemoval?.title ?? "module")?",
+            isPresented: Binding(
+                get: { keyedModulePendingRemoval != nil },
+                set: { if !$0 { keyedModulePendingRemoval = nil } }
+            ),
+            titleVisibility: .visible,
+            presenting: keyedModulePendingRemoval
+        ) { module in
+            Button("Remove", role: .destructive) {
+                keyedModulePendingRemoval = nil
+                Task { await model.removeKeyedModule(id: module.id) }
+            }
+            Button("Cancel", role: .cancel) { keyedModulePendingRemoval = nil }
+        } message: { module in
+            Text("\(module.title) will be removed from this device.")
+        }
         .overlay {
             if model.isInstalling {
                 ProgressView("Installing…")
@@ -181,6 +224,80 @@ struct LibraryView: View {
             Text(details.compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · "))
                 .font(.caption)
                 .foregroundStyle(.secondary)
+        }
+    }
+}
+
+private struct KeyedModuleReaderView: View {
+    @Environment(AppModel.self) private var model
+    let module: KeyedModule
+    @State private var keys: [String] = []
+    @State private var isLoading = true
+
+    var body: some View {
+        Group {
+            if isLoading {
+                ProgressView("Opening \(module.category.title)…")
+            } else if keys.isEmpty {
+                ContentUnavailableView(
+                    "No Readable Entries",
+                    systemImage: "text.book.closed",
+                    description: Text("This module did not provide any navigable entries.")
+                )
+            } else {
+                List(keys, id: \.self) { key in
+                    NavigationLink {
+                        KeyedEntryView(module: module, key: key)
+                            .environment(model)
+                    } label: {
+                        Text(Self.displayTitle(for: key))
+                    }
+                }
+            }
+        }
+        .navigationTitle(module.title)
+        .task {
+            do {
+                keys = try await model.keyedEntryKeys(moduleID: module.id)
+            } catch {
+                model.presentedError = PresentedError(error)
+            }
+            isLoading = false
+        }
+    }
+
+    private static func displayTitle(for key: String) -> String {
+        key.split(separator: "/").last.map(String.init) ?? key
+    }
+}
+
+private struct KeyedEntryView: View {
+    @Environment(AppModel.self) private var model
+    let module: KeyedModule
+    let key: String
+    @State private var entry: KeyedModuleEntry?
+
+    var body: some View {
+        ScrollView {
+            if let entry {
+                Text(entry.text)
+                    .font(.body)
+                    .textSelection(.enabled)
+                    .frame(maxWidth: 720, alignment: .leading)
+                    .padding()
+            } else {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+                    .padding()
+            }
+        }
+        .navigationTitle(key.split(separator: "/").last.map(String.init) ?? key)
+        .task(id: key) {
+            do {
+                entry = try await model.keyedEntry(moduleID: module.id, key: key)
+            } catch {
+                model.presentedError = PresentedError(error)
+            }
         }
     }
 }

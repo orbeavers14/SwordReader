@@ -8,6 +8,48 @@ struct BibleModule: Identifiable, Hashable, Sendable {
     let copyright: String?
 }
 
+enum ModuleContentCategory: String, Hashable, Sendable {
+    case bible
+    case commentary
+    case dictionary
+    case generalBook
+    case devotional
+    case other
+
+    var title: String {
+        switch self {
+        case .bible: String(localized: "Bible")
+        case .commentary: String(localized: "Commentary")
+        case .dictionary: String(localized: "Dictionary")
+        case .generalBook: String(localized: "Book")
+        case .devotional: String(localized: "Devotional")
+        case .other: String(localized: "Other")
+        }
+    }
+
+    var supportsReading: Bool {
+        switch self {
+        case .bible, .dictionary, .generalBook, .devotional: true
+        case .commentary, .other: false
+        }
+    }
+}
+
+struct KeyedModule: Identifiable, Hashable, Sendable {
+    let id: String
+    let title: String
+    let language: String
+    let version: String?
+    let copyright: String?
+    let category: ModuleContentCategory
+}
+
+struct KeyedModuleEntry: Hashable, Sendable {
+    let key: String
+    let text: String
+    let html: String
+}
+
 struct BibleBook: Identifiable, Hashable, Sendable {
     enum Testament: Hashable, Sendable {
         case old
@@ -128,11 +170,51 @@ struct CatalogModule: Identifiable, Hashable, Sendable {
     let language: String
     let version: String?
     let copyright: String?
-    let isBible: Bool
+    let category: ModuleContentCategory
     let sourceID: String
 
+    var isBible: Bool { category == .bible }
+
+    init(
+        id: String,
+        title: String,
+        language: String,
+        version: String?,
+        copyright: String?,
+        category: ModuleContentCategory,
+        sourceID: String
+    ) {
+        self.id = id
+        self.title = title
+        self.language = language
+        self.version = version
+        self.copyright = copyright
+        self.category = category
+        self.sourceID = sourceID
+    }
+
+    init(
+        id: String,
+        title: String,
+        language: String,
+        version: String?,
+        copyright: String?,
+        isBible: Bool,
+        sourceID: String
+    ) {
+        self.init(
+            id: id,
+            title: title,
+            language: language,
+            version: version,
+            copyright: copyright,
+            category: isBible ? .bible : .other,
+            sourceID: sourceID
+        )
+    }
+
     var compatibility: ModuleCompatibility {
-        if !isBible { return .unsupportedCategory }
+        if !category.supportsReading { return .unsupportedCategory }
         if id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
             language.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return .missingMetadata

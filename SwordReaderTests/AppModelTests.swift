@@ -4,6 +4,32 @@ import Testing
 
 @MainActor
 struct AppModelTests {
+    @Test func loadsAndReadsInstalledGeneralBook() async throws {
+        let module = KeyedModule(
+            id: "DarkNight",
+            title: "The Dark Night of the Soul",
+            language: "en",
+            version: "1.0",
+            copyright: nil,
+            category: .generalBook
+        )
+        let service = FakeScriptureService(
+            keyedModules: [module],
+            keyedEntries: ["DarkNight": [
+                KeyedModuleEntry(key: "/Book/Chapter 1", text: "On a dark night…", html: "")
+            ]]
+        )
+        let model = AppModel(service: service)
+
+        await model.start()
+        let keys = try await model.keyedEntryKeys(moduleID: module.id)
+        let entry = try await model.keyedEntry(moduleID: module.id, key: keys[0])
+
+        #expect(model.keyedModules == [module])
+        #expect(keys == ["/Book/Chapter 1"])
+        #expect(entry.text == "On a dark night…")
+    }
+
     @Test func catalogFilterIncludesModuleCategoriesAndFiltersLanguage() {
         let modules = [
             CatalogModule(id: "ASV", title: "American Standard Version", language: "en", version: nil, copyright: nil, isBible: true, sourceID: "crosswire"),
@@ -643,6 +669,8 @@ private final class FakeReadingPlanReminderScheduler: ReadingPlanReminderSchedul
 
 private actor FakeScriptureService: ScriptureServing {
     private var availableModules: [BibleModule]
+    private var availableKeyedModules: [KeyedModule]
+    private var availableKeyedEntries: [String: [KeyedModuleEntry]]
     private var removedIDs: [String] = []
     private var installedRemoteIDs: [String] = []
     private let remoteInstallDelay: Duration
@@ -658,15 +686,32 @@ private actor FakeScriptureService: ScriptureServing {
             version: nil,
             copyright: nil
         )
-    ], remoteInstallDelay: Duration = .zero,
+    ], keyedModules: [KeyedModule] = [],
+       keyedEntries: [String: [KeyedModuleEntry]] = [:],
+       remoteInstallDelay: Duration = .zero,
        searchResults: [BibleSearchResult]? = nil) {
         availableModules = modules
+        availableKeyedModules = keyedModules
+        availableKeyedEntries = keyedEntries
         self.remoteInstallDelay = remoteInstallDelay
         providedSearchResults = searchResults
     }
 
     func installedBibles() -> [BibleModule] {
         availableModules
+    }
+
+    func installedKeyedModules() -> [KeyedModule] { availableKeyedModules }
+
+    func keyedEntryKeys(moduleID: String) -> [String] {
+        availableKeyedEntries[moduleID, default: []].map(\.key)
+    }
+
+    func keyedEntry(moduleID: String, key: String) throws -> KeyedModuleEntry {
+        guard let entry = availableKeyedEntries[moduleID]?.first(where: { $0.key == key }) else {
+            throw CocoaError(.fileNoSuchFile)
+        }
+        return entry
     }
 
     func chapter(_ reference: String, moduleID: String) -> BibleChapter {

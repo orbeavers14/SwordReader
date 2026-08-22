@@ -3,6 +3,9 @@ import SwordKit
 
 protocol ScriptureServing: Sendable {
     func installedBibles() async throws -> [BibleModule]
+    func installedKeyedModules() async throws -> [KeyedModule]
+    func keyedEntryKeys(moduleID: String) async throws -> [String]
+    func keyedEntry(moduleID: String, key: String) async throws -> KeyedModuleEntry
     func books(moduleID: String) async throws -> [BibleBook]
     func chapter(_ reference: String, moduleID: String) async throws -> BibleChapter
     func parallelChapter(
@@ -61,6 +64,37 @@ actor SwordScriptureService: ScriptureServing {
             )
         }
         .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
+    }
+
+    func installedKeyedModules() -> [KeyedModule] {
+        library.modules
+            .filter { $0.category.supportsKeyedEntries }
+            .map {
+                KeyedModule(
+                    id: $0.name,
+                    title: $0.title.isEmpty ? $0.name : $0.title,
+                    language: $0.language,
+                    version: $0.version,
+                    copyright: $0.copyright,
+                    category: $0.category.contentCategory
+                )
+            }
+            .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
+    }
+
+    func keyedEntryKeys(moduleID: String) throws -> [String] {
+        guard let module = library.module(named: moduleID) else {
+            throw SwordError.moduleNotFound(moduleID)
+        }
+        return try module.keyedEntryKeys()
+    }
+
+    func keyedEntry(moduleID: String, key: String) throws -> KeyedModuleEntry {
+        guard let module = library.module(named: moduleID) else {
+            throw SwordError.moduleNotFound(moduleID)
+        }
+        let entry = try module.keyedEntry(for: key)
+        return KeyedModuleEntry(key: entry.key, text: entry.text, html: entry.html)
     }
 
     func books(moduleID: String) throws -> [BibleBook] {
@@ -197,7 +231,7 @@ actor SwordScriptureService: ScriptureServing {
                     language: $0.language,
                     version: $0.version,
                     copyright: $0.copyright,
-                    isBible: $0.category == .bible,
+                    category: $0.category.contentCategory,
                     sourceID: "local"
                 )
             }
@@ -261,7 +295,7 @@ actor SwordScriptureService: ScriptureServing {
             language: module.language,
             version: module.version,
             copyright: module.copyright,
-            isBible: module.category == .bible,
+            category: module.category.contentCategory,
             sourceID: sourceID
         )
     }
@@ -275,6 +309,19 @@ actor SwordScriptureService: ScriptureServing {
             directory: source.catalogPath,
             packageDirectory: source.packagePath
         )
+    }
+}
+
+private extension SwordModule.Category {
+    var contentCategory: ModuleContentCategory {
+        switch self {
+        case .bible: .bible
+        case .commentary: .commentary
+        case .dictionary: .dictionary
+        case .generalBook: .generalBook
+        case .devotional: .devotional
+        case .other: .other
+        }
     }
 }
 

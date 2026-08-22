@@ -58,7 +58,7 @@ struct RemoteModuleBrowser: View {
                     }
                 }
             }
-            .navigationTitle("Get Bibles")
+            .navigationTitle("Get Modules")
             .searchable(text: $query, prompt: "Name, abbreviation, or language")
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -150,6 +150,9 @@ struct RemoteModuleBrowser: View {
                 .joined(separator: " · "))
                 .font(.caption)
                 .foregroundStyle(.secondary)
+            Text(module.category.title)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
             Text("Source: \(selectedSource.host)")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
@@ -158,7 +161,8 @@ struct RemoteModuleBrowser: View {
 
     @ViewBuilder
     private func installControl(for module: CatalogModule) -> some View {
-        if model.modules.contains(where: { $0.id == module.id }) {
+        if model.modules.contains(where: { $0.id == module.id })
+            || model.keyedModules.contains(where: { $0.id == module.id }) {
             Text("Installed")
                 .font(.caption)
                 .foregroundStyle(.secondary)

@@ -12,6 +12,7 @@ final class AppModel {
     private(set) var showsVerseNumbers: Bool
     private(set) var appAppearance: AppAppearance
     private(set) var modules: [BibleModule] = []
+    private(set) var keyedModules: [KeyedModule] = []
     private(set) var selectedModuleID: String?
     private(set) var books: [BibleBook] = []
     private(set) var selectedBookID: String?
@@ -235,6 +236,7 @@ final class AppModel {
         do {
             studyItems = try studyStore?.fetchAll() ?? []
             modules = try await service.installedBibles()
+            keyedModules = try await service.installedKeyedModules()
             isPresentingOnboarding = modules.isEmpty || !hasCompletedOnboarding
             let saved = defaults.string(forKey: Self.moduleKey)
             let moduleID = modules.contains(where: { $0.id == saved })
@@ -609,7 +611,10 @@ final class AppModel {
         do {
             try await service.install(moduleID: module.id, from: catalog)
             modules = try await service.installedBibles()
-            try await activateModule(module.id, restoring: true)
+            keyedModules = try await service.installedKeyedModules()
+            if module.isBible {
+                try await activateModule(module.id, restoring: true)
+            }
             self.catalog = nil
         } catch {
             presentedError = PresentedError(error)
@@ -656,7 +661,10 @@ final class AppModel {
         do {
             try await task.value
             modules = try await service.installedBibles()
-            try await activateModule(module.id, restoring: true)
+            keyedModules = try await service.installedKeyedModules()
+            if module.isBible {
+                try await activateModule(module.id, restoring: true)
+            }
         } catch is CancellationError {
             // Cancellation is an explicit user action, not an error to present.
         } catch {
@@ -726,6 +734,26 @@ final class AppModel {
         } catch {
             presentedError = PresentedError(error)
         }
+    }
+
+    func removeKeyedModule(id moduleID: String) async {
+        guard keyedModules.contains(where: { $0.id == moduleID }) else { return }
+        removingModuleID = moduleID
+        defer { removingModuleID = nil }
+        do {
+            try await service.remove(moduleID: moduleID)
+            keyedModules = try await service.installedKeyedModules()
+        } catch {
+            presentedError = PresentedError(error)
+        }
+    }
+
+    func keyedEntryKeys(moduleID: String) async throws -> [String] {
+        try await service.keyedEntryKeys(moduleID: moduleID)
+    }
+
+    func keyedEntry(moduleID: String, key: String) async throws -> KeyedModuleEntry {
+        try await service.keyedEntry(moduleID: moduleID, key: key)
     }
 
     func sendModuleToWatch(_ moduleID: String) async {
@@ -896,6 +924,9 @@ private actor UnavailableScriptureService: ScriptureServing {
     }
 
     func installedBibles() async throws -> [BibleModule] { throw error }
+    func installedKeyedModules() async throws -> [KeyedModule] { throw error }
+    func keyedEntryKeys(moduleID: String) async throws -> [String] { throw error }
+    func keyedEntry(moduleID: String, key: String) async throws -> KeyedModuleEntry { throw error }
     func books(moduleID: String) async throws -> [BibleBook] { throw error }
     func chapter(_ reference: String, moduleID: String) async throws -> BibleChapter { throw error }
     func parallelChapter(
