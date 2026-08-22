@@ -4,6 +4,13 @@ import Testing
 
 @MainActor
 struct AppModelTests {
+    @Test func MacUpdateLinkUsesLatestGitHubRelease() {
+        #expect(
+            AppUpdateLink.latestReleaseURL.absoluteString
+                == "https://github.com/orbeavers14/SwordReader/releases/latest"
+        )
+    }
+
     @Test func loadsAndReadsInstalledGeneralBook() async throws {
         let module = KeyedModule(
             id: "DarkNight",

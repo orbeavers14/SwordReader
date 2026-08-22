@@ -1,10 +1,23 @@
 #if os(macOS)
+import AppKit
 import SwiftUI
+
+enum AppUpdateLink {
+    static let latestReleaseURL = URL(
+        string: "https://github.com/orbeavers14/SwordReader/releases/latest"
+    )!
+}
 
 struct SwordReaderCommands: Commands {
     @FocusedValue(\.swordReaderModel) private var model
 
     var body: some Commands {
+        CommandGroup(after: .appInfo) {
+            Button("Check for Updates…") {
+                NSWorkspace.shared.open(AppUpdateLink.latestReleaseURL)
+            }
+        }
+
         CommandMenu("Navigate") {
             Button("Previous Chapter") { model?.moveChapter(by: -1) }
                 .keyboardShortcut(.leftArrow, modifiers: [.command])
