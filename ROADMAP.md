@@ -45,9 +45,54 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 
 ## Ordered milestones
 
-The initial development roadmap is complete. Remaining launch work requires
-Apple Developer signing, device testing, App Store records, screenshots,
-support and privacy-policy URLs, and beta feedback.
+1. User-reviewed feedback and bug reporting
+   - Add a native Feedback screen with separate feature-request and bug-report
+     paths.
+   - Collect app version, platform, OS version, installed module identifiers and
+     versions, and optional reproduction steps in a preview the user can edit.
+   - Exclude notes, bookmarks, search history, Scripture text, file paths, and
+     other personal content by default.
+   - Open a prefilled SwordReader GitHub issue form in the system browser. The
+     user must review and submit it through their own GitHub session; the app
+     must not embed a GitHub token or silently publish a report.
+   - Offer Copy and Share alternatives for people without a GitHub account.
+
+2. Multiple module sources and compatibility inspection
+   - Support a curated list of HTTPS SWORD repositories in addition to
+     CrossWire, while keeping each source disabled until the user explicitly
+     enables network access to it.
+   - Add an advanced custom-source form for a repository name, HTTPS host,
+     catalog path, and raw-package path; reject insecure or malformed endpoints.
+   - Inspect catalogs and raw SWORD ZIP packages before installation. Show the
+     source host, module identifier, category, language, version, copyright and
+     distribution terms, package size when available, and compatibility result.
+   - Initially accept Bible-category modules with readable SWORD configuration
+     and content supported by the pinned SwordKit/SWORD release. Clearly reject
+     unsupported module categories, unsafe archives, missing metadata, duplicate
+     identifiers, and formats that are not packaged as SWORD modules.
+   - Keep local document-picker import for offline SWORD repositories and add a
+     reviewed raw-ZIP import path when SwordKit can provide the same validation
+     report used for remote sources.
+   - Persist only sources the user approves, provide source removal and catalog
+     refresh controls, and preserve publisher licensing boundaries.
+
+3. System-adaptive layered app icon
+   - Rebuild the current book-and-sword mark as editable layers in Apple Icon
+     Composer rather than relying only on flattened PNG artwork.
+   - Tune and preview Default, Dark, Clear Light, Clear Dark, Tinted Light, and
+     Tinted Dark appearances on iPhone, iPad, and Mac while keeping the same
+     recognizable silhouette in every appearance.
+   - Provide the native layered watchOS rendering, recognizing that watchOS does
+     not currently expose the appearance variants available on iOS and macOS.
+   - Verify legibility and contrast at every system-generated size, on varied
+     wallpapers, with system tint colors, and with Increase Contrast enabled.
+   - Retain the current asset-catalog icons as compatibility fallbacks until the
+     minimum supported OS and Xcode release make the Icon Composer asset safe to
+     adopt exclusively.
+
+4. Launch coordination
+   - Complete Apple Developer signing, physical-device testing, App Store
+     records, screenshots, support and privacy-policy URLs, and beta feedback.
 
 ## Platform direction
 
