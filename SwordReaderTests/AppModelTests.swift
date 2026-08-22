@@ -4,6 +4,134 @@ import Testing
 
 @MainActor
 struct AppModelTests {
+    @Test func loadsAndReadsInstalledGeneralBook() async throws {
+        let module = KeyedModule(
+            id: "DarkNight",
+            title: "The Dark Night of the Soul",
+            language: "en",
+            version: "1.0",
+            copyright: nil,
+            category: .generalBook
+        )
+        let service = FakeScriptureService(
+            keyedModules: [module],
+            keyedEntries: ["DarkNight": [
+                KeyedModuleEntry(key: "/Book/Chapter 1", text: "On a dark night…", html: "")
+            ]]
+        )
+        let model = AppModel(service: service)
+
+        await model.start()
+        let keys = try await model.keyedEntryKeys(moduleID: module.id)
+        let entry = try await model.keyedEntry(moduleID: module.id, key: keys[0])
+
+        #expect(model.keyedModules == [module])
+        #expect(keys == ["/Book/Chapter 1"])
+        #expect(entry.text == "On a dark night…")
+    }
+
+    @Test func catalogFilterIncludesModuleCategoriesAndFiltersLanguage() {
+        let modules = [
+            CatalogModule(id: "ASV", title: "American Standard Version", language: "en", version: nil, copyright: nil, isBible: true, sourceID: "crosswire"),
+            CatalogModule(id: "BAS", title: "Basque New Testament", language: "eu", version: nil, copyright: nil, isBible: true, sourceID: "crosswire"),
+            CatalogModule(id: "DEV", title: "A Devotional", language: "en", version: nil, copyright: nil, isBible: false, sourceID: "crosswire"),
+            CatalogModule(id: "BAD", title: "Missing Language", language: "", version: nil, copyright: nil, isBible: true, sourceID: "crosswire")
+        ]
+
+        #expect(Set(CatalogFilter.availableLanguages(in: modules)) == ["en", "eu"])
+        #expect(CatalogFilter.apply(to: modules, query: "", language: nil).map(\.id) == ["ASV", "BAS", "DEV", "BAD"])
+        #expect(CatalogFilter.apply(to: modules, query: "", language: "eu").map(\.id) == ["BAS"])
+        #expect(CatalogFilter.apply(to: modules, query: "standard", language: nil).map(\.id) == ["ASV"])
+    }
+
+    @Test func moduleSourceRejectsInsecureAndMalformedEndpoints() throws {
+        #expect(throws: ModuleSourceError.self) {
+            try ModuleSource.validated(
+                name: "Insecure",
+                host: "http://example.com",
+                catalogPath: "/sword",
+                packagePath: "/sword/zip"
+            )
+        }
+        #expect(throws: ModuleSourceError.self) {
+            try ModuleSource.validated(
+                name: "Traversal",
+                host: "example.com",
+                catalogPath: "/sword/../private",
+                packagePath: "/sword/zip"
+            )
+        }
+    }
+
+    @Test func approvedModuleSourcesPersistAndCanBeRemoved() throws {
+        let defaults = try #require(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+        let source = try ModuleSource.validated(
+            name: "Example Bibles",
+            host: "modules.example.org",
+            catalogPath: "/sword/raw",
+            packagePath: "/sword/packages"
+        )
+        let first = AppModel(service: FakeScriptureService(), defaults: defaults)
+
+        first.approveModuleSource(source)
+        #expect(first.moduleSources.contains(source))
+
+        let restored = AppModel(service: FakeScriptureService(), defaults: defaults)
+        #expect(restored.moduleSources.contains(source))
+
+        restored.removeModuleSource(source.id)
+        #expect(!restored.moduleSources.contains(source))
+        #expect(restored.moduleSources.contains(.crossWire))
+    }
+
+    @Test func feedbackReportIncludesOnlyReviewedDiagnostics() throws {
+        let report = FeedbackReport(
+            kind: .bug,
+            title: "Chapter does not open",
+            details: "The reader remains on the previous chapter.",
+            reproductionSteps: "1. Open John 3\n2. Choose chapter 4",
+            diagnostics: FeedbackDiagnostics(
+                appVersion: "0.1.0 (1)",
+                platform: "macOS",
+                osVersion: "15.6",
+                modules: ["KJV 2.11", "WEB"]
+            )
+        )
+
+        let body = report.body
+
+        #expect(body.contains("The reader remains on the previous chapter."))
+        #expect(body.contains("KJV 2.11, WEB"))
+        #expect(!body.localizedCaseInsensitiveContains("bookmark"))
+        #expect(!body.localizedCaseInsensitiveContains("search history"))
+        #expect(!body.localizedCaseInsensitiveContains("file path"))
+    }
+
+    @Test func feedbackReportBuildsEditableGitHubIssueURL() throws {
+        let report = FeedbackReport(
+            kind: .feature,
+            title: "Reading themes",
+            details: "Please add more reading themes.",
+            reproductionSteps: "",
+            diagnostics: FeedbackDiagnostics(
+                appVersion: "0.1.0 (1)",
+                platform: "iOS",
+                osVersion: "19.0",
+                modules: []
+            )
+        )
+
+        let url = try #require(report.githubIssueURL)
+        let components = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false))
+        let query = Dictionary(uniqueKeysWithValues: (components.queryItems ?? []).map { ($0.name, $0.value ?? "") })
+
+        #expect(components.host == "github.com")
+        #expect(components.path == "/orbeavers14/SwordReader/issues/new")
+        #expect(query["title"] == "[Feature] Reading themes")
+        #expect(query["body"]?.contains("Please add more reading themes.") == true)
+    }
+
     @Test func startSelectsFirstInstalledBible() async {
         let service = FakeScriptureService()
         let model = AppModel(service: service)
@@ -34,6 +162,21 @@ struct AppModelTests {
         )
         await restored.start()
         #expect(!restored.isPresentingOnboarding)
+    }
+
+    @Test func completedOnboardingReturnsOnLaunchWhenNoBibleIsInstalled() async throws {
+        let defaults = try #require(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+        defaults.set(true, forKey: "completedOnboarding")
+        let model = AppModel(
+            service: FakeScriptureService(modules: []),
+            defaults: defaults
+        )
+
+        await model.start()
+
+        #expect(model.modules.isEmpty)
+        #expect(model.isPresentingOnboarding)
     }
 
     @Test func removingSelectedBibleFallsBackToRemainingModule() async throws {
@@ -526,6 +669,8 @@ private final class FakeReadingPlanReminderScheduler: ReadingPlanReminderSchedul
 
 private actor FakeScriptureService: ScriptureServing {
     private var availableModules: [BibleModule]
+    private var availableKeyedModules: [KeyedModule]
+    private var availableKeyedEntries: [String: [KeyedModuleEntry]]
     private var removedIDs: [String] = []
     private var installedRemoteIDs: [String] = []
     private let remoteInstallDelay: Duration
@@ -541,15 +686,32 @@ private actor FakeScriptureService: ScriptureServing {
             version: nil,
             copyright: nil
         )
-    ], remoteInstallDelay: Duration = .zero,
+    ], keyedModules: [KeyedModule] = [],
+       keyedEntries: [String: [KeyedModuleEntry]] = [:],
+       remoteInstallDelay: Duration = .zero,
        searchResults: [BibleSearchResult]? = nil) {
         availableModules = modules
+        availableKeyedModules = keyedModules
+        availableKeyedEntries = keyedEntries
         self.remoteInstallDelay = remoteInstallDelay
         providedSearchResults = searchResults
     }
 
     func installedBibles() -> [BibleModule] {
         availableModules
+    }
+
+    func installedKeyedModules() -> [KeyedModule] { availableKeyedModules }
+
+    func keyedEntryKeys(moduleID: String) -> [String] {
+        availableKeyedEntries[moduleID, default: []].map(\.key)
+    }
+
+    func keyedEntry(moduleID: String, key: String) throws -> KeyedModuleEntry {
+        guard let entry = availableKeyedEntries[moduleID]?.first(where: { $0.key == key }) else {
+            throw CocoaError(.fileNoSuchFile)
+        }
+        return entry
     }
 
     func chapter(_ reference: String, moduleID: String) -> BibleChapter {
@@ -627,15 +789,16 @@ private actor FakeScriptureService: ScriptureServing {
     func catalog(at directory: URL) -> LocalCatalog { LocalCatalog(directory: directory, modules: []) }
     func install(moduleID: String, from catalog: LocalCatalog) {}
 
-    func remoteBibles() -> [CatalogModule] {
+    func remoteBibles(from source: ModuleSource) -> [CatalogModule] {
         [
-            CatalogModule(id: "WEB", title: "World English Bible", language: "en", version: nil, copyright: "Public domain", isBible: true),
-            CatalogModule(id: "ASV", title: "American Standard Version", language: "en", version: "1.2", copyright: "Public domain", isBible: true)
+            CatalogModule(id: "WEB", title: "World English Bible", language: "en", version: nil, copyright: "Public domain", isBible: true, sourceID: source.id),
+            CatalogModule(id: "ASV", title: "American Standard Version", language: "en", version: "1.2", copyright: "Public domain", isBible: true, sourceID: source.id)
         ]
     }
 
     func installRemote(
         moduleID: String,
+        from source: ModuleSource,
         progress: @escaping @Sendable (ModuleTransferProgress) -> Void
     ) async throws {
         progress(ModuleTransferProgress(completedBytes: 50, totalBytes: 100))

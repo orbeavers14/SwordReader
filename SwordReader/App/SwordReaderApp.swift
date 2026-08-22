@@ -6,10 +6,14 @@ struct SwordReaderApp: App {
         WindowGroup {
             SwordReaderSceneView()
         }
+        #if os(macOS)
+        .defaultSize(width: 1_100, height: 760)
+        #endif
         WindowGroup("Passage", for: ReaderDestination.self) { destination in
             SwordReaderSceneView(initialDestination: destination.wrappedValue)
         }
         #if os(macOS)
+        .defaultSize(width: 1_100, height: 760)
         .commands { SwordReaderCommands() }
         #endif
     }

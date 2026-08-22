@@ -12,6 +12,7 @@ final class AppModel {
     private(set) var showsVerseNumbers: Bool
     private(set) var appAppearance: AppAppearance
     private(set) var modules: [BibleModule] = []
+    private(set) var keyedModules: [KeyedModule] = []
     private(set) var selectedModuleID: String?
     private(set) var books: [BibleBook] = []
     private(set) var selectedBookID: String?
@@ -32,6 +33,8 @@ final class AppModel {
     private(set) var readingPlanReminderTime: Date?
     private(set) var catalog: LocalCatalog?
     private(set) var remoteModules: [CatalogModule] = []
+    private(set) var moduleSources: [ModuleSource]
+    private(set) var selectedModuleSourceID: String
     private(set) var isLoading = false
     private(set) var isSearching = false
     private(set) var isInstalling = false
@@ -70,6 +73,8 @@ final class AppModel {
     private static let readingPlanKey = "plans.selection"
     private static let readingPlanReminderHourKey = "plans.reminder.hour"
     private static let readingPlanReminderMinuteKey = "plans.reminder.minute"
+    private static let moduleSourcesKey = "modules.approvedSources"
+    private static let selectedModuleSourceKey = "modules.selectedSource"
     private static let maximumVisibleSearchResults = 250
 
     var searchResultsWereLimited: Bool {
@@ -117,6 +122,15 @@ final class AppModel {
             ?? []
         readingPlanSelection = defaults.data(forKey: Self.readingPlanKey)
             .flatMap { try? JSONDecoder().decode(ReadingPlanSelection.self, from: $0) }
+        let savedSources = defaults.data(forKey: Self.moduleSourcesKey)
+            .flatMap { try? JSONDecoder().decode([ModuleSource].self, from: $0) }
+            ?? []
+        let approvedSources = [ModuleSource.crossWire] + savedSources.filter { $0.id != ModuleSource.crossWire.id }
+        moduleSources = approvedSources
+        let savedSourceID = defaults.string(forKey: Self.selectedModuleSourceKey)
+        selectedModuleSourceID = approvedSources.contains(where: { $0.id == savedSourceID })
+            ? (savedSourceID ?? ModuleSource.crossWire.id)
+            : ModuleSource.crossWire.id
         if defaults.object(forKey: Self.readingPlanReminderHourKey) != nil {
             readingPlanReminderTime = Calendar.current.date(
                 from: DateComponents(
@@ -216,12 +230,14 @@ final class AppModel {
     }
 
     func start() async {
-        isPresentingOnboarding = !defaults.bool(
+        let hasCompletedOnboarding = defaults.bool(
             forKey: Self.completedOnboardingKey
         )
         do {
             studyItems = try studyStore?.fetchAll() ?? []
             modules = try await service.installedBibles()
+            keyedModules = try await service.installedKeyedModules()
+            isPresentingOnboarding = modules.isEmpty || !hasCompletedOnboarding
             let saved = defaults.string(forKey: Self.moduleKey)
             let moduleID = modules.contains(where: { $0.id == saved })
                 ? saved
@@ -231,6 +247,7 @@ final class AppModel {
                 try await activateModule(moduleID, restoring: true)
             }
         } catch {
+            isPresentingOnboarding = !hasCompletedOnboarding
             presentedError = PresentedError(error)
         }
     }
@@ -439,13 +456,14 @@ final class AppModel {
         }
 
         do {
-            let available = try await service.remoteBibles()
+            let source = moduleSources.first(where: { $0.id == selectedModuleSourceID }) ?? .crossWire
+            let available = try await service.remoteBibles(from: source)
             guard available.contains(where: {
                 $0.id.caseInsensitiveCompare(moduleID) == .orderedSame
             }) else {
                 throw ContinuityError.moduleUnavailable(moduleID)
             }
-            try await service.installRemote(moduleID: moduleID) { [weak self] progress in
+            try await service.installRemote(moduleID: moduleID, from: source) { [weak self] progress in
                 Task { @MainActor in self?.installProgress = progress }
             }
             modules = try await service.installedBibles()
@@ -593,19 +611,27 @@ final class AppModel {
         do {
             try await service.install(moduleID: module.id, from: catalog)
             modules = try await service.installedBibles()
-            try await activateModule(module.id, restoring: true)
+            keyedModules = try await service.installedKeyedModules()
+            if module.isBible {
+                try await activateModule(module.id, restoring: true)
+            }
             self.catalog = nil
         } catch {
             presentedError = PresentedError(error)
         }
     }
 
-    func refreshRemoteCatalog() async {
+    func refreshRemoteCatalog(sourceID: String? = nil) async {
         guard !isRefreshingRemoteCatalog else { return }
+        if let sourceID, moduleSources.contains(where: { $0.id == sourceID }) {
+            selectedModuleSourceID = sourceID
+            defaults.set(sourceID, forKey: Self.selectedModuleSourceKey)
+        }
+        guard let source = moduleSources.first(where: { $0.id == selectedModuleSourceID }) else { return }
         isRefreshingRemoteCatalog = true
         defer { isRefreshingRemoteCatalog = false }
         do {
-            remoteModules = try await service.remoteBibles().sorted {
+            remoteModules = try await service.remoteBibles(from: source).sorted {
                 if $0.id == "ASV" { return true }
                 if $1.id == "ASV" { return false }
                 return $0.title.localizedStandardCompare($1.title) == .orderedAscending
@@ -623,7 +649,10 @@ final class AppModel {
         installProgress = nil
 
         let task = Task {
-            try await service.installRemote(moduleID: module.id) { [weak self] progress in
+            guard let source = moduleSources.first(where: { $0.id == module.sourceID }) else {
+                throw ModuleSourceError.invalidEndpoint
+            }
+            try await service.installRemote(moduleID: module.id, from: source) { [weak self] progress in
                 Task { @MainActor in self?.installProgress = progress }
             }
         }
@@ -632,7 +661,10 @@ final class AppModel {
         do {
             try await task.value
             modules = try await service.installedBibles()
-            try await activateModule(module.id, restoring: true)
+            keyedModules = try await service.installedKeyedModules()
+            if module.isBible {
+                try await activateModule(module.id, restoring: true)
+            }
         } catch is CancellationError {
             // Cancellation is an explicit user action, not an error to present.
         } catch {
@@ -645,6 +677,30 @@ final class AppModel {
 
     func cancelRemoteInstall() {
         remoteInstallTask?.cancel()
+    }
+
+    func approveModuleSource(_ source: ModuleSource) {
+        guard !moduleSources.contains(where: { $0.id == source.id }) else { return }
+        moduleSources.append(source)
+        persistModuleSources()
+    }
+
+    func removeModuleSource(_ sourceID: String) {
+        guard sourceID != ModuleSource.crossWire.id else { return }
+        moduleSources.removeAll { $0.id == sourceID }
+        if selectedModuleSourceID == sourceID {
+            selectedModuleSourceID = ModuleSource.crossWire.id
+            remoteModules = []
+            defaults.set(selectedModuleSourceID, forKey: Self.selectedModuleSourceKey)
+        }
+        persistModuleSources()
+    }
+
+    private func persistModuleSources() {
+        let saved = moduleSources.filter { $0.id != ModuleSource.crossWire.id }
+        if let data = try? JSONEncoder().encode(saved) {
+            defaults.set(data, forKey: Self.moduleSourcesKey)
+        }
     }
 
     func removeModule(id moduleID: String) async {
@@ -678,6 +734,26 @@ final class AppModel {
         } catch {
             presentedError = PresentedError(error)
         }
+    }
+
+    func removeKeyedModule(id moduleID: String) async {
+        guard keyedModules.contains(where: { $0.id == moduleID }) else { return }
+        removingModuleID = moduleID
+        defer { removingModuleID = nil }
+        do {
+            try await service.remove(moduleID: moduleID)
+            keyedModules = try await service.installedKeyedModules()
+        } catch {
+            presentedError = PresentedError(error)
+        }
+    }
+
+    func keyedEntryKeys(moduleID: String) async throws -> [String] {
+        try await service.keyedEntryKeys(moduleID: moduleID)
+    }
+
+    func keyedEntry(moduleID: String, key: String) async throws -> KeyedModuleEntry {
+        try await service.keyedEntry(moduleID: moduleID, key: key)
     }
 
     func sendModuleToWatch(_ moduleID: String) async {
@@ -848,6 +924,9 @@ private actor UnavailableScriptureService: ScriptureServing {
     }
 
     func installedBibles() async throws -> [BibleModule] { throw error }
+    func installedKeyedModules() async throws -> [KeyedModule] { throw error }
+    func keyedEntryKeys(moduleID: String) async throws -> [String] { throw error }
+    func keyedEntry(moduleID: String, key: String) async throws -> KeyedModuleEntry { throw error }
     func books(moduleID: String) async throws -> [BibleBook] { throw error }
     func chapter(_ reference: String, moduleID: String) async throws -> BibleChapter { throw error }
     func parallelChapter(
@@ -863,9 +942,10 @@ private actor UnavailableScriptureService: ScriptureServing {
     ) async throws -> [BibleSearchResult] { throw error }
     func catalog(at directory: URL) async throws -> LocalCatalog { throw error }
     func install(moduleID: String, from catalog: LocalCatalog) async throws { throw error }
-    func remoteBibles() async throws -> [CatalogModule] { throw error }
+    func remoteBibles(from source: ModuleSource) async throws -> [CatalogModule] { throw error }
     func installRemote(
         moduleID: String,
+        from source: ModuleSource,
         progress: @escaping @Sendable (ModuleTransferProgress) -> Void
     ) async throws { throw error }
     func remove(moduleID: String) async throws { throw error }

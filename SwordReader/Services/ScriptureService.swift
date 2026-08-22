@@ -3,6 +3,9 @@ import SwordKit
 
 protocol ScriptureServing: Sendable {
     func installedBibles() async throws -> [BibleModule]
+    func installedKeyedModules() async throws -> [KeyedModule]
+    func keyedEntryKeys(moduleID: String) async throws -> [String]
+    func keyedEntry(moduleID: String, key: String) async throws -> KeyedModuleEntry
     func books(moduleID: String) async throws -> [BibleBook]
     func chapter(_ reference: String, moduleID: String) async throws -> BibleChapter
     func parallelChapter(
@@ -18,9 +21,10 @@ protocol ScriptureServing: Sendable {
     ) async throws -> [BibleSearchResult]
     func catalog(at directory: URL) async throws -> LocalCatalog
     func install(moduleID: String, from catalog: LocalCatalog) async throws
-    func remoteBibles() async throws -> [CatalogModule]
+    func remoteBibles(from source: ModuleSource) async throws -> [CatalogModule]
     func installRemote(
         moduleID: String,
+        from source: ModuleSource,
         progress: @escaping @Sendable (ModuleTransferProgress) -> Void
     ) async throws
     func remove(moduleID: String) async throws
@@ -29,7 +33,6 @@ protocol ScriptureServing: Sendable {
 actor SwordScriptureService: ScriptureServing {
     private let library: SwordLibrary
     private let installer: SwordModuleInstaller
-    private let repository: SwordModuleRepository
 
     init() throws {
         let location = try SwordModuleLocation.applicationSupport()
@@ -48,7 +51,6 @@ actor SwordScriptureService: ScriptureServing {
                 repositories: [repository]
             )
         )
-        self.repository = repository
     }
 
     func installedBibles() -> [BibleModule] {
@@ -62,6 +64,37 @@ actor SwordScriptureService: ScriptureServing {
             )
         }
         .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
+    }
+
+    func installedKeyedModules() -> [KeyedModule] {
+        library.modules
+            .filter { $0.category.supportsKeyedEntries }
+            .map {
+                KeyedModule(
+                    id: $0.name,
+                    title: $0.title.isEmpty ? $0.name : $0.title,
+                    language: $0.language,
+                    version: $0.version,
+                    copyright: $0.copyright,
+                    category: $0.category.contentCategory
+                )
+            }
+            .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
+    }
+
+    func keyedEntryKeys(moduleID: String) throws -> [String] {
+        guard let module = library.module(named: moduleID) else {
+            throw SwordError.moduleNotFound(moduleID)
+        }
+        return try module.keyedEntryKeys()
+    }
+
+    func keyedEntry(moduleID: String, key: String) throws -> KeyedModuleEntry {
+        guard let module = library.module(named: moduleID) else {
+            throw SwordError.moduleNotFound(moduleID)
+        }
+        let entry = try module.keyedEntry(for: key)
+        return KeyedModuleEntry(key: entry.key, text: entry.text, html: entry.html)
     }
 
     func books(moduleID: String) throws -> [BibleBook] {
@@ -198,7 +231,8 @@ actor SwordScriptureService: ScriptureServing {
                     language: $0.language,
                     version: $0.version,
                     copyright: $0.copyright,
-                    isBible: $0.category == .bible
+                    category: $0.category.contentCategory,
+                    sourceID: "local"
                 )
             }
         )
@@ -210,21 +244,23 @@ actor SwordScriptureService: ScriptureServing {
         library.refresh()
     }
 
-    func remoteBibles() async throws -> [CatalogModule] {
+    func remoteBibles(from source: ModuleSource) async throws -> [CatalogModule] {
+        let repository = try Self.repository(for: source)
         let catalog = try await installer.refreshCatalog(
             for: repository,
             acknowledgingRemoteAccessRisks: true
         )
         return catalog.modules
-            .filter { $0.category == .bible }
-            .map(Self.catalogModule)
+            .map { Self.catalogModule($0, sourceID: source.id) }
             .sorted { $0.title.localizedStandardCompare($1.title) == .orderedAscending }
     }
 
     func installRemote(
         moduleID: String,
+        from source: ModuleSource,
         progress: @escaping @Sendable (ModuleTransferProgress) -> Void
     ) async throws {
+        let repository = try Self.repository(for: source)
         try await installer.install(
             moduleNamed: moduleID,
             from: repository,
@@ -250,7 +286,8 @@ actor SwordScriptureService: ScriptureServing {
     }
 
     private static func catalogModule(
-        _ module: SwordModuleCatalogEntry
+        _ module: SwordModuleCatalogEntry,
+        sourceID: String
     ) -> CatalogModule {
         CatalogModule(
             id: module.name,
@@ -258,8 +295,33 @@ actor SwordScriptureService: ScriptureServing {
             language: module.language,
             version: module.version,
             copyright: module.copyright,
-            isBible: module.category == .bible
+            category: module.category.contentCategory,
+            sourceID: sourceID
         )
+    }
+
+    private static func repository(for source: ModuleSource) throws -> SwordModuleRepository {
+        try SwordModuleRepository(
+            identifier: source.id,
+            name: source.name,
+            transport: .https,
+            host: source.host,
+            directory: source.catalogPath,
+            packageDirectory: source.packagePath
+        )
+    }
+}
+
+private extension SwordModule.Category {
+    var contentCategory: ModuleContentCategory {
+        switch self {
+        case .bible: .bible
+        case .commentary: .commentary
+        case .dictionary: .dictionary
+        case .generalBook: .generalBook
+        case .devotional: .devotional
+        case .other: .other
+        }
     }
 }
 

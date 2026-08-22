@@ -6,7 +6,14 @@ struct RootView: View {
     var body: some View {
         Group {
             #if os(macOS)
-            SplitRootView()
+            if model.isPresentingOnboarding {
+                OnboardingView()
+                    .environment(model)
+                    .frame(minWidth: 760, minHeight: 620)
+            } else {
+                SplitRootView()
+                    .frame(minWidth: 760, minHeight: 620)
+            }
             #else
             TabRootView()
             #endif
@@ -30,11 +37,7 @@ struct RootView: View {
                 )
             )
         }
-        #if os(macOS)
-        .sheet(isPresented: onboardingBinding) {
-            OnboardingView().environment(model)
-        }
-        #else
+        #if !os(macOS)
         .fullScreenCover(isPresented: onboardingBinding) {
             OnboardingView().environment(model)
         }
