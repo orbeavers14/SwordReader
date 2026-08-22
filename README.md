@@ -74,6 +74,16 @@ xcodebuild test \
 
 CI also builds the generic iOS destination to validate iPhone and iPad support.
 
+For a clean pre-release audit that also validates metadata and compiles Release
+configurations for every current platform, run:
+
+```sh
+./Scripts/release-check.sh
+```
+
+The signing, physical-device, TestFlight, privacy, and store-listing gates are
+tracked in [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md).
+
 ## App Store privacy summary
 
 - Data collection: None

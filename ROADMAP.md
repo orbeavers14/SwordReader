@@ -40,6 +40,8 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
   assets
 - [x] Pre-release versioning, production bundle identity, launch metadata, and
   independent Watch companion declaration
+- [x] Repeatable offline release audit and physical-device/TestFlight acceptance
+  checklist
 
 ## Ordered milestones
 
