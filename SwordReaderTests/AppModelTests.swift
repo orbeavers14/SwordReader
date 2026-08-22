@@ -4,6 +4,30 @@ import Testing
 
 @MainActor
 struct AppModelTests {
+    @Test func keyedEntryFormatterRendersHTMLWithoutShowingMarkup() {
+        let entry = KeyedModuleEntry(
+            key: "/Book/Chapter III",
+            text: "<title>CHAPTER III</title><p>Readable body text.</p>",
+            html: "<h1>CHAPTER III</h1><p>Readable body text.</p>"
+        )
+
+        let rendered = String(KeyedEntryFormatter.attributedString(for: entry).characters)
+
+        #expect(rendered.contains("CHAPTER III"))
+        #expect(rendered.contains("Readable body text."))
+        #expect(!rendered.contains("<h1>"))
+        #expect(!rendered.contains("<p>"))
+    }
+
+    @Test func keyedEntryNavigationFindsAdjacentEntries() {
+        let keys = ["Chapter I", "Chapter II", "Chapter III"]
+
+        #expect(KeyedEntryNavigation.adjacentKey(to: "Chapter II", offset: -1, in: keys) == "Chapter I")
+        #expect(KeyedEntryNavigation.adjacentKey(to: "Chapter II", offset: 1, in: keys) == "Chapter III")
+        #expect(KeyedEntryNavigation.adjacentKey(to: "Chapter I", offset: -1, in: keys) == nil)
+        #expect(KeyedEntryNavigation.adjacentKey(to: "Chapter III", offset: 1, in: keys) == nil)
+    }
+
     @Test func MacUpdateLinkUsesLatestGitHubRelease() {
         #expect(
             AppUpdateLink.latestReleaseURL.absoluteString
