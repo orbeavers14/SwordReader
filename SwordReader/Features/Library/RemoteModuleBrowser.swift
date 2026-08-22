@@ -7,6 +7,7 @@ struct RemoteModuleBrowser: View {
     @State private var selectedLanguage: String?
     @State private var isShowingSources = false
     @State private var pendingSource: ModuleSource?
+    @State private var modulePendingRemoval: CatalogModule?
 
     private var selectedSource: ModuleSource {
         model.moduleSources.first(where: { $0.id == model.selectedModuleSourceID }) ?? .crossWire
@@ -60,6 +61,25 @@ struct RemoteModuleBrowser: View {
             }
             .navigationTitle("Get Modules")
             .searchable(text: $query, prompt: "Name, abbreviation, or language")
+            .safeAreaInset(edge: .top) {
+                HStack {
+                    Label("Language", systemImage: "globe")
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Picker("Language", selection: $selectedLanguage) {
+                        Text("All Languages").tag(String?.none)
+                        ForEach(availableLanguages, id: \.self) { code in
+                            Text(CatalogFilter.languageName(for: code))
+                                .tag(Optional(code))
+                        }
+                    }
+                    .labelsHidden()
+                    .pickerStyle(.menu)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .background(.bar)
+            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Done") { dismiss() }
@@ -69,23 +89,6 @@ struct RemoteModuleBrowser: View {
                         Task { await model.refreshRemoteCatalog() }
                     }
                     .disabled(model.isRefreshingRemoteCatalog || model.installingModuleID != nil)
-                }
-                ToolbarItem(placement: .secondaryAction) {
-                    Menu {
-                        Picker("Language", selection: $selectedLanguage) {
-                            Text("All Languages").tag(String?.none)
-                            ForEach(availableLanguages, id: \.self) { code in
-                                Text(CatalogFilter.languageName(for: code))
-                                    .tag(Optional(code))
-                            }
-                        }
-                    } label: {
-                        Label(
-                            selectedLanguage.map(CatalogFilter.languageName(for:)) ?? "All Languages",
-                            systemImage: "line.3.horizontal.decrease.circle"
-                        )
-                    }
-                    .help("Filter by Language")
                 }
                 ToolbarItem(placement: .secondaryAction) {
                     Menu(selectedSource.name, systemImage: "server.rack") {
@@ -129,6 +132,29 @@ struct RemoteModuleBrowser: View {
         } message: { source in
             Text("SwordReader will contact \(source.host) to retrieve its SWORD catalog. The source receives the network information needed to serve this request.")
         }
+        .confirmationDialog(
+            "Remove \(modulePendingRemoval?.title ?? "module")?",
+            isPresented: Binding(
+                get: { modulePendingRemoval != nil },
+                set: { if !$0 { modulePendingRemoval = nil } }
+            ),
+            titleVisibility: .visible,
+            presenting: modulePendingRemoval
+        ) { module in
+            Button("Remove from This Device", role: .destructive) {
+                modulePendingRemoval = nil
+                Task {
+                    if module.isBible {
+                        await model.removeModule(id: module.id)
+                    } else {
+                        await model.removeKeyedModule(id: module.id)
+                    }
+                }
+            }
+            Button("Cancel", role: .cancel) { modulePendingRemoval = nil }
+        } message: { module in
+            Text("\(module.title) will be removed from this device. You can download it again later.")
+        }
     }
 
     private func moduleDescription(_ module: CatalogModule) -> some View {
@@ -163,9 +189,18 @@ struct RemoteModuleBrowser: View {
     private func installControl(for module: CatalogModule) -> some View {
         if model.modules.contains(where: { $0.id == module.id })
             || model.keyedModules.contains(where: { $0.id == module.id }) {
-            Text("Installed")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            HStack(spacing: 8) {
+                Text("Installed")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Button("Remove \(module.title)", systemImage: "trash", role: .destructive) {
+                    modulePendingRemoval = module
+                }
+                .labelStyle(.iconOnly)
+                .buttonStyle(.borderless)
+                .disabled(model.removingModuleID != nil)
+                .help("Remove from This Device")
+            }
         } else if model.installingModuleID == module.id {
             HStack(spacing: 8) {
                 if let fraction = model.installProgress?.fractionCompleted {

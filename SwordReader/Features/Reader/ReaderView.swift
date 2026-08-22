@@ -4,6 +4,7 @@ struct ReaderView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.openWindow) private var openWindow
     @Environment(\.supportsMultipleWindows) private var supportsMultipleWindows
+    @State private var isChoosingBook = false
     @State private var isChoosingChapter = false
     @State private var isShowingComparison = false
 
@@ -32,11 +33,22 @@ struct ReaderView: View {
         .toolbarTitleDisplayMode(.inline)
         .toolbar { readerToolbar }
         #if os(macOS)
+        .sheet(isPresented: $isChoosingBook) {
+            BookNavigationView()
+                .environment(model)
+                .frame(minWidth: 420, minHeight: 560)
+        }
         .sheet(isPresented: $isChoosingChapter) {
             chapterNavigation
                 .frame(minWidth: 420, minHeight: 560)
         }
         #else
+        .popover(isPresented: $isChoosingBook) {
+            BookNavigationView()
+                .environment(model)
+                .frame(minWidth: 340, idealWidth: 420, minHeight: 480)
+                .presentationCompactAdaptation(.sheet)
+        }
         .popover(isPresented: $isChoosingChapter) {
             chapterNavigation
                 .frame(minWidth: 340, idealWidth: 420, minHeight: 480)
@@ -79,7 +91,7 @@ struct ReaderView: View {
         ToolbarItem(placement: .principal) {
             HStack(spacing: 12) {
                 previousChapterButton
-                chapterChooserButton
+                referenceChooser
                 nextChapterButton
             }
         }
@@ -89,7 +101,7 @@ struct ReaderView: View {
         }
 
         ToolbarItem(placement: .principal) {
-            chapterChooserButton
+            referenceChooser
         }
 
         ToolbarItem(placement: .primaryAction) {
@@ -182,20 +194,32 @@ struct ReaderView: View {
         .help("Previous Chapter")
     }
 
-    private var chapterChooserButton: some View {
-        Button {
-            isChoosingChapter = true
-        } label: {
-            HStack(spacing: 5) {
-                Text(model.reference.isEmpty ? "Choose Chapter" : model.reference)
+    private var referenceChooser: some View {
+        HStack(spacing: 2) {
+            Button {
+                isChoosingBook = true
+            } label: {
+                Text(model.selectedBook?.name ?? "Choose Book")
                     .fontWeight(.semibold)
-                Image(systemName: "chevron.down")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
             }
+            .accessibilityHint("Shows Bible books")
+
+            Button {
+                isChoosingChapter = true
+            } label: {
+                HStack(spacing: 4) {
+                    Text(model.selectedBook == nil ? "Chapter" : "\(model.selectedChapter)")
+                        .fontWeight(.semibold)
+                        .monospacedDigit()
+                    Image(systemName: "chevron.down")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .disabled(model.selectedBook == nil)
+            .accessibilityLabel("Choose Chapter")
         }
         .buttonStyle(.plain)
-        .accessibilityHint("Shows books and chapters")
     }
 
     private var nextChapterButton: some View {
@@ -567,7 +591,7 @@ private extension ReaderSpacing {
     }
 }
 
-private struct ChapterNavigationView: View {
+private struct BookNavigationView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
     @State private var query = ""
@@ -589,9 +613,6 @@ private struct ChapterNavigationView: View {
             .navigationTitle("Choose a Book")
             .toolbarTitleDisplayMode(.inline)
             .searchable(text: $query, prompt: "Book")
-            .navigationDestination(for: BibleBook.self) { book in
-                ChapterGridView(book: book) { dismiss() }
-            }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") { dismiss() }
@@ -609,8 +630,19 @@ private struct ChapterNavigationView: View {
         if !books.isEmpty {
             Section(title) {
                 ForEach(books) { book in
-                    NavigationLink(value: book) {
+                    Button {
+                        model.select(bookID: book.id, chapter: 1)
+                        dismiss()
+                    } label: {
                         HStack {
+                            if book.id == model.selectedBookID {
+                                Image(systemName: "checkmark")
+                                    .foregroundStyle(.tint)
+                                    .frame(width: 18)
+                                    .accessibilityLabel("Current book")
+                            } else {
+                                Color.clear.frame(width: 18, height: 1)
+                            }
                             Text(book.name)
                             Spacer()
                             Text("\(book.chapterCount)")
@@ -618,14 +650,30 @@ private struct ChapterNavigationView: View {
                                 .accessibilityLabel(
                                     "\(book.chapterCount) chapters"
                                 )
-                            if book.id == model.selectedBookID {
-                                Image(systemName: "checkmark")
-                                    .foregroundStyle(.tint)
-                                    .accessibilityLabel("Current book")
-                            }
                         }
                     }
+                    .buttonStyle(.plain)
                 }
+            }
+        }
+    }
+}
+
+private struct ChapterNavigationView: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            if let book = model.selectedBook {
+                ChapterGridView(book: book) { dismiss() }
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Close") { dismiss() }
+                        }
+                    }
+            } else {
+                ContentUnavailableView("Choose a Book First", systemImage: "book.closed")
             }
         }
     }

@@ -1,3 +1,4 @@
+import Foundation
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -247,7 +248,7 @@ private struct KeyedModuleReaderView: View {
             } else {
                 List(keys, id: \.self) { key in
                     NavigationLink {
-                        KeyedEntryView(module: module, key: key)
+                        KeyedEntryView(module: module, keys: keys, initialKey: key)
                             .environment(model)
                     } label: {
                         Text(Self.displayTitle(for: key))
@@ -274,30 +275,90 @@ private struct KeyedModuleReaderView: View {
 private struct KeyedEntryView: View {
     @Environment(AppModel.self) private var model
     let module: KeyedModule
-    let key: String
+    let keys: [String]
+    @State private var selectedKey: String
     @State private var entry: KeyedModuleEntry?
+
+    init(module: KeyedModule, keys: [String], initialKey: String) {
+        self.module = module
+        self.keys = keys
+        _selectedKey = State(initialValue: initialKey)
+    }
+
+    private var previousKey: String? {
+        KeyedEntryNavigation.adjacentKey(to: selectedKey, offset: -1, in: keys)
+    }
+
+    private var nextKey: String? {
+        KeyedEntryNavigation.adjacentKey(to: selectedKey, offset: 1, in: keys)
+    }
 
     var body: some View {
         ScrollView {
             if let entry {
-                Text(entry.text)
-                    .font(.body)
+                Text(KeyedEntryFormatter.attributedString(for: entry))
                     .textSelection(.enabled)
                     .frame(maxWidth: 720, alignment: .leading)
-                    .padding()
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 20)
             } else {
                 ProgressView()
                     .frame(maxWidth: .infinity)
                     .padding()
             }
         }
-        .navigationTitle(key.split(separator: "/").last.map(String.init) ?? key)
-        .task(id: key) {
+        .navigationTitle(selectedKey.split(separator: "/").last.map(String.init) ?? selectedKey)
+        .toolbar {
+            ToolbarItemGroup(placement: .primaryAction) {
+                Button("Previous Entry", systemImage: "chevron.left") {
+                    if let previousKey { selectedKey = previousKey }
+                }
+                .labelStyle(.iconOnly)
+                .disabled(previousKey == nil)
+                .help("Previous Entry")
+
+                Button("Next Entry", systemImage: "chevron.right") {
+                    if let nextKey { selectedKey = nextKey }
+                }
+                .labelStyle(.iconOnly)
+                .disabled(nextKey == nil)
+                .help("Next Entry")
+            }
+        }
+        .task(id: selectedKey) {
+            entry = nil
             do {
-                entry = try await model.keyedEntry(moduleID: module.id, key: key)
+                entry = try await model.keyedEntry(moduleID: module.id, key: selectedKey)
             } catch {
                 model.presentedError = PresentedError(error)
             }
         }
+    }
+}
+
+enum KeyedEntryNavigation {
+    static func adjacentKey(to key: String, offset: Int, in keys: [String]) -> String? {
+        guard let index = keys.firstIndex(of: key) else { return nil }
+        let adjacentIndex = index + offset
+        guard keys.indices.contains(adjacentIndex) else { return nil }
+        return keys[adjacentIndex]
+    }
+}
+
+enum KeyedEntryFormatter {
+    static func attributedString(for entry: KeyedModuleEntry) -> AttributedString {
+        let source = entry.html.isEmpty ? entry.text : entry.html
+        guard let data = source.data(using: .utf8),
+              let rendered = try? NSAttributedString(
+                  data: data,
+                  options: [
+                      .documentType: NSAttributedString.DocumentType.html,
+                      .characterEncoding: String.Encoding.utf8.rawValue,
+                  ],
+                  documentAttributes: nil
+              ) else {
+            return AttributedString(entry.text)
+        }
+        return AttributedString(rendered)
     }
 }
