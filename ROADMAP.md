@@ -52,7 +52,29 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 
 ## Ordered milestones
 
-1. Liquid Glass layered app icon
+1. Reader and library polish
+   - Add a dedicated Installed Modules section that clearly separates local
+     content from modules available to download and provides native management
+     actions.
+   - Audit and correct compact iPhone layouts, including spacing, safe areas,
+     toolbar density, sheets, Dynamic Type, and landscape behavior.
+   - Add reader text-size controls for books, devotionals, and other keyed
+     modules, sharing preferences with Bible typography where appropriate.
+   - Present Bible book and chapter choices from their respective toolbar
+     controls using native anchored popovers where the platform supports them,
+     with an appropriate compact iPhone presentation.
+   - Continue expanding readable book and devotional compatibility. Categorize
+     modules currently reported as incompatible, distinguish unsupported content
+     from metadata/parser defects, and route reproducible framework problems
+     through the SwordKit feedback loop below.
+   - Refine Bible text measure, margins, paragraph and verse spacing, headings,
+     and responsive layout across iPhone, iPad, and Mac.
+   - Remove always-visible bookmark and note controls from every verse. Offer
+     bookmark and note actions through the native text-selection/context menu
+     after the reader has a selected verse or highlighted passage, while keeping
+     the actions accessible to VoiceOver and keyboard users.
+
+2. Liquid Glass layered app icon
    - Rebuild the current book-and-sword mark as editable layers in Apple Icon
      Composer rather than relying only on flattened PNG artwork.
    - Import the existing default, dark, and monochrome artwork and tune Default,
@@ -66,7 +88,7 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
      minimum supported OS and Xcode release make the Icon Composer asset safe to
      adopt exclusively.
 
-2. Signed automatic Mac updates
+3. Signed automatic Mac updates
    - Add Sparkle 2 to the macOS target after a repeatable release workflow and
      Apple Developer ID signing are available.
    - Publish EdDSA-signed update archives and an appcast alongside GitHub
@@ -74,7 +96,7 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
    - Add user-controlled automatic update checks while retaining the native
      Check for Updates command.
 
-3. Launch coordination
+4. Launch coordination
    - Complete Apple Developer signing, physical-device testing, App Store
      records, screenshots, support and privacy-policy URLs, and beta feedback.
 
