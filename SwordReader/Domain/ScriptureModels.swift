@@ -129,6 +129,104 @@ struct CatalogModule: Identifiable, Hashable, Sendable {
     let version: String?
     let copyright: String?
     let isBible: Bool
+    let sourceID: String
+
+    var compatibility: ModuleCompatibility {
+        if !isBible { return .unsupportedCategory }
+        if id.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+            language.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return .missingMetadata
+        }
+        return .compatible
+    }
+}
+
+enum ModuleCompatibility: String, Hashable, Sendable {
+    case compatible
+    case unsupportedCategory
+    case missingMetadata
+
+    var title: String {
+        switch self {
+        case .compatible: String(localized: "Compatible")
+        case .unsupportedCategory: String(localized: "Unsupported module category")
+        case .missingMetadata: String(localized: "Missing required metadata")
+        }
+    }
+}
+
+struct ModuleSource: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let name: String
+    let host: String
+    let catalogPath: String
+    let packagePath: String
+    let isCurated: Bool
+
+    static let crossWire = ModuleSource(
+        id: "crosswire",
+        name: "CrossWire Bible Society",
+        host: "www.crosswire.org",
+        catalogPath: "/ftpmirror/pub/sword/raw",
+        packagePath: "/ftpmirror/pub/sword/packages/rawzip",
+        isCurated: true
+    )
+
+    static let eBible = ModuleSource(
+        id: "ebible",
+        name: "eBible.org",
+        host: "ebible.org",
+        catalogPath: "/sword",
+        packagePath: "/sword/zip",
+        isCurated: true
+    )
+
+    static func validated(
+        name: String,
+        host: String,
+        catalogPath: String,
+        packagePath: String
+    ) throws -> ModuleSource {
+        let cleanName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanHost = host.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let cleanCatalog = catalogPath.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanPackages = packagePath.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleanName.isEmpty,
+              !cleanHost.isEmpty,
+              !cleanHost.contains("://"),
+              !cleanHost.contains("/"),
+              cleanHost.contains("."),
+              Self.isSafePath(cleanCatalog),
+              Self.isSafePath(cleanPackages)
+        else { throw ModuleSourceError.invalidEndpoint }
+
+        let identifier = "custom-" + cleanHost + "-" + String(
+            cleanCatalog.unicodeScalars.reduce(into: UInt64(5381)) {
+                $0 = (($0 << 5) &+ $0) &+ UInt64($1.value)
+            },
+            radix: 16
+        )
+        return ModuleSource(
+            id: identifier,
+            name: cleanName,
+            host: cleanHost,
+            catalogPath: cleanCatalog,
+            packagePath: cleanPackages,
+            isCurated: false
+        )
+    }
+
+    private static func isSafePath(_ path: String) -> Bool {
+        path.hasPrefix("/") && !path.contains("..") && !path.contains("\\")
+    }
+}
+
+enum ModuleSourceError: LocalizedError {
+    case invalidEndpoint
+
+    var errorDescription: String? {
+        String(localized: "Enter a valid HTTPS host and absolute catalog and package paths.")
+    }
 }
 
 struct LocalCatalog: Hashable, Sendable {

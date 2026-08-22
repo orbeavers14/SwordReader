@@ -89,7 +89,7 @@ tracked in [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md).
 - Data collection: None
 - Tracking: None
 - Required-reason API: app-scoped `UserDefaults` (`CA92.1`)
-- User-initiated network service: CrossWire Bible Society module catalog and downloads
+- User-initiated network services: approved HTTPS SWORD module catalogs and downloads
 
 Recheck this summary and generate Xcode's privacy report before every release,
 especially after adding a dependency or network feature.

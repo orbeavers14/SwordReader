@@ -12,7 +12,7 @@ struct PrivacyAndLicensesView: View {
                     Label("No account or SwordReader server", systemImage: "person.crop.circle.badge.xmark")
                     Label("Reading data stays on your devices", systemImage: "iphone.and.arrow.forward")
 
-                    Text("SwordReader contacts the CrossWire Bible Society only when you choose to browse or download Bible modules. CrossWire receives the network information ordinarily required to serve that request.")
+                    Text("SwordReader contacts an approved module source only when you choose to browse or download Bible modules from it. That source receives the network information ordinarily required to serve the request.")
                         .font(.callout)
                         .foregroundStyle(.secondary)
                 }

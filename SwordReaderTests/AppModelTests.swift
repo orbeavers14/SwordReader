@@ -4,6 +4,47 @@ import Testing
 
 @MainActor
 struct AppModelTests {
+    @Test func moduleSourceRejectsInsecureAndMalformedEndpoints() throws {
+        #expect(throws: ModuleSourceError.self) {
+            try ModuleSource.validated(
+                name: "Insecure",
+                host: "http://example.com",
+                catalogPath: "/sword",
+                packagePath: "/sword/zip"
+            )
+        }
+        #expect(throws: ModuleSourceError.self) {
+            try ModuleSource.validated(
+                name: "Traversal",
+                host: "example.com",
+                catalogPath: "/sword/../private",
+                packagePath: "/sword/zip"
+            )
+        }
+    }
+
+    @Test func approvedModuleSourcesPersistAndCanBeRemoved() throws {
+        let defaults = try #require(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+        let source = try ModuleSource.validated(
+            name: "Example Bibles",
+            host: "modules.example.org",
+            catalogPath: "/sword/raw",
+            packagePath: "/sword/packages"
+        )
+        let first = AppModel(service: FakeScriptureService(), defaults: defaults)
+
+        first.approveModuleSource(source)
+        #expect(first.moduleSources.contains(source))
+
+        let restored = AppModel(service: FakeScriptureService(), defaults: defaults)
+        #expect(restored.moduleSources.contains(source))
+
+        restored.removeModuleSource(source.id)
+        #expect(!restored.moduleSources.contains(source))
+        #expect(restored.moduleSources.contains(.crossWire))
+    }
+
     @Test func feedbackReportIncludesOnlyReviewedDiagnostics() throws {
         let report = FeedbackReport(
             kind: .bug,
@@ -674,15 +715,16 @@ private actor FakeScriptureService: ScriptureServing {
     func catalog(at directory: URL) -> LocalCatalog { LocalCatalog(directory: directory, modules: []) }
     func install(moduleID: String, from catalog: LocalCatalog) {}
 
-    func remoteBibles() -> [CatalogModule] {
+    func remoteBibles(from source: ModuleSource) -> [CatalogModule] {
         [
-            CatalogModule(id: "WEB", title: "World English Bible", language: "en", version: nil, copyright: "Public domain", isBible: true),
-            CatalogModule(id: "ASV", title: "American Standard Version", language: "en", version: "1.2", copyright: "Public domain", isBible: true)
+            CatalogModule(id: "WEB", title: "World English Bible", language: "en", version: nil, copyright: "Public domain", isBible: true, sourceID: source.id),
+            CatalogModule(id: "ASV", title: "American Standard Version", language: "en", version: "1.2", copyright: "Public domain", isBible: true, sourceID: source.id)
         ]
     }
 
     func installRemote(
         moduleID: String,
+        from source: ModuleSource,
         progress: @escaping @Sendable (ModuleTransferProgress) -> Void
     ) async throws {
         progress(ModuleTransferProgress(completedBytes: 50, totalBytes: 100))

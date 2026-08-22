@@ -4,6 +4,12 @@ struct RemoteModuleBrowser: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
     @State private var query = ""
+    @State private var isShowingSources = false
+    @State private var pendingSource: ModuleSource?
+
+    private var selectedSource: ModuleSource {
+        model.moduleSources.first(where: { $0.id == model.selectedModuleSourceID }) ?? .crossWire
+    }
 
     private var filteredModules: [CatalogModule] {
         guard !query.isEmpty else { return model.remoteModules }
@@ -21,7 +27,7 @@ struct RemoteModuleBrowser: View {
                         ProgressView()
                         Text("Finding Bibles")
                     } description: {
-                        Text("Contacting the CrossWire Bible Society…")
+                        Text("Contacting \(selectedSource.name)…")
                     }
                 } else if filteredModules.isEmpty {
                     ContentUnavailableView.search(text: query)
@@ -39,6 +45,9 @@ struct RemoteModuleBrowser: View {
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
+                            Label(module.compatibility.title, systemImage: module.compatibility == .compatible ? "checkmark.shield" : "xmark.shield")
+                                .font(.caption)
+                                .foregroundStyle(module.compatibility == .compatible ? Color.secondary : Color.red)
                         }
                         .padding(.vertical, 3)
                     }
@@ -56,9 +65,48 @@ struct RemoteModuleBrowser: View {
                     }
                     .disabled(model.isRefreshingRemoteCatalog || model.installingModuleID != nil)
                 }
+                ToolbarItem(placement: .secondaryAction) {
+                    Menu(selectedSource.name, systemImage: "server.rack") {
+                        ForEach(model.moduleSources) { source in
+                            Button {
+                                pendingSource = source
+                            } label: {
+                                if source.id == selectedSource.id {
+                                    Label(source.name, systemImage: "checkmark")
+                                } else {
+                                    Text(source.name)
+                                }
+                            }
+                        }
+                        Divider()
+                        Button("Manage Sources…", systemImage: "gear") {
+                            isShowingSources = true
+                        }
+                    }
+                }
             }
         }
         .frame(minWidth: 520, minHeight: 480)
+        .sheet(isPresented: $isShowingSources) {
+            ModuleSourcesView().environment(model)
+        }
+        .confirmationDialog(
+            "Connect to \(pendingSource?.name ?? "this source")?",
+            isPresented: Binding(
+                get: { pendingSource != nil },
+                set: { if !$0 { pendingSource = nil } }
+            ),
+            titleVisibility: .visible,
+            presenting: pendingSource
+        ) { source in
+            Button("Connect") {
+                pendingSource = nil
+                Task { await model.refreshRemoteCatalog(sourceID: source.id) }
+            }
+            Button("Cancel", role: .cancel) { pendingSource = nil }
+        } message: { source in
+            Text("SwordReader will contact \(source.host) to retrieve its SWORD catalog. The source receives the network information needed to serve this request.")
+        }
     }
 
     private func moduleDescription(_ module: CatalogModule) -> some View {
@@ -79,6 +127,9 @@ struct RemoteModuleBrowser: View {
                 .filter { !$0.isEmpty }
                 .joined(separator: " · "))
                 .font(.caption)
+                .foregroundStyle(.secondary)
+            Text("Source: \(selectedSource.host)")
+                .font(.caption2)
                 .foregroundStyle(.secondary)
         }
     }
@@ -105,7 +156,7 @@ struct RemoteModuleBrowser: View {
         } else {
             Button("Get") { Task { await model.installRemote(module) } }
                 .buttonStyle(.bordered)
-                .disabled(model.installingModuleID != nil)
+                .disabled(model.installingModuleID != nil || module.compatibility != .compatible)
                 .accessibilityLabel("Get \(module.title)")
         }
     }
