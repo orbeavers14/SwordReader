@@ -31,12 +31,18 @@ struct ReaderView: View {
         .navigationTitle(model.reference.isEmpty ? "Read" : model.reference)
         .toolbarTitleDisplayMode(.inline)
         .toolbar { readerToolbar }
+        #if os(macOS)
+        .sheet(isPresented: $isChoosingChapter) {
+            chapterNavigation
+                .frame(minWidth: 420, minHeight: 560)
+        }
+        #else
         .popover(isPresented: $isChoosingChapter) {
-            ChapterNavigationView()
-                .environment(model)
+            chapterNavigation
                 .frame(minWidth: 340, idealWidth: 420, minHeight: 480)
                 .presentationCompactAdaptation(.sheet)
         }
+        #endif
         .sheet(isPresented: $isShowingComparison, onDismiss: { model.endComparison() }) {
             TranslationComparisonView().environment(model)
         }
@@ -69,37 +75,27 @@ struct ReaderView: View {
 
     @ToolbarContentBuilder
     private var readerToolbar: some ToolbarContent {
-        ToolbarItem(placement: .navigation) {
-            Button("Previous Chapter", systemImage: "chevron.left") {
-                model.moveChapter(by: -1)
+        #if os(macOS)
+        ToolbarItem(placement: .principal) {
+            HStack(spacing: 12) {
+                previousChapterButton
+                chapterChooserButton
+                nextChapterButton
             }
-            .disabled(!model.canMoveToPreviousChapter)
-            .keyboardShortcut(.leftArrow, modifiers: [.command])
+        }
+        #else
+        ToolbarItem(placement: .navigation) {
+            previousChapterButton
         }
 
         ToolbarItem(placement: .principal) {
-            Button {
-                isChoosingChapter = true
-            } label: {
-                HStack(spacing: 5) {
-                    Text(model.reference.isEmpty ? "Choose Chapter" : model.reference)
-                        .fontWeight(.semibold)
-                    Image(systemName: "chevron.down")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .buttonStyle(.plain)
-            .accessibilityHint("Shows books and chapters")
+            chapterChooserButton
         }
 
         ToolbarItem(placement: .primaryAction) {
-            Button("Next Chapter", systemImage: "chevron.right") {
-                model.moveChapter(by: 1)
-            }
-            .disabled(!model.canMoveToNextChapter)
-            .keyboardShortcut(.rightArrow, modifiers: [.command])
+            nextChapterButton
         }
+        #endif
 
         ToolbarItem(placement: .secondaryAction) {
             ReaderAppearanceMenu()
@@ -170,6 +166,46 @@ struct ReaderView: View {
             }
             .accessibilityLabel("Translation")
         }
+    }
+
+    private var chapterNavigation: some View {
+        ChapterNavigationView().environment(model)
+    }
+
+    private var previousChapterButton: some View {
+        Button("Previous Chapter", systemImage: "chevron.left") {
+            model.moveChapter(by: -1)
+        }
+        .labelStyle(.iconOnly)
+        .disabled(!model.canMoveToPreviousChapter)
+        .keyboardShortcut(.leftArrow, modifiers: [.command])
+        .help("Previous Chapter")
+    }
+
+    private var chapterChooserButton: some View {
+        Button {
+            isChoosingChapter = true
+        } label: {
+            HStack(spacing: 5) {
+                Text(model.reference.isEmpty ? "Choose Chapter" : model.reference)
+                    .fontWeight(.semibold)
+                Image(systemName: "chevron.down")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint("Shows books and chapters")
+    }
+
+    private var nextChapterButton: some View {
+        Button("Next Chapter", systemImage: "chevron.right") {
+            model.moveChapter(by: 1)
+        }
+        .labelStyle(.iconOnly)
+        .disabled(!model.canMoveToNextChapter)
+        .keyboardShortcut(.rightArrow, modifiers: [.command])
+        .help("Next Chapter")
     }
 }
 

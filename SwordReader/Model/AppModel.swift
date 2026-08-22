@@ -229,12 +229,13 @@ final class AppModel {
     }
 
     func start() async {
-        isPresentingOnboarding = !defaults.bool(
+        let hasCompletedOnboarding = defaults.bool(
             forKey: Self.completedOnboardingKey
         )
         do {
             studyItems = try studyStore?.fetchAll() ?? []
             modules = try await service.installedBibles()
+            isPresentingOnboarding = modules.isEmpty || !hasCompletedOnboarding
             let saved = defaults.string(forKey: Self.moduleKey)
             let moduleID = modules.contains(where: { $0.id == saved })
                 ? saved
@@ -244,6 +245,7 @@ final class AppModel {
                 try await activateModule(moduleID, restoring: true)
             }
         } catch {
+            isPresentingOnboarding = !hasCompletedOnboarding
             presentedError = PresentedError(error)
         }
     }

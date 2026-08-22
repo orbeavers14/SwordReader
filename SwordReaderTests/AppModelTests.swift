@@ -124,6 +124,21 @@ struct AppModelTests {
         #expect(!restored.isPresentingOnboarding)
     }
 
+    @Test func completedOnboardingReturnsOnLaunchWhenNoBibleIsInstalled() async throws {
+        let defaults = try #require(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+        defaults.set(true, forKey: "completedOnboarding")
+        let model = AppModel(
+            service: FakeScriptureService(modules: []),
+            defaults: defaults
+        )
+
+        await model.start()
+
+        #expect(model.modules.isEmpty)
+        #expect(model.isPresentingOnboarding)
+    }
+
     @Test func removingSelectedBibleFallsBackToRemainingModule() async throws {
         let defaults = try #require(UserDefaults(suiteName: #function))
         defaults.removePersistentDomain(forName: #function)
