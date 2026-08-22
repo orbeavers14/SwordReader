@@ -48,6 +48,7 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
   sources with persistent source management and catalog compatibility checks
 - [x] System-selected iOS and iPadOS light, dark, and tinted app-icon artwork
   with release-time dimension, opacity, and appearance validation
+- [x] GitHub-hosted macOS preview releases with an in-app latest-release check
 
 ## Ordered milestones
 
@@ -65,7 +66,15 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
      minimum supported OS and Xcode release make the Icon Composer asset safe to
      adopt exclusively.
 
-2. Launch coordination
+2. Signed automatic Mac updates
+   - Add Sparkle 2 to the macOS target after a repeatable release workflow and
+     Apple Developer ID signing are available.
+   - Publish EdDSA-signed update archives and an appcast alongside GitHub
+     Releases, keeping the private update key outside the repository.
+   - Add user-controlled automatic update checks while retaining the native
+     Check for Updates command.
+
+3. Launch coordination
    - Complete Apple Developer signing, physical-device testing, App Store
      records, screenshots, support and privacy-policy URLs, and beta feedback.
 
