@@ -42,22 +42,12 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
   independent Watch companion declaration
 - [x] Repeatable offline release audit and physical-device/TestFlight acceptance
   checklist
+- [x] User-reviewed feature and bug reporting with privacy-safe diagnostics,
+  editable GitHub issue drafts, and native Copy and Share alternatives
 
 ## Ordered milestones
 
-1. User-reviewed feedback and bug reporting
-   - Add a native Feedback screen with separate feature-request and bug-report
-     paths.
-   - Collect app version, platform, OS version, installed module identifiers and
-     versions, and optional reproduction steps in a preview the user can edit.
-   - Exclude notes, bookmarks, search history, Scripture text, file paths, and
-     other personal content by default.
-   - Open a prefilled SwordReader GitHub issue form in the system browser. The
-     user must review and submit it through their own GitHub session; the app
-     must not embed a GitHub token or silently publish a report.
-   - Offer Copy and Share alternatives for people without a GitHub account.
-
-2. Multiple module sources and compatibility inspection
+1. Multiple module sources and compatibility inspection
    - Support a curated list of HTTPS SWORD repositories in addition to
      CrossWire, while keeping each source disabled until the user explicitly
      enables network access to it.
@@ -76,7 +66,7 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
    - Persist only sources the user approves, provide source removal and catalog
      refresh controls, and preserve publisher licensing boundaries.
 
-3. System-adaptive layered app icon
+2. System-adaptive layered app icon
    - Rebuild the current book-and-sword mark as editable layers in Apple Icon
      Composer rather than relying only on flattened PNG artwork.
    - Tune and preview Default, Dark, Clear Light, Clear Dark, Tinted Light, and
@@ -90,7 +80,7 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
      minimum supported OS and Xcode release make the Icon Composer asset safe to
      adopt exclusively.
 
-4. Launch coordination
+3. Launch coordination
    - Complete Apple Developer signing, physical-device testing, App Store
      records, screenshots, support and privacy-policy URLs, and beta feedback.
 

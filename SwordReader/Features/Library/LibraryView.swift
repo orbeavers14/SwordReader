@@ -8,6 +8,7 @@ struct LibraryView: View {
     @State private var isShowingRemoteAccessWarning = false
     @State private var isShowingModuleBrowser = false
     @State private var isShowingPrivacyAndLicenses = false
+    @State private var isShowingFeedback = false
 
     var body: some View {
         List {
@@ -98,6 +99,11 @@ struct LibraryView: View {
                 }
             }
             ToolbarItem(placement: .secondaryAction) {
+                Button("Feedback", systemImage: "bubble.left.and.exclamationmark.bubble.right") {
+                    isShowingFeedback = true
+                }
+            }
+            ToolbarItem(placement: .secondaryAction) {
                 Button("Privacy & Licenses", systemImage: "info.circle") {
                     isShowingPrivacyAndLicenses = true
                 }
@@ -121,6 +127,9 @@ struct LibraryView: View {
         }
         .sheet(isPresented: $isShowingPrivacyAndLicenses) {
             PrivacyAndLicensesView().environment(model)
+        }
+        .sheet(isPresented: $isShowingFeedback) {
+            FeedbackView().environment(model)
         }
         .fileImporter(isPresented: $isImporting, allowedContentTypes: [.folder]) { result in
             if case .success(let url) = result {

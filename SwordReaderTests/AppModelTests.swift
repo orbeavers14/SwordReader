@@ -4,6 +4,53 @@ import Testing
 
 @MainActor
 struct AppModelTests {
+    @Test func feedbackReportIncludesOnlyReviewedDiagnostics() throws {
+        let report = FeedbackReport(
+            kind: .bug,
+            title: "Chapter does not open",
+            details: "The reader remains on the previous chapter.",
+            reproductionSteps: "1. Open John 3\n2. Choose chapter 4",
+            diagnostics: FeedbackDiagnostics(
+                appVersion: "0.1.0 (1)",
+                platform: "macOS",
+                osVersion: "15.6",
+                modules: ["KJV 2.11", "WEB"]
+            )
+        )
+
+        let body = report.body
+
+        #expect(body.contains("The reader remains on the previous chapter."))
+        #expect(body.contains("KJV 2.11, WEB"))
+        #expect(!body.localizedCaseInsensitiveContains("bookmark"))
+        #expect(!body.localizedCaseInsensitiveContains("search history"))
+        #expect(!body.localizedCaseInsensitiveContains("file path"))
+    }
+
+    @Test func feedbackReportBuildsEditableGitHubIssueURL() throws {
+        let report = FeedbackReport(
+            kind: .feature,
+            title: "Reading themes",
+            details: "Please add more reading themes.",
+            reproductionSteps: "",
+            diagnostics: FeedbackDiagnostics(
+                appVersion: "0.1.0 (1)",
+                platform: "iOS",
+                osVersion: "19.0",
+                modules: []
+            )
+        )
+
+        let url = try #require(report.githubIssueURL)
+        let components = try #require(URLComponents(url: url, resolvingAgainstBaseURL: false))
+        let query = Dictionary(uniqueKeysWithValues: (components.queryItems ?? []).map { ($0.name, $0.value ?? "") })
+
+        #expect(components.host == "github.com")
+        #expect(components.path == "/orbeavers14/SwordReader/issues/new")
+        #expect(query["title"] == "[Feature] Reading themes")
+        #expect(query["body"]?.contains("Please add more reading themes.") == true)
+    }
+
     @Test func startSelectsFirstInstalledBible() async {
         let service = FakeScriptureService()
         let model = AppModel(service: service)
