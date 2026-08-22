@@ -18,12 +18,26 @@ struct WatchReaderView: View {
                             .buttonStyle(.borderedProminent)
                     }
                 } else {
-                    List {
-                        ForEach(model.verses) { verse in
-                            Text(verse.number + " ")
-                                .font(.caption.bold())
-                                .foregroundStyle(.secondary)
-                            + Text(verse.text)
+                    Group {
+                        if model.isLoadingChapter && model.verses.isEmpty {
+                            ProgressView("Loading…")
+                        } else {
+                            List {
+                                ForEach(model.verses) { verse in
+                                    Text(verse.number + " ")
+                                        .font(.caption.bold())
+                                        .foregroundStyle(.secondary)
+                                    + Text(verse.text)
+                                }
+                            }
+                            .overlay(alignment: .bottom) {
+                                if model.isLoadingChapter {
+                                    ProgressView()
+                                        .controlSize(.small)
+                                        .padding(6)
+                                        .background(.regularMaterial, in: .circle)
+                                }
+                            }
                         }
                     }
                     .navigationTitle(model.reference)

@@ -10,7 +10,7 @@ protocol ReadingPlanReminderScheduling: AnyObject {
 enum ReadingPlanReminderError: LocalizedError {
     case permissionDenied
     var errorDescription: String? {
-        "Notifications are disabled for SwordReader. You can enable them in System Settings."
+        String(localized: "Notifications are disabled for SwordReader. You can enable them in System Settings.")
     }
 }
 
@@ -30,8 +30,8 @@ final class ReadingPlanReminderScheduler: ReadingPlanReminderScheduling {
             throw ReadingPlanReminderError.permissionDenied
         }
         let content = UNMutableNotificationContent()
-        content.title = "Today’s Reading"
-        content.body = "Continue your optional SwordReader reading plan."
+        content.title = String(localized: "Today’s Reading")
+        content.body = String(localized: "Continue your optional SwordReader reading plan.")
         content.sound = .default
         let trigger = UNCalendarNotificationTrigger(
             dateMatching: DateComponents(hour: hour, minute: minute),
