@@ -1,6 +1,6 @@
 name: SwordReader
 options:
-  bundleIdPrefix: com.example
+  bundleIdPrefix: com.orbeavers14
   deploymentTarget:
     iOS: "17.0"
     macOS: "14.0"
@@ -23,16 +23,21 @@ targetTemplates:
         SWIFT_VERSION: 6.0
         ENABLE_USER_SCRIPT_SANDBOXING: YES
         CODE_SIGN_STYLE: Automatic
+        MARKETING_VERSION: 0.1.0
+        CURRENT_PROJECT_VERSION: 1
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
     info:
       path: Support/${target_name}-Info.plist
       properties:
         CFBundleDisplayName: SwordReader
         CFBundleURLTypes:
           - CFBundleTypeRole: Viewer
-            CFBundleURLName: com.example.SwordReader.read
+            CFBundleURLName: com.orbeavers14.SwordReader.read
             CFBundleURLSchemes:
               - swordreader
         UILaunchScreen: {}
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft
@@ -44,14 +49,14 @@ targetTemplates:
           - UIInterfaceOrientationLandscapeRight
         NSHumanReadableCopyright: "SwordReader is licensed under GPL-2.0-only. Bible modules have separate licenses."
         NSUserActivityTypes:
-          - com.example.SwordReader.reading
+          - com.orbeavers14.SwordReader.reading
 targets:
   SwordReader:
     templates: [SwordReaderApp]
     platform: iOS
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.example.SwordReader
+        PRODUCT_BUNDLE_IDENTIFIER: com.orbeavers14.SwordReader
         SUPPORTS_MACCATALYST: NO
     dependencies:
       - target: SwordReaderWatch
@@ -61,7 +66,7 @@ targets:
     platform: macOS
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.example.SwordReader.mac
+        PRODUCT_BUNDLE_IDENTIFIER: com.orbeavers14.SwordReader.mac
   SwordReaderTests:
     type: bundle.unit-test
     platform: macOS
@@ -71,7 +76,7 @@ targets:
       - target: SwordReaderMac
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.example.SwordReaderTests
+        PRODUCT_BUNDLE_IDENTIFIER: com.orbeavers14.SwordReaderTests
         GENERATE_INFOPLIST_FILE: YES
         SWIFT_VERSION: 6.0
   SwordReaderWatch:
@@ -84,11 +89,14 @@ targets:
         product: SwordKit
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.example.SwordReader.watchkitapp
+        PRODUCT_BUNDLE_IDENTIFIER: com.orbeavers14.SwordReader.watchkitapp
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: Support/SwordReaderWatch-Info.plist
         SWIFT_VERSION: 6.0
         CODE_SIGN_STYLE: Automatic
+        MARKETING_VERSION: 0.1.0
+        CURRENT_PROJECT_VERSION: 1
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
 schemes:
   SwordReader:
     build:

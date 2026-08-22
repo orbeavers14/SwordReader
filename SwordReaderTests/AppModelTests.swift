@@ -332,6 +332,32 @@ struct AppModelTests {
         #expect(await service.lastSearchScope() == .newTestament)
     }
 
+    @Test func broadSearchKeepsAVisibleResultLimitAndFullCount() async throws {
+        let results = (1...300).map { index in
+            BibleSearchResult(
+                reference: "Psalm \(index):1",
+                moduleID: "WEB",
+                text: "Match \(index)",
+                score: 300 - index
+            )
+        }
+        let model = AppModel(
+            service: FakeScriptureService(searchResults: results)
+        )
+        await model.start()
+
+        model.search("match")
+        try await Task.sleep(for: .milliseconds(20))
+
+        #expect(model.searchResults.count == 250)
+        #expect(model.searchResultCount == 300)
+        #expect(model.searchResultsWereLimited)
+
+        model.search("")
+        #expect(model.searchResultCount == 0)
+        #expect(!model.searchResultsWereLimited)
+    }
+
     @Test func bookmarkPersistsThroughStudyStore() async {
         let store = FakeStudyStore()
         let model = AppModel(
@@ -503,6 +529,7 @@ private actor FakeScriptureService: ScriptureServing {
     private var removedIDs: [String] = []
     private var installedRemoteIDs: [String] = []
     private let remoteInstallDelay: Duration
+    private let providedSearchResults: [BibleSearchResult]?
     private var capturedSearchMode: ScriptureSearchMode?
     private var capturedSearchScope: ScriptureSearchScope?
 
@@ -514,9 +541,11 @@ private actor FakeScriptureService: ScriptureServing {
             version: nil,
             copyright: nil
         )
-    ], remoteInstallDelay: Duration = .zero) {
+    ], remoteInstallDelay: Duration = .zero,
+       searchResults: [BibleSearchResult]? = nil) {
         availableModules = modules
         self.remoteInstallDelay = remoteInstallDelay
+        providedSearchResults = searchResults
     }
 
     func installedBibles() -> [BibleModule] {
@@ -585,7 +614,14 @@ private actor FakeScriptureService: ScriptureServing {
         capturedSearchMode = mode
         capturedSearchScope = scope
         progress(100)
-        return [BibleSearchResult(reference: "Ephesians 2:8", moduleID: moduleID, text: query, score: 100)]
+        return providedSearchResults ?? [
+            BibleSearchResult(
+                reference: "Ephesians 2:8",
+                moduleID: moduleID,
+                text: query,
+                score: 100
+            )
+        ]
     }
 
     func catalog(at directory: URL) -> LocalCatalog { LocalCatalog(directory: directory, modules: []) }

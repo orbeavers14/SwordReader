@@ -21,6 +21,7 @@ final class AppModel {
     private(set) var comparisonModuleID: String?
     private(set) var isLoadingComparison = false
     private(set) var searchResults: [BibleSearchResult] = []
+    private(set) var searchResultCount = 0
     private(set) var searchMode: ScriptureSearchMode
     private(set) var searchScope: ScriptureSearchScope
     private(set) var searchProgress: Int?
@@ -69,6 +70,11 @@ final class AppModel {
     private static let readingPlanKey = "plans.selection"
     private static let readingPlanReminderHourKey = "plans.reminder.hour"
     private static let readingPlanReminderMinuteKey = "plans.reminder.minute"
+    private static let maximumVisibleSearchResults = 250
+
+    var searchResultsWereLimited: Bool {
+        searchResultCount > searchResults.count
+    }
 
     init(
         service: any ScriptureServing,
@@ -517,6 +523,7 @@ final class AppModel {
         let normalized = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !normalized.isEmpty, let selectedModuleID else {
             searchResults = []
+            searchResultCount = 0
             isSearching = false
             searchProgress = nil
             return
@@ -531,14 +538,22 @@ final class AppModel {
         searchGeneration = generation
         searchTask = Task {
             do {
-                searchResults = try await service.search(
+                let results = try await service.search(
                     normalized,
                     moduleID: selectedModuleID,
                     mode: mode,
                     scope: scope
                 ) { [weak self] percentage in
-                    Task { @MainActor in self?.searchProgress = percentage }
+                    Task { @MainActor in
+                        guard self?.searchGeneration == generation else { return }
+                        self?.searchProgress = percentage
+                    }
                 }
+                guard searchGeneration == generation else { return }
+                searchResultCount = results.count
+                searchResults = Array(
+                    results.prefix(Self.maximumVisibleSearchResults)
+                )
             } catch is CancellationError {
                 // A newer search owns the visible state.
             } catch {
@@ -820,7 +835,7 @@ enum ContinuityError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .moduleUnavailable(let moduleID):
-            "\(moduleID) is not currently available from CrossWire."
+            String(localized: "\(moduleID) is not currently available from CrossWire.")
         }
     }
 }

@@ -15,20 +15,28 @@ struct SearchView: View {
             } else if model.searchResults.isEmpty {
                 ContentUnavailableView.search(text: query)
             } else {
-                List(model.searchResults) { result in
-                    Button {
-                        model.open(reference: result.reference)
-                    } label: {
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(result.reference).font(.headline)
-                            Text(highlighted(result.text))
-                                .font(.body)
-                                .foregroundStyle(.primary)
-                                .lineLimit(3)
+                List {
+                    Section {
+                        ForEach(model.searchResults) { result in
+                            Button {
+                                model.open(reference: result.reference)
+                            } label: {
+                                VStack(alignment: .leading, spacing: 5) {
+                                    Text(result.reference).font(.headline)
+                                    Text(highlighted(result.text))
+                                        .font(.body)
+                                        .foregroundStyle(.primary)
+                                        .lineLimit(3)
+                                }
+                                .padding(.vertical, 4)
+                            }
+                            .buttonStyle(.plain)
                         }
-                        .padding(.vertical, 4)
+                    } footer: {
+                        if model.searchResultsWereLimited {
+                            Text("Showing the first \(model.searchResults.count) of \(model.searchResultCount) matches. Narrow the search or scope to see different results.")
+                        }
                     }
-                    .buttonStyle(.plain)
                 }
             }
         }

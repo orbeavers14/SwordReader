@@ -46,12 +46,14 @@ struct OnboardingView: View {
 
             Spacer(minLength: 20)
 
-            Button(model.modules.isEmpty ? "Browse Bibles" : "Start Reading") {
+            Button {
                 if model.modules.isEmpty {
                     isShowingRemoteAccessWarning = true
                 } else {
                     model.completeOnboarding()
                 }
+            } label: {
+                Text(model.modules.isEmpty ? "Browse Bibles" : "Start Reading")
             }
             .buttonStyle(.borderedProminent)
             .controlSize(.large)
@@ -89,8 +91,8 @@ struct OnboardingView: View {
 
 private struct OnboardingFeature: View {
     let systemImage: String
-    let title: String
-    let detail: String
+    let title: LocalizedStringKey
+    let detail: LocalizedStringKey
 
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
