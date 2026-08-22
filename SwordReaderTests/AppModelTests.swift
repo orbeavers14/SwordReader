@@ -4,6 +4,20 @@ import Testing
 
 @MainActor
 struct AppModelTests {
+    @Test func catalogFilterIncludesModuleCategoriesAndFiltersLanguage() {
+        let modules = [
+            CatalogModule(id: "ASV", title: "American Standard Version", language: "en", version: nil, copyright: nil, isBible: true, sourceID: "crosswire"),
+            CatalogModule(id: "BAS", title: "Basque New Testament", language: "eu", version: nil, copyright: nil, isBible: true, sourceID: "crosswire"),
+            CatalogModule(id: "DEV", title: "A Devotional", language: "en", version: nil, copyright: nil, isBible: false, sourceID: "crosswire"),
+            CatalogModule(id: "BAD", title: "Missing Language", language: "", version: nil, copyright: nil, isBible: true, sourceID: "crosswire")
+        ]
+
+        #expect(Set(CatalogFilter.availableLanguages(in: modules)) == ["en", "eu"])
+        #expect(CatalogFilter.apply(to: modules, query: "", language: nil).map(\.id) == ["ASV", "BAS", "DEV", "BAD"])
+        #expect(CatalogFilter.apply(to: modules, query: "", language: "eu").map(\.id) == ["BAS"])
+        #expect(CatalogFilter.apply(to: modules, query: "standard", language: nil).map(\.id) == ["ASV"])
+    }
+
     @Test func moduleSourceRejectsInsecureAndMalformedEndpoints() throws {
         #expect(throws: ModuleSourceError.self) {
             try ModuleSource.validated(

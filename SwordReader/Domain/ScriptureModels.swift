@@ -155,6 +155,32 @@ enum ModuleCompatibility: String, Hashable, Sendable {
     }
 }
 
+enum CatalogFilter {
+    static func availableLanguages(in modules: [CatalogModule]) -> [String] {
+        Array(Set(modules.lazy
+            .map(\.language)
+            .filter { !$0.isEmpty }))
+            .sorted { languageName(for: $0).localizedStandardCompare(languageName(for: $1)) == .orderedAscending }
+    }
+
+    static func apply(
+        to modules: [CatalogModule],
+        query: String,
+        language: String?
+    ) -> [CatalogModule] {
+        modules.filter { module in
+            guard language == nil || module.language == language else { return false }
+            guard !query.isEmpty else { return true }
+            return [module.title, module.id, module.language, languageName(for: module.language)]
+                .contains { $0.localizedCaseInsensitiveContains(query) }
+        }
+    }
+
+    static func languageName(for code: String) -> String {
+        Locale.current.localizedString(forLanguageCode: code) ?? code
+    }
+}
+
 struct ModuleSource: Codable, Hashable, Identifiable, Sendable {
     let id: String
     let name: String

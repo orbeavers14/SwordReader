@@ -4,6 +4,7 @@ struct RemoteModuleBrowser: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
     @State private var query = ""
+    @State private var selectedLanguage: String?
     @State private var isShowingSources = false
     @State private var pendingSource: ModuleSource?
 
@@ -12,11 +13,15 @@ struct RemoteModuleBrowser: View {
     }
 
     private var filteredModules: [CatalogModule] {
-        guard !query.isEmpty else { return model.remoteModules }
-        return model.remoteModules.filter {
-            [$0.title, $0.id, $0.language]
-                .contains { $0.localizedCaseInsensitiveContains(query) }
-        }
+        CatalogFilter.apply(
+            to: model.remoteModules,
+            query: query,
+            language: selectedLanguage
+        )
+    }
+
+    private var availableLanguages: [String] {
+        CatalogFilter.availableLanguages(in: model.remoteModules)
     }
 
     var body: some View {
@@ -64,6 +69,23 @@ struct RemoteModuleBrowser: View {
                         Task { await model.refreshRemoteCatalog() }
                     }
                     .disabled(model.isRefreshingRemoteCatalog || model.installingModuleID != nil)
+                }
+                ToolbarItem(placement: .secondaryAction) {
+                    Menu {
+                        Picker("Language", selection: $selectedLanguage) {
+                            Text("All Languages").tag(String?.none)
+                            ForEach(availableLanguages, id: \.self) { code in
+                                Text(CatalogFilter.languageName(for: code))
+                                    .tag(Optional(code))
+                            }
+                        }
+                    } label: {
+                        Label(
+                            selectedLanguage.map(CatalogFilter.languageName(for:)) ?? "All Languages",
+                            systemImage: "line.3.horizontal.decrease.circle"
+                        )
+                    }
+                    .help("Filter by Language")
                 }
                 ToolbarItem(placement: .secondaryAction) {
                     Menu(selectedSource.name, systemImage: "server.rack") {
