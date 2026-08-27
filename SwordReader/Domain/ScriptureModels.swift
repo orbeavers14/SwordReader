@@ -535,6 +535,61 @@ struct ReaderTabSession: Codable, Hashable, Sendable {
     }
 }
 
+struct KeyedReaderTab: Identifiable, Hashable, Sendable {
+    let id: UUID
+    var key: String
+
+    init(id: UUID = UUID(), key: String) {
+        self.id = id
+        self.key = key
+    }
+}
+
+struct KeyedReaderTabs: Hashable, Sendable {
+    private(set) var tabs: [KeyedReaderTab]
+    private(set) var selectedTabID: KeyedReaderTab.ID
+
+    init(initialKey: String) {
+        let tab = KeyedReaderTab(key: initialKey)
+        tabs = [tab]
+        selectedTabID = tab.id
+    }
+
+    var selectedKey: String {
+        tabs.first { $0.id == selectedTabID }?.key ?? tabs[0].key
+    }
+
+    mutating func createTab() {
+        let tab = KeyedReaderTab(key: selectedKey)
+        tabs.append(tab)
+        selectedTabID = tab.id
+    }
+
+    mutating func selectTab(_ id: KeyedReaderTab.ID) {
+        guard tabs.contains(where: { $0.id == id }) else { return }
+        selectedTabID = id
+    }
+
+    mutating func selectKey(_ key: String) {
+        guard let index = tabs.firstIndex(where: { $0.id == selectedTabID }) else {
+            return
+        }
+        tabs[index].key = key
+    }
+
+    mutating func closeTab(_ id: KeyedReaderTab.ID) {
+        guard tabs.count > 1,
+              let index = tabs.firstIndex(where: { $0.id == id })
+        else { return }
+
+        let wasSelected = selectedTabID == id
+        tabs.remove(at: index)
+        if wasSelected {
+            selectedTabID = tabs[min(index, tabs.count - 1)].id
+        }
+    }
+}
+
 struct ReadingHistoryEntry: Codable, Identifiable, Hashable, Sendable {
     var id: String { "\(moduleID):\(reference)" }
     let moduleID: String

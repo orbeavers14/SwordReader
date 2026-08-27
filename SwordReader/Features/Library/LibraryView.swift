@@ -276,14 +276,16 @@ private struct KeyedEntryView: View {
     @Environment(AppModel.self) private var model
     let module: KeyedModule
     let keys: [String]
-    @State private var selectedKey: String
+    @State private var readerTabs: KeyedReaderTabs
     @State private var entry: KeyedModuleEntry?
 
     init(module: KeyedModule, keys: [String], initialKey: String) {
         self.module = module
         self.keys = keys
-        _selectedKey = State(initialValue: initialKey)
+        _readerTabs = State(initialValue: KeyedReaderTabs(initialKey: initialKey))
     }
+
+    private var selectedKey: String { readerTabs.selectedKey }
 
     private var previousKey: String? {
         KeyedEntryNavigation.adjacentKey(to: selectedKey, offset: -1, in: keys)
@@ -307,18 +309,21 @@ private struct KeyedEntryView: View {
                     .padding()
             }
         }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            keyedReaderTabBar
+        }
         .navigationTitle(selectedKey.split(separator: "/").last.map(String.init) ?? selectedKey)
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 Button("Previous Entry", systemImage: "chevron.left") {
-                    if let previousKey { selectedKey = previousKey }
+                    if let previousKey { readerTabs.selectKey(previousKey) }
                 }
                 .labelStyle(.iconOnly)
                 .disabled(previousKey == nil)
                 .help("Previous Entry")
 
                 Button("Next Entry", systemImage: "chevron.right") {
-                    if let nextKey { selectedKey = nextKey }
+                    if let nextKey { readerTabs.selectKey(nextKey) }
                 }
                 .labelStyle(.iconOnly)
                 .disabled(nextKey == nil)
@@ -333,6 +338,51 @@ private struct KeyedEntryView: View {
                 model.presentedError = PresentedError(error)
             }
         }
+    }
+
+    private var keyedReaderTabBar: some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: 6) {
+                ForEach(readerTabs.tabs) { tab in
+                    HStack(spacing: 4) {
+                        Button(Self.displayTitle(for: tab.key)) {
+                            readerTabs.selectTab(tab.id)
+                        }
+                        .lineLimit(1)
+
+                        Button("Close Tab", systemImage: "xmark") {
+                            readerTabs.closeTab(tab.id)
+                        }
+                        .labelStyle(.iconOnly)
+                        .disabled(readerTabs.tabs.count == 1)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 7)
+                    .background(
+                        tab.id == readerTabs.selectedTabID
+                            ? Color.accentColor.opacity(0.16)
+                            : Color.secondary.opacity(0.08),
+                        in: .rect(cornerRadius: 8)
+                    )
+                }
+
+                Button("New Tab", systemImage: "plus") {
+                    readerTabs.createTab()
+                }
+                .labelStyle(.iconOnly)
+                .buttonStyle(.borderless)
+                .help("New Reading Tab")
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+        }
+        .background(.bar)
+        .accessibilityLabel("Reading Tabs")
+    }
+
+    private static func displayTitle(for key: String) -> String {
+        key.split(separator: "/").last.map(String.init) ?? key
     }
 }
 

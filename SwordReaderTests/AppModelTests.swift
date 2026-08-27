@@ -28,6 +28,27 @@ struct AppModelTests {
         #expect(KeyedEntryNavigation.adjacentKey(to: "Chapter III", offset: 1, in: keys) == nil)
     }
 
+    @Test func keyedReaderTabsPreserveIndependentEntries() {
+        var tabs = KeyedReaderTabs(initialKey: "Chapter I")
+        let firstTab = tabs.selectedTabID
+
+        tabs.createTab()
+        let secondTab = tabs.selectedTabID
+        #expect(secondTab != firstTab)
+        #expect(tabs.tabs.count == 2)
+
+        tabs.selectKey("Chapter III")
+        #expect(tabs.selectedKey == "Chapter III")
+        #expect(tabs.tabs.first { $0.id == secondTab }?.key == "Chapter III")
+
+        tabs.selectTab(firstTab)
+        #expect(tabs.selectedKey == "Chapter I")
+
+        tabs.closeTab(firstTab)
+        #expect(tabs.tabs.map(\.id) == [secondTab])
+        #expect(tabs.selectedKey == "Chapter III")
+    }
+
     @Test func MacUpdateLinkUsesLatestGitHubRelease() {
         #expect(
             AppUpdateLink.latestReleaseURL.absoluteString
