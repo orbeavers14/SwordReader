@@ -299,6 +299,7 @@ private struct KeyedEntryView: View {
         ScrollView {
             if let entry {
                 Text(KeyedEntryFormatter.attributedString(for: entry))
+                    .font(.system(size: model.readerFontSize, design: model.readerFont.design))
                     .textSelection(.enabled)
                     .frame(maxWidth: 720, alignment: .leading)
                     .padding(.horizontal, 24)

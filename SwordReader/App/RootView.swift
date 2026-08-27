@@ -70,6 +70,9 @@ private struct TabRootView: View {
             NavigationStack { LibraryView() }
                 .tabItem { Label(AppSection.library.title, systemImage: AppSection.library.systemImage) }
                 .tag(AppSection.library)
+            NavigationStack { PreferencesView() }
+                .tabItem { Label(AppSection.settings.title, systemImage: AppSection.settings.systemImage) }
+                .tag(AppSection.settings)
         }
     }
 }
@@ -108,8 +111,167 @@ private struct SplitRootView: View {
                 case .plans: ReadingPlansView()
                 case .search: SearchView()
                 case .library: LibraryView()
+                case .settings: PreferencesView()
                 }
             }
+        }
+    }
+}
+
+struct PreferencesView: View {
+    @Environment(AppModel.self) private var model
+
+    var body: some View {
+        Form {
+            Section("Reading") {
+                Toggle("Red-letter text", isOn: redLetterBinding)
+                    .help("Show words of Christ in red when the installed module provides that formatting")
+
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Font Size")
+                        Spacer()
+                        Text("\(Int(model.readerFontSize.rounded())) pt")
+                            .foregroundStyle(.secondary)
+                            .monospacedDigit()
+                    }
+                    Slider(value: fontSizeBinding, in: 12...32, step: 0.5) {
+                        Text("Font Size")
+                    } minimumValueLabel: {
+                        Image(systemName: "textformat.size.smaller")
+                    } maximumValueLabel: {
+                        Image(systemName: "textformat.size.larger")
+                    }
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Reader Preview")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        (Text("16 ").foregroundStyle(.secondary)
+                            + Text("I am the way, and the truth, and the life.")
+                                .foregroundStyle(model.showsRedLetterText ? .red : .primary))
+                            .font(.system(size: model.readerFontSize, design: model.readerFont.design))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding()
+                            .background(.background, in: .rect(cornerRadius: 8))
+                    }
+                }
+            }
+
+            Section("Library") {
+                NavigationLink("Installed Modules") {
+                    InstalledModulesPreferencesView()
+                        .environment(model)
+                }
+            }
+        }
+        .formStyle(.grouped)
+        .navigationTitle("Settings")
+    }
+
+    private var redLetterBinding: Binding<Bool> {
+        Binding(
+            get: { model.showsRedLetterText },
+            set: { model.setShowsRedLetterText($0) }
+        )
+    }
+
+    private var fontSizeBinding: Binding<Double> {
+        Binding(
+            get: { model.readerFontSize },
+            set: { model.setReaderFontSize($0) }
+        )
+    }
+}
+
+private struct InstalledModulesPreferencesView: View {
+    @Environment(AppModel.self) private var model
+    @State private var biblePendingRemoval: BibleModule?
+    @State private var keyedModulePendingRemoval: KeyedModule?
+
+    var body: some View {
+        List {
+            Section("Bibles") {
+                if model.modules.isEmpty {
+                    Text("No Bibles installed").foregroundStyle(.secondary)
+                }
+                ForEach(model.modules) { module in
+                    moduleRow(
+                        title: module.title,
+                        details: [module.id, module.language, module.version]
+                    ) {
+                        biblePendingRemoval = module
+                    }
+                }
+            }
+
+            Section("Books & Devotionals") {
+                if model.keyedModules.isEmpty {
+                    Text("No books or devotionals installed").foregroundStyle(.secondary)
+                }
+                ForEach(model.keyedModules) { module in
+                    moduleRow(
+                        title: module.title,
+                        details: [module.category.title, module.language, module.version]
+                    ) {
+                        keyedModulePendingRemoval = module
+                    }
+                }
+            }
+        }
+        .navigationTitle("Installed Modules")
+        .confirmationDialog(
+            "Delete \(biblePendingRemoval?.title ?? "Bible")?",
+            isPresented: Binding(
+                get: { biblePendingRemoval != nil },
+                set: { if !$0 { biblePendingRemoval = nil } }
+            ),
+            titleVisibility: .visible,
+            presenting: biblePendingRemoval
+        ) { module in
+            Button("Delete from This Device", role: .destructive) {
+                biblePendingRemoval = nil
+                Task { await model.removeModule(id: module.id) }
+            }
+            Button("Cancel", role: .cancel) { biblePendingRemoval = nil }
+        } message: { module in
+            Text("\(module.title) can be installed again later from its module source.")
+        }
+        .confirmationDialog(
+            "Delete \(keyedModulePendingRemoval?.title ?? "Module")?",
+            isPresented: Binding(
+                get: { keyedModulePendingRemoval != nil },
+                set: { if !$0 { keyedModulePendingRemoval = nil } }
+            ),
+            titleVisibility: .visible,
+            presenting: keyedModulePendingRemoval
+        ) { module in
+            Button("Delete from This Device", role: .destructive) {
+                keyedModulePendingRemoval = nil
+                Task { await model.removeKeyedModule(id: module.id) }
+            }
+            Button("Cancel", role: .cancel) { keyedModulePendingRemoval = nil }
+        } message: { module in
+            Text("\(module.title) can be installed again later from its module source.")
+        }
+    }
+
+    private func moduleRow(
+        title: String,
+        details: [String?],
+        delete: @escaping () -> Void
+    ) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                Text(details.compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · "))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            Button("Delete", systemImage: "trash", role: .destructive, action: delete)
+                .labelStyle(.iconOnly)
+                .disabled(model.removingModuleID != nil)
         }
     }
 }

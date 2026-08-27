@@ -8,8 +8,10 @@ final class AppModel {
     var section: AppSection = .read
     private(set) var readerFont: ReaderFont
     private(set) var readerTextSize: ReaderTextSize
+    private(set) var readerFontSize: Double
     private(set) var readerSpacing: ReaderSpacing
     private(set) var showsVerseNumbers: Bool
+    private(set) var showsRedLetterText: Bool
     private(set) var appAppearance: AppAppearance
     private(set) var modules: [BibleModule] = []
     private(set) var keyedModules: [KeyedModule] = []
@@ -66,8 +68,10 @@ final class AppModel {
     private static let completedOnboardingKey = "completedOnboarding"
     private static let readerFontKey = "reader.font"
     private static let readerTextSizeKey = "reader.textSize"
+    private static let readerFontSizeKey = "reader.fontSize"
     private static let readerSpacingKey = "reader.spacing"
     private static let showsVerseNumbersKey = "reader.showsVerseNumbers"
+    private static let showsRedLetterTextKey = "reader.showsRedLetterText"
     private static let appAppearanceKey = "app.appearance"
     private static let searchModeKey = "search.mode"
     private static let searchScopeKey = "search.scope"
@@ -102,12 +106,18 @@ final class AppModel {
         readerTextSize = ReaderTextSize(
             rawValue: defaults.string(forKey: Self.readerTextSizeKey) ?? ""
         ) ?? .standard
+        readerFontSize = defaults.object(forKey: Self.readerFontSizeKey) == nil
+            ? 17
+            : defaults.double(forKey: Self.readerFontSizeKey)
         readerSpacing = ReaderSpacing(
             rawValue: defaults.string(forKey: Self.readerSpacingKey) ?? ""
         ) ?? .comfortable
         showsVerseNumbers = defaults.object(
             forKey: Self.showsVerseNumbersKey
         ).map { _ in defaults.bool(forKey: Self.showsVerseNumbersKey) } ?? true
+        showsRedLetterText = defaults.object(
+            forKey: Self.showsRedLetterTextKey
+        ).map { _ in defaults.bool(forKey: Self.showsRedLetterTextKey) } ?? true
         appAppearance = AppAppearance(
             rawValue: defaults.string(forKey: Self.appAppearanceKey) ?? ""
         ) ?? .system
@@ -271,6 +281,19 @@ final class AppModel {
     func setReaderTextSize(_ size: ReaderTextSize) {
         readerTextSize = size
         defaults.set(size.rawValue, forKey: Self.readerTextSizeKey)
+        let fontSize: Double
+        switch size {
+        case .small: fontSize = 14
+        case .standard: fontSize = 17
+        case .large: fontSize = 21
+        case .extraLarge: fontSize = 26
+        }
+        setReaderFontSize(fontSize)
+    }
+
+    func setReaderFontSize(_ size: Double) {
+        readerFontSize = min(max(size, 12), 32)
+        defaults.set(readerFontSize, forKey: Self.readerFontSizeKey)
     }
 
     func setReaderSpacing(_ spacing: ReaderSpacing) {
@@ -281,6 +304,20 @@ final class AppModel {
     func setShowsVerseNumbers(_ shows: Bool) {
         showsVerseNumbers = shows
         defaults.set(shows, forKey: Self.showsVerseNumbersKey)
+    }
+
+    func setShowsRedLetterText(_ shows: Bool) {
+        showsRedLetterText = shows
+        defaults.set(shows, forKey: Self.showsRedLetterTextKey)
+    }
+
+    func reloadReaderPreferences() {
+        if defaults.object(forKey: Self.readerFontSizeKey) != nil {
+            readerFontSize = min(max(defaults.double(forKey: Self.readerFontSizeKey), 12), 32)
+        }
+        showsRedLetterText = defaults.object(
+            forKey: Self.showsRedLetterTextKey
+        ).map { _ in defaults.bool(forKey: Self.showsRedLetterTextKey) } ?? true
     }
 
     func setAppAppearance(_ appearance: AppAppearance) {

@@ -28,6 +28,12 @@ struct AppModelTests {
         #expect(KeyedEntryNavigation.adjacentKey(to: "Chapter III", offset: 1, in: keys) == nil)
     }
 
+    @Test func sideBySideReaderDividerKeepsBothPanesUsable() {
+        #expect(ReaderPaneLayout.ratio(startingAt: 0.5, translation: 100, totalWidth: 1_000) == 0.6)
+        #expect(ReaderPaneLayout.ratio(startingAt: 0.5, translation: -900, totalWidth: 1_000) == 0.25)
+        #expect(ReaderPaneLayout.ratio(startingAt: 0.5, translation: 900, totalWidth: 1_000) == 0.75)
+    }
+
     @Test func keyedReaderTabsPreserveIndependentEntries() {
         var tabs = KeyedReaderTabs(initialKey: "Chapter I")
         let firstTab = tabs.selectedTabID
@@ -297,6 +303,19 @@ struct AppModelTests {
         )
         await restored.start()
         #expect(!restored.isPresentingOnboarding)
+    }
+
+    @Test func readerPreferencesPersistRedLettersAndContinuousFontSize() throws {
+        let defaults = try #require(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+        let model = AppModel(service: FakeScriptureService(), defaults: defaults)
+
+        model.setShowsRedLetterText(false)
+        model.setReaderFontSize(23.5)
+
+        let restored = AppModel(service: FakeScriptureService(), defaults: defaults)
+        #expect(!restored.showsRedLetterText)
+        #expect(restored.readerFontSize == 23.5)
     }
 
     @Test func completedOnboardingReturnsOnLaunchWhenNoBibleIsInstalled() async throws {

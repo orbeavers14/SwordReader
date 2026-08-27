@@ -49,19 +49,12 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 - [x] System-selected iOS and iPadOS light, dark, and tinted app-icon artwork
   with release-time dimension, opacity, and appearance validation
 - [x] GitHub-hosted macOS preview releases with an in-app latest-release check
+- [x] Native Settings/Preferences with persistent red-letter and continuous font
+  sizing controls, a live reader preview, and confirmed deletion of installed modules
 
 ## Ordered milestones
 
 1. Reader and library polish
-   - Add a native Settings/Preferences screen using each platform's standard
-     presentation. Include a checkbox-style toggle to enable or disable red-letter
-     words of Christ when the active module provides that markup, plus a continuous
-     font-size slider whose changes apply to Bible, book, and devotional readers.
-     Persist both preferences and keep every reading view usable when red-letter
-     metadata is unavailable.
-   - Add an Installed Modules page within Settings/Preferences that lists local
-     Bibles, books, and devotionals and allows people to review module details and
-     delete installed content with a confirmation step.
    - Add a dedicated Installed Modules section that clearly separates local
      content from modules available to download and provides native management
      actions.

@@ -3,6 +3,12 @@ import SwiftUI
 @main
 struct SwordReaderApp: App {
     var body: some Scene {
+        #if os(macOS)
+        Settings {
+            PreferencesSceneView()
+        }
+        #endif
+
         WindowGroup {
             SwordReaderSceneView()
         }
@@ -18,6 +24,21 @@ struct SwordReaderApp: App {
         #endif
     }
 }
+
+#if os(macOS)
+private struct PreferencesSceneView: View {
+    @State private var model = AppModel()
+
+    var body: some View {
+        NavigationStack {
+            PreferencesView()
+                .environment(model)
+        }
+        .frame(width: 560, height: 520)
+        .task { await model.start() }
+    }
+}
+#endif
 
 private struct SwordReaderSceneView: View {
     @State private var model = AppModel()
@@ -70,6 +91,11 @@ private struct SwordReaderSceneView: View {
             }
             .onChange(of: model.readerTabSession) { _, session in
                 storedTabSession = session?.encoded ?? ""
+            }
+            .onReceive(NotificationCenter.default.publisher(
+                for: UserDefaults.didChangeNotification
+            )) { _ in
+                model.reloadReaderPreferences()
             }
     }
 }

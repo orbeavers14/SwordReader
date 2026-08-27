@@ -436,6 +436,7 @@ enum AppSection: String, CaseIterable, Identifiable, Sendable {
     case plans
     case search
     case library
+    case settings
 
     var id: Self { self }
 
@@ -445,6 +446,7 @@ enum AppSection: String, CaseIterable, Identifiable, Sendable {
         case .plans: String(localized: "Plans")
         case .search: String(localized: "Search")
         case .library: String(localized: "Library")
+        case .settings: String(localized: "Settings")
         }
     }
 
@@ -454,6 +456,7 @@ enum AppSection: String, CaseIterable, Identifiable, Sendable {
         case .plans: "calendar"
         case .search: "magnifyingglass"
         case .library: "books.vertical"
+        case .settings: "gearshape"
         }
     }
 }

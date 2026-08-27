@@ -7,6 +7,8 @@ struct ReaderView: View {
     @State private var isChoosingBook = false
     @State private var isChoosingChapter = false
     @State private var isShowingComparison = false
+    @State private var sideBySideRatio = 0.5
+    @State private var sideBySideDragStartRatio: Double?
 
     var body: some View {
         Group {
@@ -213,7 +215,8 @@ struct ReaderView: View {
                 if isWide {
                     HStack(spacing: 0) {
                         sideBySidePane(model.sideBySidePanes[0])
-                        Divider()
+                            .frame(width: max(0, (proxy.size.width - 12) * sideBySideRatio))
+                        resizablePaneDivider(totalWidth: proxy.size.width)
                         sideBySidePane(model.sideBySidePanes[1])
                     }
                 } else {
@@ -225,6 +228,33 @@ struct ReaderView: View {
                 }
             }
         }
+    }
+
+    private func resizablePaneDivider(totalWidth: CGFloat) -> some View {
+        Rectangle()
+            .fill(Color.secondary.opacity(0.18))
+            .frame(width: 12)
+            .overlay {
+                Capsule()
+                    .fill(Color.secondary)
+                    .frame(width: 3, height: 36)
+            }
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(minimumDistance: 1)
+                    .onChanged { value in
+                        let startingRatio = sideBySideDragStartRatio ?? sideBySideRatio
+                        sideBySideDragStartRatio = startingRatio
+                        sideBySideRatio = ReaderPaneLayout.ratio(
+                            startingAt: startingRatio,
+                            translation: value.translation.width,
+                            totalWidth: totalWidth
+                        )
+                    }
+                    .onEnded { _ in sideBySideDragStartRatio = nil }
+            )
+            .accessibilityLabel("Resize Reading Panes")
+            .accessibilityHint("Drag left or right to resize both reading panes")
     }
 
     private func sideBySidePane(_ pane: SideBySideReaderPane) -> some View {
@@ -246,11 +276,8 @@ struct ReaderView: View {
                                     .font(.caption.weight(.semibold))
                                     .foregroundStyle(.secondary)
                             }
-                            Text(verse.content)
-                                .font(.system(
-                                    model.readerTextSize.textStyle,
-                                    design: model.readerFont.design
-                                ))
+                            Text(displayedContent(for: verse))
+                                .font(.system(size: model.readerFontSize, design: model.readerFont.design))
                                 .lineSpacing(model.readerSpacing.lineSpacing)
                                 .textSelection(.enabled)
                         }
@@ -260,6 +287,13 @@ struct ReaderView: View {
                 .padding()
             }
         }
+    }
+
+    private func displayedContent(for verse: BibleVerse) -> AttributedString {
+        guard !model.showsRedLetterText else { return verse.content }
+        var content = verse.content
+        content.foregroundColor = nil
+        return content
     }
 
     private var previousChapterButton: some View {
@@ -308,6 +342,17 @@ struct ReaderView: View {
         .disabled(!model.canMoveToNextChapter)
         .keyboardShortcut(.rightArrow, modifiers: [.command])
         .help("Next Chapter")
+    }
+}
+
+enum ReaderPaneLayout {
+    static func ratio(
+        startingAt ratio: Double,
+        translation: CGFloat,
+        totalWidth: CGFloat
+    ) -> Double {
+        guard totalWidth > 0 else { return ratio }
+        return min(max(ratio + translation / totalWidth, 0.25), 0.75)
     }
 }
 
@@ -462,7 +507,7 @@ private struct VerseView: View {
             }
 
             verseText
-                .font(.system(model.readerTextSize.textStyle, design: model.readerFont.design))
+                .font(.system(size: model.readerFontSize, design: model.readerFont.design))
                 .lineSpacing(model.readerSpacing.lineSpacing)
                 .textSelection(.enabled)
 
@@ -519,10 +564,17 @@ private struct VerseView: View {
             Text(verse.number + " ")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
-            + Text(verse.content)
+            + Text(displayedContent)
         } else {
-            Text(verse.content)
+            Text(displayedContent)
         }
+    }
+
+    private var displayedContent: AttributedString {
+        guard !model.showsRedLetterText else { return verse.content }
+        var content = verse.content
+        content.foregroundColor = nil
+        return content
     }
 }
 
@@ -683,7 +735,7 @@ private struct ReaderAppearanceMenu: View {
     }
 }
 
-private extension ReaderFont {
+extension ReaderFont {
     var design: Font.Design {
         switch self {
         case .system: .default

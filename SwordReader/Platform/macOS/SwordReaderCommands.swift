@@ -42,6 +42,7 @@ private extension AppSection {
         case .plans: "2"
         case .search: "3"
         case .library: "4"
+        case .settings: "5"
         }
     }
 }
