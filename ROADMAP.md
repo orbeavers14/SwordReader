@@ -55,25 +55,11 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 ## Ordered milestones
 
 1. Reader and library polish
-   - Make the downloadable-module language filter default to the system's preferred
-     language when that language is available, fall back to English otherwise, and
-     persist the person's explicit language choice until they change it again.
-   - Add a tab context menu that lets people switch that tab to any compatible
-     installed module without changing other tabs. Make the current module visible
-     in the menu and preserve the tab's reading location when the destination module
-     supports it.
-   - Make side-by-side reading discoverable from the tab context menu and tab bar,
-     explain which neighboring tab will be paired, and keep the split-back action
-     visible while panes are merged. Fix the reported macOS array-bounds crash by
-     rendering from a stable two-pane snapshot instead of indexing mutable pane
-     state during layout, with regression tests for merge, resize, tab changes, and
-     split-back transitions.
-   - Correct macOS launch behavior so opening SwordReader creates or restores the
-     main reader window instead of presenting only the Settings window. Keep
-     SwordReader > Settings as the native Preferences entry point.
-   - Remove Settings from the macOS navigation sidebar because the native app-menu
-     Settings command already provides it. Retain an appropriate in-app Settings
-     destination on iPhone and iPad, where there is no equivalent macOS app menu.
+   - Complete the focused module, tab, and Mac usability issues: downloadable-module
+     language defaults and persistence ([#11](https://github.com/orbeavers14/SwordReader/issues/11)),
+     per-tab module switching ([#12](https://github.com/orbeavers14/SwordReader/issues/12)),
+     safe and discoverable side-by-side reading ([#13](https://github.com/orbeavers14/SwordReader/issues/13)),
+     and correct Mac launch and Settings behavior ([#14](https://github.com/orbeavers14/SwordReader/issues/14)).
    - Add a dedicated Installed Modules section that clearly separates local
      content from modules available to download and provides native management
      actions.
