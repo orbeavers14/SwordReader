@@ -60,6 +60,7 @@ struct SearchView: View {
                         }
                     }
                 }
+                .help("Search Options")
             }
         }
         .safeAreaInset(edge: .bottom) {

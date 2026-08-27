@@ -305,6 +305,7 @@ private struct InstalledModulesPreferencesView: View {
             Button("Delete", systemImage: "trash", role: .destructive, action: delete)
                 .labelStyle(.iconOnly)
                 .disabled(model.removingModuleID != nil)
+                .help("Remove from This Device")
         }
     }
 }

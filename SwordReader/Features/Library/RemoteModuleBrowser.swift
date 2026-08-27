@@ -111,6 +111,7 @@ struct RemoteModuleBrowser: View {
                         Task { await model.refreshRemoteCatalog() }
                     }
                     .disabled(model.isRefreshingRemoteCatalog || model.installingModuleID != nil)
+                    .help("Refresh Module Catalog")
                 }
                 ToolbarItem(placement: .secondaryAction) {
                     Menu(selectedSource.name, systemImage: "server.rack") {
@@ -130,6 +131,7 @@ struct RemoteModuleBrowser: View {
                             isShowingSources = true
                         }
                     }
+                    .help("Module Source: \(selectedSource.name)")
                 }
             }
         }

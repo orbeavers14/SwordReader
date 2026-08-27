@@ -119,21 +119,25 @@ struct LibraryView: View {
                 Button("Get Modules", systemImage: "arrow.down.circle") {
                     isShowingRemoteAccessWarning = true
                 }
+                .help("Get Modules")
             }
             ToolbarItem(placement: .secondaryAction) {
                 Button("Import Local Catalog", systemImage: "folder.badge.plus") {
                     isImporting = true
                 }
+                .help("Import Local Catalog")
             }
             ToolbarItem(placement: .secondaryAction) {
                 Button("Feedback", systemImage: "bubble.left.and.exclamationmark.bubble.right") {
                     isShowingFeedback = true
                 }
+                .help("Send Feedback")
             }
             ToolbarItem(placement: .secondaryAction) {
                 Button("Privacy & Licenses", systemImage: "info.circle") {
                     isShowingPrivacyAndLicenses = true
                 }
+                .help("Privacy & Licenses")
             }
         }
         .confirmationDialog(
@@ -418,6 +422,7 @@ private struct KeyedEntryView: View {
                         }
                         .labelStyle(.iconOnly)
                         .disabled(readerTabs.tabs.count == 1)
+                        .help("Close Tab")
                     }
                     .buttonStyle(.plain)
                     .padding(.horizontal, 10)
@@ -479,6 +484,7 @@ private struct KeyedEntryView: View {
                     }
                     .labelStyle(.iconOnly)
                     .buttonStyle(.borderless)
+                    .help("Split Back into Tabs")
                 } else if let neighbor = neighbor(of: readerTabs.selectedTabID) {
                     Button(
                         "Show Side by Side with \(tabTitle(neighbor))",
@@ -488,6 +494,7 @@ private struct KeyedEntryView: View {
                     }
                     .labelStyle(.iconOnly)
                     .buttonStyle(.borderless)
+                    .help("Show Side by Side with \(tabTitle(neighbor))")
                 }
             }
             .padding(.horizontal)

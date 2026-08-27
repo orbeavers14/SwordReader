@@ -128,12 +128,14 @@ struct ReaderView: View {
                 Button("Split Back into Tabs", systemImage: "rectangle.split.1x2") {
                     model.splitSideBySideTabs()
                 }
+                .help("Split Back into Tabs")
             }
         } else if model.canShowSelectedTabsSideBySide {
             ToolbarItem(placement: .secondaryAction) {
                 Button("Show Adjacent Tab Side by Side", systemImage: "rectangle.split.2x1") {
                     Task { await model.showSelectedTabsSideBySide() }
                 }
+                .help("Show Adjacent Tab Side by Side")
             }
         }
 
@@ -374,6 +376,7 @@ private struct ReaderTabBar: View {
                         }
                         .labelStyle(.iconOnly)
                         .disabled(model.readerTabs.count == 1)
+                        .help("Close Tab")
                     }
                     .buttonStyle(.plain)
                     .padding(.horizontal, 10)
