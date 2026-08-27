@@ -509,6 +509,12 @@ struct ReaderTab: Codable, Identifiable, Hashable, Sendable {
     }
 }
 
+struct SideBySideReaderPane: Identifiable, Hashable, Sendable {
+    let id: ReaderTab.ID
+    let destination: ReaderDestination
+    let chapter: BibleChapter
+}
+
 struct ReaderTabSession: Codable, Hashable, Sendable {
     let tabs: [ReaderTab]
     let selectedTabID: ReaderTab.ID

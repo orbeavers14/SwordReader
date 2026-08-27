@@ -253,6 +253,30 @@ struct AppModelTests {
         #expect(restored.reference == "John 1")
     }
 
+    @Test func readerTabsMergeSideBySideAndSplitBackWithoutLosingState() async throws {
+        let model = AppModel(service: FakeScriptureService())
+        await model.start()
+
+        let firstTab = try #require(model.selectedReaderTabID)
+        let firstDestination = try #require(model.currentDestination)
+        model.createReaderTab()
+        let secondTab = try #require(model.selectedReaderTabID)
+        model.select(bookID: "John", chapter: 2)
+
+        await model.showSelectedTabsSideBySide()
+
+        #expect(model.sideBySidePanes.map(\.id) == [firstTab, secondTab])
+        #expect(model.sideBySidePanes.map(\.destination.reference) == [firstDestination.reference, "John 2"])
+        #expect(model.readerTabs.count == 2)
+
+        model.splitSideBySideTabs()
+
+        #expect(model.sideBySidePanes.isEmpty)
+        #expect(model.readerTabs.map(\.id) == [firstTab, secondTab])
+        #expect(model.selectedReaderTabID == secondTab)
+        #expect(model.reference == "John 2")
+    }
+
     @Test func firstLaunchPresentsOnboardingUntilCompleted() async throws {
         let defaults = try #require(UserDefaults(suiteName: #function))
         defaults.removePersistentDomain(forName: #function)

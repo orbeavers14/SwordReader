@@ -20,6 +20,8 @@ struct ReaderView: View {
                 }
             } else if model.isLoading && model.chapter == nil {
                 ProgressView("Loading chapter…")
+            } else if model.sideBySidePanes.count == 2 {
+                sideBySideContent
             } else if let chapter = model.chapter {
                 chapterContent(chapter)
             } else {
@@ -119,6 +121,20 @@ struct ReaderView: View {
             ReaderAppearanceMenu()
         }
 
+        if model.sideBySidePanes.count == 2 {
+            ToolbarItem(placement: .secondaryAction) {
+                Button("Split Back into Tabs", systemImage: "rectangle.split.1x2") {
+                    model.splitSideBySideTabs()
+                }
+            }
+        } else if model.canShowSelectedTabsSideBySide {
+            ToolbarItem(placement: .secondaryAction) {
+                Button("Show Adjacent Tab Side by Side", systemImage: "rectangle.split.2x1") {
+                    Task { await model.showSelectedTabsSideBySide() }
+                }
+            }
+        }
+
         if model.modules.count > 1 {
             ToolbarItem(placement: .secondaryAction) {
                 Menu("Compare Translation", systemImage: "rectangle.split.2x1") {
@@ -188,6 +204,62 @@ struct ReaderView: View {
 
     private var chapterNavigation: some View {
         ChapterNavigationView().environment(model)
+    }
+
+    private var sideBySideContent: some View {
+        GeometryReader { proxy in
+            let isWide = proxy.size.width >= 700
+            Group {
+                if isWide {
+                    HStack(spacing: 0) {
+                        sideBySidePane(model.sideBySidePanes[0])
+                        Divider()
+                        sideBySidePane(model.sideBySidePanes[1])
+                    }
+                } else {
+                    VStack(spacing: 0) {
+                        sideBySidePane(model.sideBySidePanes[0])
+                        Divider()
+                        sideBySidePane(model.sideBySidePanes[1])
+                    }
+                }
+            }
+        }
+    }
+
+    private func sideBySidePane(_ pane: SideBySideReaderPane) -> some View {
+        VStack(spacing: 0) {
+            Text(model.readerTabTitle(ReaderTab(id: pane.id, destination: pane.destination)))
+                .font(.headline)
+                .lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal)
+                .padding(.vertical, 10)
+                .background(.bar)
+
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: model.readerSpacing.verseSpacing) {
+                    ForEach(pane.chapter.verses) { verse in
+                        HStack(alignment: .firstTextBaseline, spacing: 6) {
+                            if model.showsVerseNumbers {
+                                Text(verse.number)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(.secondary)
+                            }
+                            Text(verse.content)
+                                .font(.system(
+                                    model.readerTextSize.textStyle,
+                                    design: model.readerFont.design
+                                ))
+                                .lineSpacing(model.readerSpacing.lineSpacing)
+                                .textSelection(.enabled)
+                        }
+                    }
+                }
+                .frame(maxWidth: 720, alignment: .leading)
+                .padding()
+            }
+        }
     }
 
     private var previousChapterButton: some View {

@@ -15,6 +15,7 @@ final class AppModel {
     private(set) var keyedModules: [KeyedModule] = []
     private(set) var readerTabs: [ReaderTab] = []
     private(set) var selectedReaderTabID: ReaderTab.ID?
+    private(set) var sideBySidePanes: [SideBySideReaderPane] = []
     private(set) var selectedModuleID: String?
     private(set) var books: [BibleBook] = []
     private(set) var selectedBookID: String?
@@ -401,6 +402,51 @@ final class AppModel {
         readerTabs.insert(tab, at: targetIndex)
     }
 
+    var canShowSelectedTabsSideBySide: Bool {
+        readerTabs.count > 1 && selectedReaderTabID != nil
+    }
+
+    func showSelectedTabsSideBySide() async {
+        guard let selectedReaderTabID,
+              let selectedIndex = readerTabs.firstIndex(where: {
+                  $0.id == selectedReaderTabID
+              }),
+              readerTabs.count > 1
+        else { return }
+
+        let neighborIndex = selectedIndex < readerTabs.count - 1
+            ? selectedIndex + 1
+            : selectedIndex - 1
+        let paneIDs = Set([selectedReaderTabID, readerTabs[neighborIndex].id])
+        let tabs = readerTabs.filter { paneIDs.contains($0.id) }
+
+        do {
+            var panes: [SideBySideReaderPane] = []
+            for tab in tabs {
+                guard let moduleID = tab.destination.moduleID else { continue }
+                let chapter = try await service.chapter(
+                    tab.destination.reference,
+                    moduleID: moduleID
+                )
+                panes.append(
+                    SideBySideReaderPane(
+                        id: tab.id,
+                        destination: tab.destination,
+                        chapter: chapter
+                    )
+                )
+            }
+            guard panes.count == 2 else { return }
+            sideBySidePanes = panes
+        } catch {
+            presentedError = PresentedError(error)
+        }
+    }
+
+    func splitSideBySideTabs() {
+        sideBySidePanes = []
+    }
+
     func closeReaderTab(_ tabID: ReaderTab.ID) async {
         guard readerTabs.count > 1,
               let index = readerTabs.firstIndex(where: { $0.id == tabID })
@@ -408,6 +454,9 @@ final class AppModel {
 
         let wasSelected = selectedReaderTabID == tabID
         readerTabs.remove(at: index)
+        if sideBySidePanes.contains(where: { $0.id == tabID }) {
+            splitSideBySideTabs()
+        }
         guard wasSelected else { return }
 
         let replacement = readerTabs[min(index, readerTabs.count - 1)]
