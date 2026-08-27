@@ -22,6 +22,7 @@ struct SwordReaderApp: App {
 private struct SwordReaderSceneView: View {
     @State private var model = AppModel()
     @SceneStorage("reader.sceneDestination") private var storedDestination = ""
+    @SceneStorage("reader.sceneTabs") private var storedTabSession = ""
     let initialDestination: ReaderDestination?
 
     init(initialDestination: ReaderDestination? = nil) {
@@ -36,9 +37,14 @@ private struct SwordReaderSceneView: View {
             .focusedSceneValue(\.swordReaderModel, model)
             #endif
             .task {
+                let sessionToRestore = ReaderTabSession(
+                    encoded: storedTabSession
+                )
                 await model.start()
                 if let initialDestination {
                     await model.open(destination: initialDestination)
+                } else if let sessionToRestore {
+                    await model.restoreReaderTabs(sessionToRestore)
                 } else if let url = URL(string: storedDestination),
                           let restored = ReaderDestination(url: url) {
                     await model.open(destination: restored)
@@ -61,6 +67,9 @@ private struct SwordReaderSceneView: View {
             }
             .onChange(of: model.currentDestination) { _, destination in
                 storedDestination = destination?.url?.absoluteString ?? ""
+            }
+            .onChange(of: model.readerTabSession) { _, session in
+                storedTabSession = session?.encoded ?? ""
             }
     }
 }

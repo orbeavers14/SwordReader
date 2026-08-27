@@ -201,6 +201,31 @@ struct AppModelTests {
         #expect(model.reference == "John \(secondChapter)")
     }
 
+    @Test func readerTabSessionRoundTripsAndRestoresAllTabs() async throws {
+        let defaults = try #require(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+        let first = AppModel(
+            service: FakeScriptureService(),
+            defaults: defaults
+        )
+        await first.start()
+        first.createReaderTab()
+        first.select(bookID: "John", chapter: 1)
+
+        let encoded = try #require(first.readerTabSession?.encoded)
+        let session = try #require(ReaderTabSession(encoded: encoded))
+        let restored = AppModel(
+            service: FakeScriptureService(),
+            defaults: defaults
+        )
+        await restored.start()
+        await restored.restoreReaderTabs(session)
+
+        #expect(restored.readerTabs == session.tabs)
+        #expect(restored.selectedReaderTabID == session.selectedTabID)
+        #expect(restored.reference == "John 1")
+    }
+
     @Test func firstLaunchPresentsOnboardingUntilCompleted() async throws {
         let defaults = try #require(UserDefaults(suiteName: #function))
         defaults.removePersistentDomain(forName: #function)

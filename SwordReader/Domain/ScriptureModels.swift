@@ -509,6 +509,32 @@ struct ReaderTab: Codable, Identifiable, Hashable, Sendable {
     }
 }
 
+struct ReaderTabSession: Codable, Hashable, Sendable {
+    let tabs: [ReaderTab]
+    let selectedTabID: ReaderTab.ID
+
+    init?(tabs: [ReaderTab], selectedTabID: ReaderTab.ID) {
+        guard !tabs.isEmpty,
+              tabs.contains(where: { $0.id == selectedTabID })
+        else { return nil }
+        self.tabs = tabs
+        self.selectedTabID = selectedTabID
+    }
+
+    init?(encoded: String) {
+        guard let data = Data(base64Encoded: encoded),
+              let session = try? JSONDecoder().decode(Self.self, from: data),
+              !session.tabs.isEmpty,
+              session.tabs.contains(where: { $0.id == session.selectedTabID })
+        else { return nil }
+        self = session
+    }
+
+    var encoded: String? {
+        try? JSONEncoder().encode(self).base64EncodedString()
+    }
+}
+
 struct ReadingHistoryEntry: Codable, Identifiable, Hashable, Sendable {
     var id: String { "\(moduleID):\(reference)" }
     let moduleID: String

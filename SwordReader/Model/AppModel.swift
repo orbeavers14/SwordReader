@@ -361,6 +361,14 @@ final class AppModel {
         return ReaderDestination(moduleID: selectedModuleID, reference: reference)
     }
 
+    var readerTabSession: ReaderTabSession? {
+        guard let selectedReaderTabID else { return nil }
+        return ReaderTabSession(
+            tabs: readerTabs,
+            selectedTabID: selectedReaderTabID
+        )
+    }
+
     func readerTabTitle(_ tab: ReaderTab) -> String {
         let moduleTitle = modules.first {
             $0.id == tab.destination.moduleID
@@ -395,6 +403,21 @@ final class AppModel {
         let replacement = readerTabs[min(index, readerTabs.count - 1)]
         selectedReaderTabID = replacement.id
         await open(destination: replacement.destination)
+    }
+
+    func restoreReaderTabs(_ session: ReaderTabSession) async {
+        let availableTabs = session.tabs.filter { tab in
+            guard let moduleID = tab.destination.moduleID else { return true }
+            return modules.contains { $0.id == moduleID }
+        }
+        guard !availableTabs.isEmpty else { return }
+
+        readerTabs = availableTabs
+        let selectedTab = availableTabs.first {
+            $0.id == session.selectedTabID
+        } ?? availableTabs[0]
+        selectedReaderTabID = selectedTab.id
+        await open(destination: selectedTab.destination)
     }
 
     var canMoveToPreviousChapter: Bool {
