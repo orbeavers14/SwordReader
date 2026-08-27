@@ -59,6 +59,9 @@ private struct SwordReaderSceneView: View {
             .focusedSceneValue(\.swordReaderModel, model)
             #endif
             .task {
+                #if canImport(MetricKit)
+                MetricKitCrashMonitor.shared.start()
+                #endif
                 let sessionToRestore = ReaderTabSession(
                     encoded: storedTabSession
                 )
@@ -97,6 +100,11 @@ private struct SwordReaderSceneView: View {
                 for: UserDefaults.didChangeNotification
             )) { _ in
                 model.reloadReaderPreferences()
+            }
+            .onReceive(NotificationCenter.default.publisher(
+                for: CrashDiagnosticStore.didSaveNotification
+            )) { _ in
+                model.reloadPendingCrashDiagnostic()
             }
     }
 }

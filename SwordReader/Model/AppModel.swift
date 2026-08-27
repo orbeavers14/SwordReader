@@ -51,6 +51,7 @@ final class AppModel {
     private(set) var isPresentingOnboarding = false
     var presentedError: PresentedError?
     var continuityNotice: ContinuityNotice?
+    private(set) var pendingCrashDiagnostic: CrashDiagnosticReport?
 
     private let service: any ScriptureServing
     private let defaults: UserDefaults
@@ -100,6 +101,9 @@ final class AppModel {
         self.companionSync = companionSync
         self.reminderScheduler = reminderScheduler
         self.defaults = defaults
+        pendingCrashDiagnostic = CrashDiagnosticStore(
+            defaults: defaults
+        ).pendingReport()
         readerFont = ReaderFont(
             rawValue: defaults.string(forKey: Self.readerFontKey) ?? ""
         ) ?? .system
@@ -318,6 +322,17 @@ final class AppModel {
         showsRedLetterText = defaults.object(
             forKey: Self.showsRedLetterTextKey
         ).map { _ in defaults.bool(forKey: Self.showsRedLetterTextKey) } ?? true
+    }
+
+    func reloadPendingCrashDiagnostic() {
+        pendingCrashDiagnostic = CrashDiagnosticStore(
+            defaults: defaults
+        ).pendingReport()
+    }
+
+    func clearPendingCrashDiagnostic() {
+        CrashDiagnosticStore(defaults: defaults).clear()
+        pendingCrashDiagnostic = nil
     }
 
     func setAppAppearance(_ appearance: AppAppearance) {

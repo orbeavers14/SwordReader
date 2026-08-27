@@ -163,3 +163,86 @@ struct FeedbackView: View {
         #endif
     }
 }
+
+struct CrashDiagnosticReviewView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+    let report: CrashDiagnosticReport
+    let deleteReport: () -> Void
+    @State private var reviewedJSON: String
+    @State private var isConfirmingDeletion = false
+
+    init(report: CrashDiagnosticReport, deleteReport: @escaping () -> Void) {
+        self.report = report
+        self.deleteReport = deleteReport
+        _reviewedJSON = State(initialValue: report.json)
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    TextEditor(text: $reviewedJSON)
+                        .font(.body.monospaced())
+                        .frame(minHeight: 320)
+                        .accessibilityLabel("Apple Crash Diagnostic")
+                } header: {
+                    Text("Review Apple Diagnostic")
+                } footer: {
+                    Text("Crash diagnostics may contain device details, file paths, and runtime information. Edit or remove anything you do not want to share.")
+                }
+
+                Section {
+                    Button("Open GitHub Issue Draft", systemImage: "safari") {
+                        if let url = draft.githubIssueURL { openURL(url) }
+                    }
+                    .disabled(reviewedJSON.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                    ShareLink(
+                        item: reviewedJSON,
+                        subject: Text(draft.title),
+                        message: Text("SwordReader Apple crash diagnostic")
+                    ) {
+                        Label("Share Full Diagnostic", systemImage: "square.and.arrow.up")
+                    }
+
+                    Button("Delete Stored Diagnostic", systemImage: "trash", role: .destructive) {
+                        isConfirmingDeletion = true
+                    }
+                } header: {
+                    Text("Share After Review")
+                } footer: {
+                    Text("GitHub opens for final review under your own account. SwordReader stores no GitHub credentials and never submits crash reports automatically.")
+                }
+            }
+            .formStyle(.grouped)
+            .navigationTitle("Crash Report")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+            .confirmationDialog(
+                "Delete this diagnostic?",
+                isPresented: $isConfirmingDeletion,
+                titleVisibility: .visible
+            ) {
+                Button("Delete", role: .destructive) { deleteReport() }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("The locally stored Apple diagnostic will be permanently removed.")
+            }
+        }
+        .frame(idealWidth: 700, idealHeight: 720)
+    }
+
+    private var draft: CrashDiagnosticIssueDraft {
+        CrashDiagnosticIssueDraft(
+            report: CrashDiagnosticReport(
+                id: report.id,
+                capturedAt: report.capturedAt,
+                json: reviewedJSON
+            )
+        )
+    }
+}

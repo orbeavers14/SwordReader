@@ -2,6 +2,8 @@ import SwiftUI
 
 struct RootView: View {
     @Environment(AppModel.self) private var model
+    @State private var dismissedCrashDiagnosticID: CrashDiagnosticReport.ID?
+    @State private var crashDiagnosticForReview: CrashDiagnosticReport?
 
     var body: some View {
         Group {
@@ -37,6 +39,22 @@ struct RootView: View {
                 )
             )
         }
+        .alert("Crash Diagnostic Available", isPresented: crashDiagnosticAlertBinding) {
+            Button("Review Report") {
+                crashDiagnosticForReview = model.pendingCrashDiagnostic
+            }
+            Button("Not Now", role: .cancel) {
+                dismissedCrashDiagnosticID = model.pendingCrashDiagnostic?.id
+            }
+        } message: {
+            Text("Apple provided a diagnostic for a previous crash. Review and edit it before choosing whether to share it; SwordReader never uploads it automatically.")
+        }
+        .sheet(item: $crashDiagnosticForReview) { report in
+            CrashDiagnosticReviewView(report: report) {
+                model.clearPendingCrashDiagnostic()
+                crashDiagnosticForReview = nil
+            }
+        }
         #if !os(macOS)
         .fullScreenCover(isPresented: onboardingBinding) {
             OnboardingView().environment(model)
@@ -48,6 +66,20 @@ struct RootView: View {
         Binding(
             get: { model.isPresentingOnboarding },
             set: { if !$0 { model.completeOnboarding() } }
+        )
+    }
+
+    private var crashDiagnosticAlertBinding: Binding<Bool> {
+        Binding(
+            get: {
+                guard let report = model.pendingCrashDiagnostic else { return false }
+                return report.id != dismissedCrashDiagnosticID
+            },
+            set: { isPresented in
+                if !isPresented, crashDiagnosticForReview == nil {
+                    dismissedCrashDiagnosticID = model.pendingCrashDiagnostic?.id
+                }
+            }
         )
     }
 }

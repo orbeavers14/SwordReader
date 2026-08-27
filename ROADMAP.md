@@ -53,6 +53,8 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
   sizing controls, a live reader preview, and confirmed deletion of installed modules
 - [x] System-aware persistent module language filtering, independent per-tab module
   switching, crash-safe split reading, and native Mac launch and Settings behavior
+- [x] Privacy-first Apple MetricKit crash diagnostics with local-only retention,
+  editable review, full-payload sharing, and user-approved GitHub issue drafts
 
 ## Ordered milestones
 

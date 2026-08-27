@@ -232,6 +232,27 @@ struct AppModelTests {
         #expect(query["body"]?.contains("Please add more reading themes.") == true)
     }
 
+    @Test func crashDiagnosticPersistsLocallyAndBuildsReviewedIssueDraft() throws {
+        let defaults = try #require(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+        let store = CrashDiagnosticStore(defaults: defaults)
+        let report = CrashDiagnosticReport(
+            capturedAt: Date(timeIntervalSince1970: 1_000),
+            json: "{\"crash\":\"ReaderView\"}"
+        )
+
+        store.save(report)
+        #expect(store.pendingReport() == report)
+
+        let draft = CrashDiagnosticIssueDraft(report: report)
+        #expect(draft.title == "[Crash] Apple diagnostic report")
+        #expect(draft.body.contains("ReaderView"))
+        #expect(draft.githubIssueURL != nil)
+
+        store.clear()
+        #expect(store.pendingReport() == nil)
+    }
+
     @Test func startSelectsFirstInstalledBible() async {
         let service = FakeScriptureService()
         let model = AppModel(service: service)
