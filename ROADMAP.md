@@ -51,15 +51,12 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 - [x] GitHub-hosted macOS preview releases with an in-app latest-release check
 - [x] Native Settings/Preferences with persistent red-letter and continuous font
   sizing controls, a live reader preview, and confirmed deletion of installed modules
+- [x] System-aware persistent module language filtering, independent per-tab module
+  switching, crash-safe split reading, and native Mac launch and Settings behavior
 
 ## Ordered milestones
 
 1. Reader and library polish
-   - Complete the focused module, tab, and Mac usability issues: downloadable-module
-     language defaults and persistence ([#11](https://github.com/orbeavers14/SwordReader/issues/11)),
-     per-tab module switching ([#12](https://github.com/orbeavers14/SwordReader/issues/12)),
-     safe and discoverable side-by-side reading ([#13](https://github.com/orbeavers14/SwordReader/issues/13)),
-     and correct Mac launch and Settings behavior ([#14](https://github.com/orbeavers14/SwordReader/issues/14)).
    - Add a dedicated Installed Modules section that clearly separates local
      content from modules available to download and provides native management
      actions.
