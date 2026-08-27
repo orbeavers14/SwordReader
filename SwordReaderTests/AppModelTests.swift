@@ -105,6 +105,36 @@ struct AppModelTests {
         #expect(CatalogFilter.apply(to: modules, query: "standard", language: nil).map(\.id) == ["ASV"])
     }
 
+    @Test func catalogLanguageDefaultsToSystemThenEnglishAndRestoresSavedChoice() {
+        let available = ["de", "en", "fr"]
+
+        #expect(CatalogLanguagePreference.selection(
+            available: available,
+            preferredLanguages: ["fr-FR", "de-DE"],
+            savedValue: nil
+        ) == "fr")
+        #expect(CatalogLanguagePreference.selection(
+            available: available,
+            preferredLanguages: ["ja-JP"],
+            savedValue: nil
+        ) == "en")
+        #expect(CatalogLanguagePreference.selection(
+            available: available,
+            preferredLanguages: ["fr-FR"],
+            savedValue: "de"
+        ) == "de")
+        #expect(CatalogLanguagePreference.selection(
+            available: available,
+            preferredLanguages: ["fr-FR"],
+            savedValue: CatalogLanguagePreference.allLanguagesValue
+        ) == nil)
+        #expect(CatalogLanguagePreference.selection(
+            available: ["de"],
+            preferredLanguages: ["ja-JP"],
+            savedValue: "fr"
+        ) == nil)
+    }
+
     @Test func moduleSourceRejectsInsecureAndMalformedEndpoints() throws {
         #expect(throws: ModuleSourceError.self) {
             try ModuleSource.validated(

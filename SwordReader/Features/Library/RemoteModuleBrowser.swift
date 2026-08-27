@@ -25,6 +25,19 @@ struct RemoteModuleBrowser: View {
         CatalogFilter.availableLanguages(in: model.remoteModules)
     }
 
+    private var languageBinding: Binding<String?> {
+        Binding(
+            get: { selectedLanguage },
+            set: { language in
+                selectedLanguage = language
+                UserDefaults.standard.set(
+                    language ?? CatalogLanguagePreference.allLanguagesValue,
+                    forKey: CatalogLanguagePreference.defaultsKey
+                )
+            }
+        )
+    }
+
     var body: some View {
         NavigationStack {
             Group {
@@ -66,7 +79,7 @@ struct RemoteModuleBrowser: View {
                     Label("Language", systemImage: "globe")
                         .foregroundStyle(.secondary)
                     Spacer()
-                    Picker("Language", selection: $selectedLanguage) {
+                    Picker("Language", selection: languageBinding) {
                         Text("All Languages").tag(String?.none)
                         ForEach(availableLanguages, id: \.self) { code in
                             Text(CatalogFilter.languageName(for: code))
@@ -79,6 +92,15 @@ struct RemoteModuleBrowser: View {
                 .padding(.horizontal)
                 .padding(.vertical, 8)
                 .background(.bar)
+            }
+            .onChange(of: availableLanguages, initial: true) { _, languages in
+                selectedLanguage = CatalogLanguagePreference.selection(
+                    available: languages,
+                    preferredLanguages: Locale.preferredLanguages,
+                    savedValue: UserDefaults.standard.string(
+                        forKey: CatalogLanguagePreference.defaultsKey
+                    )
+                )
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

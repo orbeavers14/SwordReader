@@ -263,6 +263,42 @@ enum CatalogFilter {
     }
 }
 
+enum CatalogLanguagePreference {
+    static let defaultsKey = "catalog.selectedLanguage"
+    static let allLanguagesValue = "*"
+
+    static func selection(
+        available: [String],
+        preferredLanguages: [String],
+        savedValue: String?
+    ) -> String? {
+        if savedValue == allLanguagesValue { return nil }
+        if let savedValue,
+           let saved = available.first(where: {
+               $0.caseInsensitiveCompare(savedValue) == .orderedSame
+           }) {
+            return saved
+        }
+
+        for preferredLanguage in preferredLanguages {
+            let languageCode = preferredLanguage
+                .split(whereSeparator: { $0 == "-" || $0 == "_" })
+                .first
+                .map(String.init)
+            if let languageCode,
+               let match = available.first(where: {
+                   $0.caseInsensitiveCompare(languageCode) == .orderedSame
+               }) {
+                return match
+            }
+        }
+
+        return available.first {
+            $0.caseInsensitiveCompare("en") == .orderedSame
+        }
+    }
+}
+
 struct ModuleSource: Codable, Hashable, Identifiable, Sendable {
     let id: String
     let name: String
