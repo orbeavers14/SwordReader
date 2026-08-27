@@ -40,7 +40,7 @@ struct AppModelTests {
     }
 
     @Test func keyedReaderTabsPreserveIndependentEntries() {
-        var tabs = KeyedReaderTabs(initialKey: "Chapter I")
+        var tabs = KeyedReaderTabs(initialModuleID: "BookA", initialKey: "Chapter I")
         let firstTab = tabs.selectedTabID
 
         tabs.createTab()
@@ -52,6 +52,10 @@ struct AppModelTests {
         #expect(tabs.selectedKey == "Chapter III")
         #expect(tabs.tabs.first { $0.id == secondTab }?.key == "Chapter III")
 
+        tabs.selectModule("DictionaryA", key: "Grace")
+        #expect(tabs.tabs.first { $0.id == secondTab }?.moduleID == "DictionaryA")
+        #expect(tabs.selectedKey == "Grace")
+
         tabs.selectTab(firstTab)
         #expect(tabs.selectedKey == "Chapter I")
 
@@ -60,7 +64,7 @@ struct AppModelTests {
 
         tabs.closeTab(firstTab)
         #expect(tabs.tabs.map(\.id) == [secondTab])
-        #expect(tabs.selectedKey == "Chapter III")
+        #expect(tabs.selectedKey == "Grace")
     }
 
     @Test func MacUpdateLinkUsesLatestGitHubRelease() {

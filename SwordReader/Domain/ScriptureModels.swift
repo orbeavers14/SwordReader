@@ -591,20 +591,27 @@ struct ReaderTabSession: Codable, Hashable, Sendable {
 
 struct KeyedReaderTab: Identifiable, Hashable, Sendable {
     let id: UUID
+    var moduleID: String
     var key: String
 
-    init(id: UUID = UUID(), key: String) {
+    init(id: UUID = UUID(), moduleID: String = "", key: String) {
         self.id = id
+        self.moduleID = moduleID
         self.key = key
     }
+}
+
+struct KeyedReaderTabPair: Hashable, Sendable {
+    let leading: KeyedReaderTab
+    let trailing: KeyedReaderTab
 }
 
 struct KeyedReaderTabs: Hashable, Sendable {
     private(set) var tabs: [KeyedReaderTab]
     private(set) var selectedTabID: KeyedReaderTab.ID
 
-    init(initialKey: String) {
-        let tab = KeyedReaderTab(key: initialKey)
+    init(initialModuleID: String = "", initialKey: String) {
+        let tab = KeyedReaderTab(moduleID: initialModuleID, key: initialKey)
         tabs = [tab]
         selectedTabID = tab.id
     }
@@ -614,7 +621,8 @@ struct KeyedReaderTabs: Hashable, Sendable {
     }
 
     mutating func createTab() {
-        let tab = KeyedReaderTab(key: selectedKey)
+        let selected = tabs.first { $0.id == selectedTabID } ?? tabs[0]
+        let tab = KeyedReaderTab(moduleID: selected.moduleID, key: selected.key)
         tabs.append(tab)
         selectedTabID = tab.id
     }
@@ -628,6 +636,22 @@ struct KeyedReaderTabs: Hashable, Sendable {
         guard let index = tabs.firstIndex(where: { $0.id == selectedTabID }) else {
             return
         }
+        tabs[index].key = key
+    }
+
+    mutating func selectModule(_ moduleID: String, key: String) {
+        selectModule(moduleID, key: key, in: selectedTabID)
+    }
+
+    mutating func selectModule(
+        _ moduleID: String,
+        key: String,
+        in tabID: KeyedReaderTab.ID
+    ) {
+        guard let index = tabs.firstIndex(where: { $0.id == tabID }) else {
+            return
+        }
+        tabs[index].moduleID = moduleID
         tabs[index].key = key
     }
 

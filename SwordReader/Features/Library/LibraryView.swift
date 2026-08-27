@@ -61,9 +61,9 @@ struct LibraryView: View {
                 }
             }
 
-            Section("Books & Devotionals") {
+            Section("Books, Dictionaries & Devotionals") {
                 if model.keyedModules.isEmpty {
-                    Text("No books or devotionals installed")
+                    Text("No books, dictionaries, or devotionals installed")
                         .foregroundStyle(.secondary)
                 }
                 ForEach(model.keyedModules) { module in
@@ -277,43 +277,90 @@ private struct KeyedEntryView: View {
     let module: KeyedModule
     let keys: [String]
     @State private var readerTabs: KeyedReaderTabs
+    @State private var keysByModule: [String: [String]]
     @State private var entry: KeyedModuleEntry?
+    @State private var splitTabIDs: Set<KeyedReaderTab.ID> = []
 
     init(module: KeyedModule, keys: [String], initialKey: String) {
         self.module = module
         self.keys = keys
-        _readerTabs = State(initialValue: KeyedReaderTabs(initialKey: initialKey))
+        _readerTabs = State(initialValue: KeyedReaderTabs(
+            initialModuleID: module.id,
+            initialKey: initialKey
+        ))
+        _keysByModule = State(initialValue: [module.id: keys])
     }
 
-    private var selectedKey: String { readerTabs.selectedKey }
+    private var selectedTab: KeyedReaderTab {
+        readerTabs.tabs.first { $0.id == readerTabs.selectedTabID }
+            ?? readerTabs.tabs[0]
+    }
+
+    private var selectedKeys: [String] {
+        keysByModule[selectedTab.moduleID, default: []]
+    }
 
     private var previousKey: String? {
-        KeyedEntryNavigation.adjacentKey(to: selectedKey, offset: -1, in: keys)
+        KeyedEntryNavigation.adjacentKey(
+            to: selectedTab.key,
+            offset: -1,
+            in: selectedKeys
+        )
     }
 
     private var nextKey: String? {
-        KeyedEntryNavigation.adjacentKey(to: selectedKey, offset: 1, in: keys)
+        KeyedEntryNavigation.adjacentKey(
+            to: selectedTab.key,
+            offset: 1,
+            in: selectedKeys
+        )
+    }
+
+    private var splitPair: KeyedReaderTabPair? {
+        let tabs = readerTabs.tabs.filter { splitTabIDs.contains($0.id) }
+        guard tabs.count == 2 else { return nil }
+        return KeyedReaderTabPair(leading: tabs[0], trailing: tabs[1])
     }
 
     var body: some View {
-        ScrollView {
-            if let entry {
-                Text(KeyedEntryFormatter.attributedString(for: entry))
-                    .font(.system(size: model.readerFontSize, design: model.readerFont.design))
-                    .textSelection(.enabled)
-                    .frame(maxWidth: 720, alignment: .leading)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 20)
+        Group {
+            if let splitPair {
+                GeometryReader { proxy in
+                    if proxy.size.width >= 700 {
+                        HStack(spacing: 0) {
+                            keyedPane(splitPair.leading)
+                            Divider()
+                            keyedPane(splitPair.trailing)
+                        }
+                    } else {
+                        VStack(spacing: 0) {
+                            keyedPane(splitPair.leading)
+                            Divider()
+                            keyedPane(splitPair.trailing)
+                        }
+                    }
+                }
             } else {
-                ProgressView()
-                    .frame(maxWidth: .infinity)
-                    .padding()
+                ScrollView {
+                    if let entry {
+                        Text(KeyedEntryFormatter.attributedString(for: entry))
+                            .font(.system(size: model.readerFontSize, design: model.readerFont.design))
+                            .textSelection(.enabled)
+                            .frame(maxWidth: 720, alignment: .leading)
+                            .padding(.horizontal, 24)
+                            .padding(.vertical, 20)
+                    } else {
+                        ProgressView()
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                    }
+                }
             }
         }
         .safeAreaInset(edge: .top, spacing: 0) {
             keyedReaderTabBar
         }
-        .navigationTitle(selectedKey.split(separator: "/").last.map(String.init) ?? selectedKey)
+        .navigationTitle(Self.displayTitle(for: selectedTab.key))
         .toolbar {
             ToolbarItemGroup(placement: .primaryAction) {
                 Button("Previous Entry", systemImage: "chevron.left") {
@@ -331,10 +378,24 @@ private struct KeyedEntryView: View {
                 .help("Next Entry")
             }
         }
-        .task(id: selectedKey) {
+        .task(id: selectedTab) {
+            guard splitPair == nil else { return }
             entry = nil
             do {
-                entry = try await model.keyedEntry(moduleID: module.id, key: selectedKey)
+                let availableKeys = try await keys(for: selectedTab.moduleID)
+                guard let fallback = availableKeys.first else { return }
+                if !availableKeys.contains(selectedTab.key) {
+                    readerTabs.selectModule(
+                        selectedTab.moduleID,
+                        key: fallback,
+                        in: selectedTab.id
+                    )
+                    return
+                }
+                entry = try await model.keyedEntry(
+                    moduleID: selectedTab.moduleID,
+                    key: selectedTab.key
+                )
             } catch {
                 model.presentedError = PresentedError(error)
             }
@@ -352,6 +413,7 @@ private struct KeyedEntryView: View {
                         .lineLimit(1)
 
                         Button("Close Tab", systemImage: "xmark") {
+                            splitTabIDs.remove(tab.id)
                             readerTabs.closeTab(tab.id)
                         }
                         .labelStyle(.iconOnly)
@@ -374,6 +436,34 @@ private struct KeyedEntryView: View {
                         readerTabs.moveTab(draggedID, to: tab.id)
                         return true
                     }
+                    .contextMenu {
+                        Menu("Module", systemImage: "books.vertical") {
+                            ForEach(model.keyedModules) { availableModule in
+                                Button {
+                                    Task {
+                                        await select(
+                                            module: availableModule,
+                                            for: tab
+                                        )
+                                    }
+                                } label: {
+                                    if tab.moduleID == availableModule.id {
+                                        Label(availableModule.title, systemImage: "checkmark")
+                                    } else {
+                                        Text(availableModule.title)
+                                    }
+                                }
+                            }
+                        }
+                        if let neighbor = neighbor(of: tab.id) {
+                            Button(
+                                "Show Side by Side with \(tabTitle(neighbor))",
+                                systemImage: "rectangle.split.2x1"
+                            ) {
+                                splitTabIDs = [tab.id, neighbor.id]
+                            }
+                        }
+                    }
                 }
 
                 Button("New Tab", systemImage: "plus") {
@@ -382,6 +472,23 @@ private struct KeyedEntryView: View {
                 .labelStyle(.iconOnly)
                 .buttonStyle(.borderless)
                 .help("New Reading Tab")
+
+                if splitPair != nil {
+                    Button("Split Back into Tabs", systemImage: "rectangle.split.1x2") {
+                        splitTabIDs = []
+                    }
+                    .labelStyle(.iconOnly)
+                    .buttonStyle(.borderless)
+                } else if let neighbor = neighbor(of: readerTabs.selectedTabID) {
+                    Button(
+                        "Show Side by Side with \(tabTitle(neighbor))",
+                        systemImage: "rectangle.split.2x1"
+                    ) {
+                        splitTabIDs = [readerTabs.selectedTabID, neighbor.id]
+                    }
+                    .labelStyle(.iconOnly)
+                    .buttonStyle(.borderless)
+                }
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
@@ -392,6 +499,88 @@ private struct KeyedEntryView: View {
 
     private static func displayTitle(for key: String) -> String {
         key.split(separator: "/").last.map(String.init) ?? key
+    }
+
+    private func tabTitle(_ tab: KeyedReaderTab) -> String {
+        let title = model.keyedModules.first { $0.id == tab.moduleID }?.title
+            ?? tab.moduleID
+        return "\(title) · \(Self.displayTitle(for: tab.key))"
+    }
+
+    private func neighbor(of tabID: KeyedReaderTab.ID) -> KeyedReaderTab? {
+        guard readerTabs.tabs.count > 1,
+              let index = readerTabs.tabs.firstIndex(where: { $0.id == tabID })
+        else { return nil }
+        let neighborIndex = index < readerTabs.tabs.count - 1 ? index + 1 : index - 1
+        return readerTabs.tabs[neighborIndex]
+    }
+
+    private func keys(for moduleID: String) async throws -> [String] {
+        if let cached = keysByModule[moduleID] { return cached }
+        let loaded = try await model.keyedEntryKeys(moduleID: moduleID)
+        keysByModule[moduleID] = loaded
+        return loaded
+    }
+
+    private func select(module: KeyedModule, for tab: KeyedReaderTab) async {
+        do {
+            let availableKeys = try await keys(for: module.id)
+            guard let fallback = availableKeys.first else { return }
+            readerTabs.selectModule(
+                module.id,
+                key: availableKeys.contains(tab.key) ? tab.key : fallback,
+                in: tab.id
+            )
+        } catch {
+            model.presentedError = PresentedError(error)
+        }
+    }
+
+    private func keyedPane(_ tab: KeyedReaderTab) -> some View {
+        KeyedTabPane(tab: tab)
+            .environment(model)
+    }
+}
+
+private struct KeyedTabPane: View {
+    @Environment(AppModel.self) private var model
+    let tab: KeyedReaderTab
+    @State private var entry: KeyedModuleEntry?
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Text(title)
+                .font(.headline)
+                .lineLimit(1)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+                .background(.bar)
+            ScrollView {
+                if let entry {
+                    Text(KeyedEntryFormatter.attributedString(for: entry))
+                        .font(.system(size: model.readerFontSize, design: model.readerFont.design))
+                        .textSelection(.enabled)
+                        .frame(maxWidth: 720, alignment: .leading)
+                        .padding()
+                } else {
+                    ProgressView().padding()
+                }
+            }
+        }
+        .task(id: tab) {
+            do {
+                entry = try await model.keyedEntry(moduleID: tab.moduleID, key: tab.key)
+            } catch {
+                model.presentedError = PresentedError(error)
+            }
+        }
+    }
+
+    private var title: String {
+        let moduleTitle = model.keyedModules.first { $0.id == tab.moduleID }?.title
+            ?? tab.moduleID
+        let entryTitle = tab.key.split(separator: "/").last.map(String.init) ?? tab.key
+        return "\(moduleTitle) · \(entryTitle)"
     }
 }
 

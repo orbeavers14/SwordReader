@@ -205,9 +205,10 @@ private struct InstalledModulesPreferencesView: View {
                 }
             }
 
-            Section("Books & Devotionals") {
+            Section("Books, Dictionaries & Devotionals") {
                 if model.keyedModules.isEmpty {
-                    Text("No books or devotionals installed").foregroundStyle(.secondary)
+                    Text("No books, dictionaries, or devotionals installed")
+                        .foregroundStyle(.secondary)
                 }
                 ForEach(model.keyedModules) { module in
                     moduleRow(
