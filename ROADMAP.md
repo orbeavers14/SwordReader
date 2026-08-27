@@ -59,6 +59,9 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
      font-size slider whose changes apply to Bible, book, and devotional readers.
      Persist both preferences and keep every reading view usable when red-letter
      metadata is unavailable.
+   - Add an Installed Modules page within Settings/Preferences that lists local
+     Bibles, books, and devotionals and allows people to review module details and
+     delete installed content with a confirmation step.
    - Add a dedicated Installed Modules section that clearly separates local
      content from modules available to download and provides native management
      actions.

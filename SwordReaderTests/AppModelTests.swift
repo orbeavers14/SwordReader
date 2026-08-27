@@ -44,6 +44,9 @@ struct AppModelTests {
         tabs.selectTab(firstTab)
         #expect(tabs.selectedKey == "Chapter I")
 
+        tabs.moveTab(firstTab, to: secondTab)
+        #expect(tabs.tabs.map(\.id) == [secondTab, firstTab])
+
         tabs.closeTab(firstTab)
         #expect(tabs.tabs.map(\.id) == [secondTab])
         #expect(tabs.selectedKey == "Chapter III")
@@ -206,6 +209,9 @@ struct AppModelTests {
         let secondTab = try #require(model.selectedReaderTabID)
         #expect(secondTab != firstTab)
         #expect(model.readerTabs.count == 2)
+
+        model.moveReaderTab(firstTab, to: secondTab)
+        #expect(model.readerTabs.map(\.id) == [secondTab, firstTab])
 
         let secondChapter = firstDestination.reference == "John 1" ? 2 : 1
         model.select(bookID: "John", chapter: secondChapter)

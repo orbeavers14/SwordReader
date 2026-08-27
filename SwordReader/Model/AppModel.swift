@@ -391,6 +391,16 @@ final class AppModel {
         await open(destination: tab.destination)
     }
 
+    func moveReaderTab(_ tabID: ReaderTab.ID, to targetID: ReaderTab.ID) {
+        guard tabID != targetID,
+              let sourceIndex = readerTabs.firstIndex(where: { $0.id == tabID }),
+              let targetIndex = readerTabs.firstIndex(where: { $0.id == targetID })
+        else { return }
+
+        let tab = readerTabs.remove(at: sourceIndex)
+        readerTabs.insert(tab, at: targetIndex)
+    }
+
     func closeReaderTab(_ tabID: ReaderTab.ID) async {
         guard readerTabs.count > 1,
               let index = readerTabs.firstIndex(where: { $0.id == tabID })

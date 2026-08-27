@@ -577,6 +577,16 @@ struct KeyedReaderTabs: Hashable, Sendable {
         tabs[index].key = key
     }
 
+    mutating func moveTab(_ id: KeyedReaderTab.ID, to targetID: KeyedReaderTab.ID) {
+        guard id != targetID,
+              let sourceIndex = tabs.firstIndex(where: { $0.id == id }),
+              let targetIndex = tabs.firstIndex(where: { $0.id == targetID })
+        else { return }
+
+        let tab = tabs.remove(at: sourceIndex)
+        tabs.insert(tab, at: targetIndex)
+    }
+
     mutating func closeTab(_ id: KeyedReaderTab.ID) {
         guard tabs.count > 1,
               let index = tabs.firstIndex(where: { $0.id == id })

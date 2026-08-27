@@ -365,6 +365,14 @@ private struct KeyedEntryView: View {
                             : Color.secondary.opacity(0.08),
                         in: .rect(cornerRadius: 8)
                     )
+                    .draggable(tab.id.uuidString)
+                    .dropDestination(for: String.self) { identifiers, _ in
+                        guard let draggedID = identifiers.compactMap({
+                            UUID(uuidString: $0)
+                        }).first else { return false }
+                        readerTabs.moveTab(draggedID, to: tab.id)
+                        return true
+                    }
                 }
 
                 Button("New Tab", systemImage: "plus") {
