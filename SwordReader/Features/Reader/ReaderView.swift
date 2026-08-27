@@ -29,6 +29,12 @@ struct ReaderView: View {
                 )
             }
         }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if !model.readerTabs.isEmpty {
+                ReaderTabBar()
+                    .environment(model)
+            }
+        }
         .navigationTitle(model.reference.isEmpty ? "Read" : model.reference)
         .toolbarTitleDisplayMode(.inline)
         .toolbar { readerToolbar }
@@ -230,6 +236,51 @@ struct ReaderView: View {
         .disabled(!model.canMoveToNextChapter)
         .keyboardShortcut(.rightArrow, modifiers: [.command])
         .help("Next Chapter")
+    }
+}
+
+private struct ReaderTabBar: View {
+    @Environment(AppModel.self) private var model
+
+    var body: some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: 6) {
+                ForEach(model.readerTabs) { tab in
+                    HStack(spacing: 4) {
+                        Button(model.readerTabTitle(tab)) {
+                            Task { await model.selectReaderTab(tab.id) }
+                        }
+                        .lineLimit(1)
+
+                        Button("Close Tab", systemImage: "xmark") {
+                            Task { await model.closeReaderTab(tab.id) }
+                        }
+                        .labelStyle(.iconOnly)
+                        .disabled(model.readerTabs.count == 1)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 7)
+                    .background(
+                        tab.id == model.selectedReaderTabID
+                            ? Color.accentColor.opacity(0.16)
+                            : Color.secondary.opacity(0.08),
+                        in: .rect(cornerRadius: 8)
+                    )
+                }
+
+                Button("New Tab", systemImage: "plus") {
+                    model.createReaderTab()
+                }
+                .labelStyle(.iconOnly)
+                .buttonStyle(.borderless)
+                .help("New Reading Tab")
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+        }
+        .background(.bar)
+        .accessibilityLabel("Reading Tabs")
     }
 }
 

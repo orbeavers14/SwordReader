@@ -499,6 +499,16 @@ struct ReaderDestination: Codable, Hashable, Sendable {
     }
 }
 
+struct ReaderTab: Codable, Identifiable, Hashable, Sendable {
+    let id: UUID
+    var destination: ReaderDestination
+
+    init(id: UUID = UUID(), destination: ReaderDestination) {
+        self.id = id
+        self.destination = destination
+    }
+}
+
 struct ReadingHistoryEntry: Codable, Identifiable, Hashable, Sendable {
     var id: String { "\(moduleID):\(reference)" }
     let moduleID: String
