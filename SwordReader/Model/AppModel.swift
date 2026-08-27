@@ -13,6 +13,8 @@ final class AppModel {
     private(set) var appAppearance: AppAppearance
     private(set) var modules: [BibleModule] = []
     private(set) var keyedModules: [KeyedModule] = []
+    private(set) var readerTabs: [ReaderTab] = []
+    private(set) var selectedReaderTabID: ReaderTab.ID?
     private(set) var selectedModuleID: String?
     private(set) var books: [BibleBook] = []
     private(set) var selectedBookID: String?
@@ -357,6 +359,42 @@ final class AppModel {
     var currentDestination: ReaderDestination? {
         guard let selectedModuleID, !reference.isEmpty else { return nil }
         return ReaderDestination(moduleID: selectedModuleID, reference: reference)
+    }
+
+    func readerTabTitle(_ tab: ReaderTab) -> String {
+        let moduleTitle = modules.first {
+            $0.id == tab.destination.moduleID
+        }?.title ?? tab.destination.moduleID ?? "Bible"
+        return "\(moduleTitle) · \(tab.destination.reference)"
+    }
+
+    func createReaderTab() {
+        guard let currentDestination else { return }
+        let tab = ReaderTab(destination: currentDestination)
+        readerTabs.append(tab)
+        selectedReaderTabID = tab.id
+    }
+
+    func selectReaderTab(_ tabID: ReaderTab.ID) async {
+        guard tabID != selectedReaderTabID,
+              let tab = readerTabs.first(where: { $0.id == tabID })
+        else { return }
+        selectedReaderTabID = tabID
+        await open(destination: tab.destination)
+    }
+
+    func closeReaderTab(_ tabID: ReaderTab.ID) async {
+        guard readerTabs.count > 1,
+              let index = readerTabs.firstIndex(where: { $0.id == tabID })
+        else { return }
+
+        let wasSelected = selectedReaderTabID == tabID
+        readerTabs.remove(at: index)
+        guard wasSelected else { return }
+
+        let replacement = readerTabs[min(index, readerTabs.count - 1)]
+        selectedReaderTabID = replacement.id
+        await open(destination: replacement.destination)
     }
 
     var canMoveToPreviousChapter: Bool {
@@ -728,6 +766,8 @@ final class AppModel {
                 selectedChapter = 1
                 books = []
                 chapter = nil
+                readerTabs = []
+                selectedReaderTabID = nil
                 searchResults = []
                 section = .library
             }
@@ -769,6 +809,7 @@ final class AppModel {
 
     private func loadChapter() {
         chapterTask?.cancel()
+        synchronizeSelectedReaderTab()
         guard let selectedModuleID, !reference.isEmpty else {
             chapter = nil
             return
@@ -785,6 +826,19 @@ final class AppModel {
                 presentedError = PresentedError(error)
             }
             isLoading = false
+        }
+    }
+
+    private func synchronizeSelectedReaderTab() {
+        guard let currentDestination else { return }
+
+        if let selectedReaderTabID,
+           let index = readerTabs.firstIndex(where: { $0.id == selectedReaderTabID }) {
+            readerTabs[index].destination = currentDestination
+        } else {
+            let tab = ReaderTab(destination: currentDestination)
+            readerTabs = [tab]
+            selectedReaderTabID = tab.id
         }
     }
 

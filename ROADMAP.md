@@ -6,7 +6,7 @@ bed for public SwordKit releases. Complete and commit one milestone at a time.
 ## Completed
 
 - [x] Shared observable application model
-- [x] Public SwordKit 0.5.1 dependency
+- [x] Public SwordKit 0.6.0 dependency
 - [x] Adaptive iPhone, iPad, and Mac navigation shell
 - [x] Chapter reading and translation selection
 - [x] Cancellable Scripture search

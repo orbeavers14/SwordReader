@@ -173,6 +173,34 @@ struct AppModelTests {
         #expect(model.selectedModuleID == "WEB")
     }
 
+    @Test func readerTabsPreserveIndependentDestinations() async throws {
+        let model = AppModel(service: FakeScriptureService())
+        await model.start()
+
+        let firstTab = try #require(model.selectedReaderTabID)
+        let firstDestination = try #require(model.currentDestination)
+        #expect(model.readerTabs.count == 1)
+
+        model.createReaderTab()
+        let secondTab = try #require(model.selectedReaderTabID)
+        #expect(secondTab != firstTab)
+        #expect(model.readerTabs.count == 2)
+
+        let secondChapter = firstDestination.reference == "John 1" ? 2 : 1
+        model.select(bookID: "John", chapter: secondChapter)
+        #expect(
+            model.readerTabs.first { $0.id == secondTab }?.destination.reference
+                == "John \(secondChapter)"
+        )
+
+        await model.selectReaderTab(firstTab)
+        #expect(model.currentDestination == firstDestination)
+
+        await model.closeReaderTab(firstTab)
+        #expect(model.readerTabs.map(\.id) == [secondTab])
+        #expect(model.reference == "John \(secondChapter)")
+    }
+
     @Test func firstLaunchPresentsOnboardingUntilCompleted() async throws {
         let defaults = try #require(UserDefaults(suiteName: #function))
         defaults.removePersistentDomain(forName: #function)
