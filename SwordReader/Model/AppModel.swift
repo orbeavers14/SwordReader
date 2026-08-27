@@ -478,18 +478,30 @@ final class AppModel {
         readerTabs.count > 1 && selectedReaderTabID != nil
     }
 
-    func showSelectedTabsSideBySide() async {
-        guard let selectedReaderTabID,
-              let selectedIndex = readerTabs.firstIndex(where: {
-                  $0.id == selectedReaderTabID
-              }),
-              readerTabs.count > 1
-        else { return }
+    var sideBySidePair: SideBySideReaderPair? {
+        guard sideBySidePanes.count == 2 else { return nil }
+        return SideBySideReaderPair(
+            leading: sideBySidePanes[0],
+            trailing: sideBySidePanes[1]
+        )
+    }
 
-        let neighborIndex = selectedIndex < readerTabs.count - 1
-            ? selectedIndex + 1
-            : selectedIndex - 1
-        let paneIDs = Set([selectedReaderTabID, readerTabs[neighborIndex].id])
+    func neighboringReaderTab(for tabID: ReaderTab.ID) -> ReaderTab? {
+        guard readerTabs.count > 1,
+              let index = readerTabs.firstIndex(where: { $0.id == tabID })
+        else { return nil }
+        let neighborIndex = index < readerTabs.count - 1 ? index + 1 : index - 1
+        return readerTabs[neighborIndex]
+    }
+
+    func showSelectedTabsSideBySide() async {
+        guard let selectedReaderTabID else { return }
+        await showTabsSideBySide(startingWith: selectedReaderTabID)
+    }
+
+    func showTabsSideBySide(startingWith tabID: ReaderTab.ID) async {
+        guard let neighbor = neighboringReaderTab(for: tabID) else { return }
+        let paneIDs = Set([tabID, neighbor.id])
         let tabs = readerTabs.filter { paneIDs.contains($0.id) }
 
         do {

@@ -301,6 +301,8 @@ struct AppModelTests {
 
         await model.showSelectedTabsSideBySide()
 
+        let pair = try #require(model.sideBySidePair)
+        #expect([pair.leading.id, pair.trailing.id] == [firstTab, secondTab])
         #expect(model.sideBySidePanes.map(\.id) == [firstTab, secondTab])
         #expect(model.sideBySidePanes.map(\.destination.reference) == [firstDestination.reference, "John 2"])
         #expect(model.readerTabs.count == 2)
@@ -311,6 +313,21 @@ struct AppModelTests {
         #expect(model.readerTabs.map(\.id) == [firstTab, secondTab])
         #expect(model.selectedReaderTabID == secondTab)
         #expect(model.reference == "John 2")
+    }
+
+    @Test func closingMergedTabClearsStableSideBySidePair() async throws {
+        let model = AppModel(service: FakeScriptureService())
+        await model.start()
+        model.createReaderTab()
+        let selectedTab = try #require(model.selectedReaderTabID)
+
+        await model.showSelectedTabsSideBySide()
+        #expect(model.sideBySidePair != nil)
+
+        await model.closeReaderTab(selectedTab)
+        #expect(model.sideBySidePair == nil)
+        #expect(model.sideBySidePanes.isEmpty)
+        #expect(model.readerTabs.count == 1)
     }
 
     @Test func readerTabCanChangeModuleWithoutChangingOtherTabs() async throws {

@@ -22,8 +22,8 @@ struct ReaderView: View {
                 }
             } else if model.isLoading && model.chapter == nil {
                 ProgressView("Loading chapter…")
-            } else if model.sideBySidePanes.count == 2 {
-                sideBySideContent
+            } else if let pair = model.sideBySidePair {
+                sideBySideContent(pair)
             } else if let chapter = model.chapter {
                 chapterContent(chapter)
             } else {
@@ -123,7 +123,7 @@ struct ReaderView: View {
             ReaderAppearanceMenu()
         }
 
-        if model.sideBySidePanes.count == 2 {
+        if model.sideBySidePair != nil {
             ToolbarItem(placement: .secondaryAction) {
                 Button("Split Back into Tabs", systemImage: "rectangle.split.1x2") {
                     model.splitSideBySideTabs()
@@ -208,22 +208,22 @@ struct ReaderView: View {
         ChapterNavigationView().environment(model)
     }
 
-    private var sideBySideContent: some View {
+    private func sideBySideContent(_ pair: SideBySideReaderPair) -> some View {
         GeometryReader { proxy in
             let isWide = proxy.size.width >= 700
             Group {
                 if isWide {
                     HStack(spacing: 0) {
-                        sideBySidePane(model.sideBySidePanes[0])
+                        sideBySidePane(pair.leading)
                             .frame(width: max(0, (proxy.size.width - 12) * sideBySideRatio))
                         resizablePaneDivider(totalWidth: proxy.size.width)
-                        sideBySidePane(model.sideBySidePanes[1])
+                        sideBySidePane(pair.trailing)
                     }
                 } else {
                     VStack(spacing: 0) {
-                        sideBySidePane(model.sideBySidePanes[0])
+                        sideBySidePane(pair.leading)
                         Divider()
-                        sideBySidePane(model.sideBySidePanes[1])
+                        sideBySidePane(pair.trailing)
                     }
                 }
             }
@@ -411,6 +411,17 @@ private struct ReaderTabBar: View {
                                 }
                             }
                         }
+                        if let neighbor = model.neighboringReaderTab(for: tab.id) {
+                            Divider()
+                            Button(
+                                "Show Side by Side with \(model.readerTabTitle(neighbor))",
+                                systemImage: "rectangle.split.2x1"
+                            ) {
+                                Task {
+                                    await model.showTabsSideBySide(startingWith: tab.id)
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -420,6 +431,26 @@ private struct ReaderTabBar: View {
                 .labelStyle(.iconOnly)
                 .buttonStyle(.borderless)
                 .help("New Reading Tab")
+
+                if model.sideBySidePair != nil {
+                    Button("Split Back into Tabs", systemImage: "rectangle.split.1x2") {
+                        model.splitSideBySideTabs()
+                    }
+                    .labelStyle(.iconOnly)
+                    .buttonStyle(.borderless)
+                    .help("Split Back into Tabs")
+                } else if let selectedTabID = model.selectedReaderTabID,
+                          let neighbor = model.neighboringReaderTab(for: selectedTabID) {
+                    Button(
+                        "Show Side by Side with \(model.readerTabTitle(neighbor))",
+                        systemImage: "rectangle.split.2x1"
+                    ) {
+                        Task { await model.showSelectedTabsSideBySide() }
+                    }
+                    .labelStyle(.iconOnly)
+                    .buttonStyle(.borderless)
+                    .help("Show Side by Side with \(model.readerTabTitle(neighbor))")
+                }
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
