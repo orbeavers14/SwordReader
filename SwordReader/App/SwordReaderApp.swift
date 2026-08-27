@@ -3,24 +3,25 @@ import SwiftUI
 @main
 struct SwordReaderApp: App {
     var body: some Scene {
-        #if os(macOS)
-        Settings {
-            PreferencesSceneView()
-        }
-        #endif
-
         WindowGroup {
             SwordReaderSceneView()
         }
         #if os(macOS)
         .defaultSize(width: 1_100, height: 760)
+        .commands { SwordReaderCommands() }
         #endif
+
         WindowGroup("Passage", for: ReaderDestination.self) { destination in
             SwordReaderSceneView(initialDestination: destination.wrappedValue)
         }
         #if os(macOS)
         .defaultSize(width: 1_100, height: 760)
-        .commands { SwordReaderCommands() }
+        #endif
+
+        #if os(macOS)
+        Settings {
+            PreferencesSceneView()
+        }
         #endif
     }
 }

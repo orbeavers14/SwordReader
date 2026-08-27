@@ -26,7 +26,7 @@ struct SwordReaderCommands: Commands {
                 .keyboardShortcut(.rightArrow, modifiers: [.command])
                 .disabled(model == nil)
             Divider()
-            ForEach(AppSection.allCases) { section in
+            ForEach(AppSection.primarySections) { section in
                 Button(section.title) { model?.section = section }
                     .keyboardShortcut(section.keyboardKey, modifiers: [.command])
                     .disabled(model == nil)
@@ -42,7 +42,7 @@ private extension AppSection {
         case .plans: "2"
         case .search: "3"
         case .library: "4"
-        case .settings: "5"
+        case .settings: "4"
         }
     }
 }

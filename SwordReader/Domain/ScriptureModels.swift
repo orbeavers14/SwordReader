@@ -476,6 +476,10 @@ enum AppSection: String, CaseIterable, Identifiable, Sendable {
 
     var id: Self { self }
 
+    static var primarySections: [Self] {
+        allCases.filter { $0 != .settings }
+    }
+
     var title: String {
         switch self {
         case .read: String(localized: "Read")

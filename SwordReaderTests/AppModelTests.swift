@@ -4,6 +4,11 @@ import Testing
 
 @MainActor
 struct AppModelTests {
+    @Test func primaryNavigationExcludesSettings() {
+        #expect(AppSection.primarySections == [.read, .plans, .search, .library])
+        #expect(AppSection.allCases.contains(.settings))
+    }
+
     @Test func keyedEntryFormatterRendersHTMLWithoutShowingMarkup() {
         let entry = KeyedModuleEntry(
             key: "/Book/Chapter III",

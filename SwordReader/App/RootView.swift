@@ -82,7 +82,7 @@ private struct SplitRootView: View {
 
     var body: some View {
         NavigationSplitView {
-            List(AppSection.allCases) { section in
+            List(AppSection.primarySections) { section in
                 Button {
                     model.section = section
                 } label: {
