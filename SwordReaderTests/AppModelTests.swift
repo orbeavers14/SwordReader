@@ -313,6 +313,37 @@ struct AppModelTests {
         #expect(model.reference == "John 2")
     }
 
+    @Test func readerTabCanChangeModuleWithoutChangingOtherTabs() async throws {
+        let defaults = try #require(UserDefaults(suiteName: #function))
+        defaults.removePersistentDomain(forName: #function)
+        let modules = [
+            BibleModule(id: "WEB", title: "World English Bible", language: "en", version: nil, copyright: nil),
+            BibleModule(id: "KJV", title: "King James Version", language: "en", version: nil, copyright: nil),
+        ]
+        let model = AppModel(
+            service: FakeScriptureService(modules: modules),
+            defaults: defaults
+        )
+        await model.start()
+
+        let firstTab = try #require(model.selectedReaderTabID)
+        model.createReaderTab()
+        let secondTab = try #require(model.selectedReaderTabID)
+        let reference = model.reference
+
+        await model.setReaderTabModule(firstTab, moduleID: "KJV")
+
+        #expect(model.readerTabs.first { $0.id == firstTab }?.destination.moduleID == "KJV")
+        #expect(model.readerTabs.first { $0.id == firstTab }?.destination.reference == reference)
+        #expect(model.readerTabs.first { $0.id == secondTab }?.destination.moduleID == "WEB")
+        #expect(model.selectedReaderTabID == secondTab)
+        #expect(model.selectedModuleID == "WEB")
+
+        await model.selectReaderTab(firstTab)
+        #expect(model.selectedModuleID == "KJV")
+        #expect(model.reference == reference)
+    }
+
     @Test func firstLaunchPresentsOnboardingUntilCompleted() async throws {
         let defaults = try #require(UserDefaults(suiteName: #function))
         defaults.removePersistentDomain(forName: #function)

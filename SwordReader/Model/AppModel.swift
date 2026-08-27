@@ -439,6 +439,41 @@ final class AppModel {
         readerTabs.insert(tab, at: targetIndex)
     }
 
+    func setReaderTabModule(_ tabID: ReaderTab.ID, moduleID: String) async {
+        guard modules.contains(where: { $0.id == moduleID }),
+              let index = readerTabs.firstIndex(where: { $0.id == tabID }),
+              readerTabs[index].destination.moduleID != moduleID
+        else { return }
+
+        let currentReference = readerTabs[index].destination.reference
+        let destination: ReaderDestination
+        do {
+            _ = try await service.chapter(currentReference, moduleID: moduleID)
+            destination = ReaderDestination(
+                moduleID: moduleID,
+                reference: currentReference
+            )
+        } catch {
+            do {
+                guard let firstBook = try await service.books(moduleID: moduleID).first else {
+                    throw error
+                }
+                destination = ReaderDestination(
+                    moduleID: moduleID,
+                    reference: "\(firstBook.name) 1"
+                )
+            } catch {
+                presentedError = PresentedError(error)
+                return
+            }
+        }
+
+        readerTabs[index].destination = destination
+        if selectedReaderTabID == tabID {
+            await open(destination: destination)
+        }
+    }
+
     var canShowSelectedTabsSideBySide: Bool {
         readerTabs.count > 1 && selectedReaderTabID != nil
     }

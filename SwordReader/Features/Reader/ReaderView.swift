@@ -392,6 +392,26 @@ private struct ReaderTabBar: View {
                         model.moveReaderTab(draggedID, to: tab.id)
                         return true
                     }
+                    .contextMenu {
+                        Menu("Translation", systemImage: "character.book.closed") {
+                            ForEach(model.modules) { module in
+                                Button {
+                                    Task {
+                                        await model.setReaderTabModule(
+                                            tab.id,
+                                            moduleID: module.id
+                                        )
+                                    }
+                                } label: {
+                                    if tab.destination.moduleID == module.id {
+                                        Label(module.title, systemImage: "checkmark")
+                                    } else {
+                                        Text(module.title)
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
 
                 Button("New Tab", systemImage: "plus") {
